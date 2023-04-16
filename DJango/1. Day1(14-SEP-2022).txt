@@ -1,0 +1,110 @@
+===>> DJANGO Framework Web-Development::-
+(Web-Applications in DJANGO)
+
+==> What is DJANGO??
+= Python is Compl.P.lang, using which we dev. End-user comp.app's
+Ex:-
+	Notepad-app
+	calculator-app
+	office-app
+	etc...
+	
+=> Def(DJANGO)::-
+	= DJANGO is Python-Framework, using which we develop real-time computer web-applications
+	(web-application means website)
+	Ex:-
+		www.gmail.com
+		www.facebook.com
+		www.sbi.co.in
+
+=*** A website is collection of Webpages
+Ex:-
+	https://news.google.com/		(website)
+	(coll.of.webpages)
+	=> India-news
+	=> World-News
+	=> Local-News
+	=> Buss.-News
+	=> Sports-News
+	....etc
+
+=> Webpage(Def:-)	
+	=  A webpage is presentation of Data, in the form of 
+	Ex:-
+		Text,
+		Images,
+		Audio,
+		Video,
+		Graphics
+		etc...
+		
+=> To develop any webpage, we use UI-Technologies
+(User-Interface technologies)
+Ex:-
+	HTML,		(Stardard UI-Technologies)
+	CSS,
+	Javascript,
+	---------------
+	Bootstrap,		(Advanced UI-Technologies)
+	JQuery,
+	Angular,
+	ReactJS
+	....etc
+	
+NOTE::-
+= To access any webpage, we require Browser-software
+Ex:-
+	Google Chrome
+	Mozilla Firefox
+	Apple Safari
+	...etc
+	
+***= In every Browser-software, we have in-built support for HTML-parser, CSS-coder, Javascript-engine
+
+
+==>> What is Framework??
+= A Framework is coll.of. Runtime-Libraries+Runtime-Environment, using which we develop web-applications(Simple,Easy,Quick,Fast) 
+Ex:-
+	Python DJango Framework (MVT-approach)
+	Java Spring Framework(MVC-approach)
+	.Net MVC Framework (MVC-approach)
+	...etc
+	
+Ex:-(Ui-Frameworks) ---> mini/micro frameworks
+	AngularJS
+	Angular(typescript)
+	ReactJS
+	
+NOTE:-
+= MVT(Model-View-Template) approach of developing web-application is "very-Simple & very-Easy" when compared to MVC(Model-View-Controller) approach
+(*** in MVT-approach we have less-coding & short-time development of web-applications)
+
+
+==>> Web-Application development::-
+(3-Tier Archictecture)
+= To develop any web-application(Website), we use 3-Tier Archictecture
+= It is a model use in IT-companies for developing real-time websites
+= 3-Tier is Divided into 3-sections/layers
+	1) Tier-1 (Client) -> Front-end-layer(Presentation-layer)
+	2) Tier-2 (Server) -> Middleware-layer(Buss.Logic-layer)
+	3) Tier-3 (Database) -> Backend-Layer(Data-Storage-Layer)
+	
+==Diagram==
+Client -------------------->Server------------------> Database
+(End-user)				 =accept		   =Data(info)base(store)
+(PC/Laptop/Mobile)		 =process		   =Ex:-Student-table
+(Browser-s/w)			 =response			(store/modify/del)
+Ex:- www.gmail.com		(Server-s/w)	   =provides datatoserver
+(request to server)		= Py.DJango code	"Database-tech"
+(response as webpage)	= Py.DJango.Server	Ex:- MySQL/Oracle
+(webpage in browser)	(DJango-Framework)	
+(text/imgs/links...)
+"Ui-tech"				"Server-side-tech"	= Back-end-tech
+Ex:- HTML/CSS/JScript	"Middleware-tech"	"Data-Storage-Layer"
+(Front-end-tech)		"Buss.Logic-Layer"	
+"Presentation-Layer"
+
+
+
+NOTE:-
+=> Ui-Tech + Server-side-Tech + Database-Tech = Python Full-Stack-Dev

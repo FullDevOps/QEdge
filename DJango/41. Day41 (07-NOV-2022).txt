@@ -1,0 +1,274 @@
+==> Django Real Time Project:::-
+(Live-on-server-hosting)
+
+****Project-Name::- (Blog Application Development)****
+-----------------------------------------------------------
+
+==> Some basics of coding::-
+------------------------------------
+**(Drop-down/Choice field in models.py)** List-box/Combo-box)
+==> How to specify dropdown choice field in models.py::-
+class Post(models.Model):
+	STATUS_CHOICES=(('draft', 'Draft'),('published','Published'))
+	status=models.CharField(max_length=10,choices=STATUS_CHOICES,default='draft')
+
+
+===> slug field::-
+(dynamic url for our links in webpage)
+(Based on selected url or link)
+(use this in model-class i.e, models.py)
+
+slug = models.SlugField(max_length=256, unique_for_date='publish')
+
+****tech-points::-
+= slug field can be used in urls
+= A slug is a short label containing only alphabet symbols, numbers, underscore symbol and hyphens
+= Use??
+We can use slug field to build human understandable and SEO friendly  dynamic-URLs
+= unique_for_date="" para/arg specifies that slug is unique per publish date
+
+
+===> ForeignKey in models.py:-
+(child-table to parent-table relationship)
+Ex:--
+author = models.ForeignKey(User,related_name='blog-posts')
+
+(auth_user is a table in mysql)
+(posts table also in mysql)
+==Diagram==
+
+*** The value of author must be one of users in default auth application(django.contrib.auth). Multiple posts can be published by same author (same User). Hence it represents MANY-TO-ONE relationship.
+We can specify reverse relationship from User to Post with the related_name attribute.
+
+
+===> DateTimeField:-
+publish = models.DateTimeField(default=timezone.now)
+(We have to use the following import,
+-> "from django.utils import timezone")
+
+
+
+
+*****Start-Project-coding*****
+(projectname: "BlogRealTimeProject")
+(appname: "BlogApp")
+*********************************
+Ex:-
+*** models.py (BlogApp main-folder)
+-------------------------------------
+from django.db import models
+# Create your models here.
+from django.db import models
+from django.contrib.auth.models import User #user-authentication
+from django.utils import timezone
+# Create your models here.
+class Post(models.Model):
+	STATUS_CHOICES=(('draft', 'Draft'), ('published', 'Published'));
+	title=models.CharField(max_length=264)
+	slug=models.SlugField(max_length=264,unique_for_date='publish')
+	author=models.ForeignKey(User,related_name='blog_posts',on_delete=models.CASCADE)
+	body=models.TextField()
+	publish=models.DateTimeField(default=timezone.now)
+	created=models.DateTimeField(auto_now_add=True) #datetime of create() action
+	updated=models.DateTimeField(auto_now=True)  #datetime of save() action
+	status=models.CharField(max_length=10,choices=STATUS_CHOICES,default='draft')
+	class Meta:
+		ordering=('-publish',)
+		def __str__(self):			#for admin-page-display
+			return self.title
+
+
+Now,
+===>pytz Module (Python Timezone Module):
+= Timezone definitions are required for python and used by SQLite(MySQL) to work with datetimes
+= pytz module provides timezone definitions. Hence we required to install explicitly
+
+cmd> pip install pytz
+
+=**Note:-
+Python 3.X alerady contains this module and we are not required to install it explicitly(manually)
+
+=**Note:- 
+= Django also provides inbuilt support for timezones. 
+In settings.py the following attribute already defined.
+Ex:-
+TIME_ZONE = 'UTC'
+USE_TZ = True
+
+
+Now,
+===> Customization of Admin Interface:-
+(http://localhost:8000/admin)
+= We can customize admin interface for our model by defining ModelAdmin class(admin.py) (PostAdmin-class)
+= In this class we can specify the following properties based on our requirement.
+Ex:-
+1) list_display:
+	= Here we have to specify the field names which have to display.
+2) list_filter
+	= To filter records based on our provided fields
+	= list_filter=('status','created', 'publish', 'author')
+	= As the result, on the Right hand side side bar will be appeared for filtering purpose(filter-data)
+3) search_fields
+	= search_fields=('title','body')
+	= A search bar appeared on the page
+4) prepopulated_fields
+	= prepopulated_fields={'slug':('title',)}
+	= If we type title then the same value will be considered automatically for the slug field also
+5) raw_id_fields
+	= raw_id_fields=('author',)
+	= "author" field is displayed with lookup widget, that can scale better than dropdown list. This is helpful if huge number of values are available.
+6) date_hierarchy
+	= date_hierarchy='publish'
+	= Below search button, we can see a bar to navigate quickly based on published date
+7) ordering
+	= ordering=['status', 'publish']
+	= To display records according to specified order
+
+
+Ex:-
+==> admin.py (BlogApp app-main-folder)
+--------------------------------------
+from django.contrib import admin
+from BlogApp.models import Post
+# Register your models here.
+class PostAdmin(admin.ModelAdmin):
+    list_display=['title','slug', 'author', 'publish', 'created', 'updated','status']
+    list_filter=('status','created','publish','author')
+    search_fields=('title','body')
+    prepopulated_fields={"slug":('title',)}
+    raw_id_fields=('author',)
+    ordering=['status','publish']
+
+admin.site.register(Post, PostAdmin)
+
+
+
+(Do in last...or here only...)
+==** Perform MYSQL-DB-Settings & Configurations::-
+(create database blogdb)
+mysql> create database blogdb;
+mysql> use blogdb;
+mysql> show tables;
+mysql>
+
+Now,
+Ex:-
+settings.py (BlogRealTimeProject conf-folder)
+------------------------------------------------------
+DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+    'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'HOST': 'localhost',
+            'PORT': '3306',		#3306 or 3308
+            'NAME': 'blogdb',
+            'USER': 'root',
+            'PASSWORD': 'root',
+        }
+}
+
+Now,
+=> install mysqlclient
+cmd> pip install --only-binary :all: mysqlclient
+
+=> Verify DB connection from Django to MySQL-db,
+cmd> py manage.py shell
+>>> from django.db import connection
+>>> mycursor = connection.cursor()
+>>> print(mycursor)
+>>> exit();
+
+=> perform makemigrations
+cmd> py manage.py makemigrations
+Migrations for 'BlogApp':
+  BlogApp\migrations\0001_initial.py
+    - Create model Post
+
+
+=> perform sqlmigrate
+cmd> py manage.py sqlmigrate BlogApp 0001
+
+=> run migrate
+cmd> py manage.py migrate
+
+=> Optionally, also verify tables in mysql-db,
+mysql> show tables;
++----------------------------+
+| Tables_in_blogdb           |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| blogapp_post               |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
++----------------------------+
+
+=> Optionally create admin-login-interface(username/pwd) using superuser
+cmd> py manage.py createsuperuser
+uname:sai
+pwd:sai
+
+(***)
+=> Now start-server & request below URL for admin-login-interface
+http://localhost:8000/admin/
+(login with sai/sai)
+(perform required operations on Posts table)
+(insert/update/delete operations...) ---> Not-Req as of now...
+
+=> Optionally, also verify details in mysql-db,
+mysql> select * from blogapp_post;
+Empty set (0.00 sec)
+
+
+Now,
+*** Implementation of List-View and Detail-View By using FBVs::-
+----------------------------------------------------------------
+Ex:-
+==>views.py (BlogApp main-folder)
+------------------------------------
+from django.shortcuts import render,get_object_or_404
+from BlogApp.models import Post
+
+# Create your views here.
+def post_list_view(request):
+    post_list=Post.objects.all();
+    return render(request,'BlogApp/post_list.html',{"post_list":post_list})
+
+def post_detail_view(request, year,month,day,post):
+    post=get_object_or_404(Post,slug=post,
+        status='published',
+        publish__year=year,
+        publish__month=month,
+        publish__day=day);
+    return render(request, "BlogApp/post_detail.html",{'post':post})
+
+
+Ex:-
+==> urls.py (BlogRealTimeProject conf-folder)
+----------------------------------------------------
+from django.contrib import admin
+from django.urls import path,re_path
+from BlogApp import views
+
+urlpatterns =[
+ 	path('admin/', admin.site.urls),
+ 	path('^(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/(?P<post>[-\w]+)/$', views.post_detail_view,name='post_detail'),
+
+    #use-in-last
+    re_path('^.*$', views.post_list_view),
+ ]
+
+
+NOTe:-
+= optinally run-server and goto home-url,
+http://localhost:8000/
+(We get errror... post_list.html does not exists)

@@ -1,0 +1,393 @@
+***DJango-Live-Project*** (BlogApp)
+--------------------------------------------
+(Working with similar-posts in BlogApp)
+===> How to display similar posts::-
+1) Retrieve all tags for the current post
+2) Get all posts that are tagged with any of those tags
+3) Exclude current post from the list to avoid recommended the same post
+4) Order the results by number of tags shared with the current post
+5) If two or more posts with the same number of tags, recommend the most recent post
+6) Limit the query to the number of posts we have to recommend
+
+
+***Start-coding***
+-----------------------
+Ex:- (in views.py for post_detail_view)
+from django.db.models import Count
+......
+post_tags_ids=post.tags.values_list('id',flat=True)
+similar_posts=Post.objects.filter(tags__in=post_tags_ids).exclude(id=post.id)
+similar_posts=similar_posts.annotate(same_tags=Count('tags')).order_by('-same_tags', 'publish')[:4]
+		
+***
+Note: By using annotate() function, we can add fields to the query. In the above code,
+Count() function returned value we are assigning to same_tags variable and this variable
+can be used in next level.
+
+Ex:-
+==> views.py (BlogApp main-folder)
+-----------------------------------------
+ #comment form-view
+from BlogApp.models import Comment
+from BlogApp.forms import CommentForm
+from django.db.models import Count
+
+def post_detail_view(request, year,month,day,post):
+    post=get_object_or_404(Post,slug=post,
+                status='published',
+                publish__year=year,
+                publish__month=month,
+                publish__day=day)
+    post_tags_ids = post.tags.values_list('id', flat=True)
+    similar_posts = Post.objects.filter(tags__in=post_tags_ids).exclude(id=post.id)
+    similar_posts = similar_posts.annotate(same_tags=Count('tags')).order_by('-same_tags', 'publish')[:4]
+
+    comments=post.comments.filter(active=True)
+    csubmit=False
+    if request.method=='POST':
+        form=CommentForm(data=request.POST)
+        if form.is_valid():
+            new_comment=form.save(commit=False)
+            new_comment.post=post
+            new_comment.save()
+            csubmit=True
+    else:
+        form=CommentForm()
+    return render(request,'BlogApp/post_detail.html',{"post":post, 'form':form, 'comments':comments,'csubmit':csubmit,'similar_posts':similar_posts})
+
+
+
+Ex:-
+post_detail.html (BlogApp main-folder) -> make modifications
+---------------------------------------------------------------
+(In this html page we have to display similar posts)
+<h2>Similar Posts</h2>
+{%if similar_posts%}
+	{%for post in similar_posts%}
+		<h3> <a href="{{post.get_absolute_url}}">{{post.title}}</a> </h3>
+	{%endfor%}
+{%else%}
+	<p>No Similar Posts yet</p>
+{%endif%}
+
+
+Ex:-
+***complete file***
+post_detail.html (BlogApp main-folder)
+--------------------------------------------
+<!DOCTYPE html>
+{%extends 'BlogApp/base.html'%}
+{%block title %}{{post.title}}{%endblock%}
+{%block content%}
+    <h1>{{post.title}}</h1>
+    <hr />
+    <p id='date'>Published on {{post.publish}} by {{post.author|title}}</p>
+    {{post.body|linebreaks}}
+    <br />
+    <a href="/{{post.id}}/share/" class="btn btn-lg btn-warning">Share Post By Email</a>
+    <br/><br/>
+    <h4 style="color:darkblue;text-decoration: underline;">Similar Posts</h4>
+    {%if similar_posts%}
+    {%for post in similar_posts%}
+        <h5> <a href="{{post.get_absolute_url}}">{{post.title}}</a> </h5>
+    {%endfor%}
+    {%else%}
+    <p>No Similar Posts yet</p>
+    {%endif%}
+
+    <br />
+    {% with comments.count as comments_count%}
+        <h2 style="text-decoration: underline;">{{comments_count}} Comment{{comments_count|pluralize}}</h2>
+    {%endwith%}
+    {%if comments %}
+        {%for comment in comments %}
+            <p id='ch' style="font-style: italic;background-color: green;"> comment {{forloop.counter}} by {{comment.name}} on {{comment.created}}</p>
+		    <div class="cb" style="color:yellow;">{{comment.body|linebreaks}}</div>
+ 	        <hr />
+ 	    {%endfor%}
+ 	{%else%}
+ 	    <p>There are NO Comments Yet !!!</p>
+ 	{%endif%}
+ 	{%if csubmit %}
+		<h2>Your Comment Added Succefully</h2>
+ 	{%else%}
+        <form method="post">
+            {{form.as_p}}
+            {%csrf_token%}
+            <input type="submit" name="" value="Submit-Comment">
+        </form>
+ 	{%endif%}
+{%endblock%}
+
+
+
+Ex:-
+==** Now re-run the server & verify the above content in post_detail.html page
+(click post topic link & verify...)
+(http://localhost:8000/)
+
+
+
+(******)
+Now,(new-concept)
+===> Custom Template Tags: (in BlogApp)
+---------------------------------------------
+(Django provide a big list of predefined template-tags like as follows)
+Ex:-
+{{post.title}}		#template-var-tag
+{%csrf_token%}		#template-coding-tag
+{%if post_list %} {%endif %}		#template-coding-tag(if)
+{%for post in post_list%}.....{%endfor%}	#template-coding-tag(for)
+etc...
+
+=*** Sometimes these predefined tags may not fulfill our requirement. In this case we can define our own template tag based on our required functionality,such type of tags are called Custom-Template-Tags.
+
+
+****
+(3-ways to work with Custom-Template-Tags)
+===> 3-Utility-Functions to define Custom Template Tags::-
+(3-helper-functions)
+= Django provides the following 3-helper-functions for creating our own template tags.
+1) simple_tag:- Perform some processing/work/oper and returns a string
+2) inclusion_tag: Perform some processing/oper and returns a rendered template(html-code)
+3) assignment_tag: Perform some processing/oper and assign the result to a variable in the context(var)
+
+
+(How to code??)
+===> How to Create Custom Template Tag:
+1) Inside our application folder(BlogApp) create a folder named with 'templatetags'
+***add/register this folder in settings.py***
+Ex:-
+    'DIRS': [BASE_DIR / 'templates',BASE_DIR / 'templatetags' ]
+
+2) In that 'templatetags' folder,create an empty file __init__.py,so that this folder is considered as python package
+3) in that 'templatetags' folder, create a python file(BlogApp_tags.py) to hold/write custom-template-tags
+(AppName_tags.py ---> is the syntax....use same-syntax(mandatory))
+....
+	BlogApp
+	|-.....
+	|-templatetags
+		|- __init__.py	#create it manually...
+		|- BlogApp_tags.py
+
+
+		
+**** Note: 
+= custom-template-tags should be placed in application folder but not in project folder(**)
+
+Now,(case-1) simple_tag()
+===> Usage of simple tag to return number of posts published:-
+Ex:-
+*** BlogApp_tags.py (BlogApp/template-tags folder)
+---------------------------------------------------
+from django import template
+from BlogApp.models import Post
+register = template.Library()
+
+@register.simple_tag
+#@register.simple_tag(name='my_tag')
+def total_posts():
+    return Post.objects.count()
+
+
+** Note:-
+1) By using register variable we can register template tags with Library.
+2) By default function name (total_posts) will become tag-name.But we can specify our own name as follows
+Ex:-
+	@register.simple_tag(name='my_tag')
+	
+
+Now,	
+===> How to use Custom-Template-Tags in html-page::-
+1) We have to load custom tag functionality as follows,
+Ex:-
+	{%load BlogApp_tags%}
+2) We can call template tag as follows,
+Ex:-
+	{%total_posts%}
+	(or)
+	{%my_tag%}
+
+Ex:-
+*** base.html (BlogApp main-folder)
+------------------------------------------
+<!DOCTYPE html>
+{%load BlogApp_tags%}
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <link rel="stylesheet" href="{% static 'css/blog.css'%}">
+        <title>{%block title%}{%endblock%}</title>
+    </head>
+    <body>
+        <div class="content">
+            {%block content%}{%endblock%}
+        </div>
+        <div class="sidebar">
+            <h2>SAI-SIR BLOG</h2>
+            <p>Watch here for Python Related content..!!</p>
+            <p>The total number of published posts till today: {%total_posts%}</p>
+        </div>
+    </body>
+</html>
+
+==** Now re-run the server & verify the above content in home-page
+(http://localhost:8000/)
+
+
+
+
+***Now(case-2), inclusion_tag()
+===> Usage of inclusion_tag to display Latest Posts::-
+= The most commonly used and powerful utility function is inclusion_tag
+
+Ex:-
+*** BlogApp_tags.py (BlogApp/template-tags folder)
+-------------------------------------------------------
+@register.inclusion_tag('BlogApp/latest_posts.html')
+def show_latest_posts(count=5):
+    latest_posts=Post.objects.order_by('-publish')[:count]
+    return {'latest_posts':latest_posts}
+	
+	
+Ex:-
+*** latest_posts.html (templates/BlogApp folder)
+----------------------------------------------------
+<ul>
+    {%for post in latest_posts %}
+        <li><a href="{{post.get_absolute_url}}">{{post.title}}</a></li>
+    {% endfor %}
+</ul>
+
+
+Ex:-
+*** base.html (templates/BlogApp folder)
+----------------------------------------------------
+<!DOCTYPE html>
+{%load BlogApp_tags%}
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <link rel="stylesheet" href="{% static 'css/blog.css'%}">
+        <title>{%block title%}{%endblock%}</title>
+    </head>
+    <body>
+        <div class="content">
+            {%block content%}{%endblock%}
+        </div>
+        <div class="sidebar">
+            <h2>SAI-SIR BLOG</h2>
+            <p>Watch here for Python Related content..!!</p>
+            <p>The total number of published posts till today: {%total_posts%}</p>
+            <h3>Latest Posts:</h3>{% show_latest_posts 100%}
+        </div>
+    </body>
+</html>
+
+
+
+Ex:-
+==** Now re-run the server & verify the above content in home-page
+(http://localhost:8000/)
+
+
+
+Now(case-3) assignment_tag()
+===> Usage of assignment_tag to display Most Commented Posts::-
+= assignment_tag is exactly same as simple_tag except that it stores the result in the given variable.
+Ex:-
+*** BlogApp_tags.py (BlogApp/template-tags folder)
+-------------------------------------------------------
+from django.db.models import Count
+#@register.assignment_tag 	#not-working
+@register.simple_tag		#hence use simple_tag
+def get_most_commented_posts(count=5):
+    return Post.objects.annotate(total_comments=Count('comments')).order_by('-total_comments')[:count]
+
+
+Ex:-
+*** base.html (templates/BlogApp folder)
+----------------------------------------------------------
+<!DOCTYPE html>
+{%load BlogApp_tags%}
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <link rel="stylesheet" href="{% static 'css/blog.css'%}">
+        <title>{%block title%}{%endblock%}</title>
+    </head>
+    <body>
+        <div class="content">
+            {%block content%}{%endblock%}
+        </div>
+        <div class="sidebar">
+            <h2>SAI SIR BLOG..!!</h2>
+            <p>Watch here for Python Related content..!!</p>
+            <p>The total number of published posts till today: {%my_tag%}</p>
+            <h3>Latest Posts:</h3>{% show_latest_posts 5%}
+            <h3>Most Commented Posts:</h3>
+            {% get_most_commented_posts as most_commented_posts%}
+            <ul>
+                {% for post in most_commented_posts %}
+                    <li><a href="{{post.get_absolute_url}}"><span id='la'>{{post.title}}</span></a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </body>
+</html>
+
+Ex:-
+***blog.css**
+----------------
+#la{
+    background-color: white;
+}
+
+
+Ex:-
+==** Now re-run the server & verify the above content in home-page
+(http://localhost:8000/)
+
+
+
+
+"Assignments" in Real-time-Project(BlogApp)
+---------------------------------------------
+1) Push this BlogProject to github.com
+2) From github.com deploy our Project on pythonanywhere.com
+(use your own new-accounts)
+3) make tinyurl.com for your live-project-website-address
+-----------------------------------------------------------
+
+4) Now Add-Post button below main-home-page Title, provide login-page & then followed by Post-Form
+(posted post should goto directly to BlogApp_post table in DB)
+
+5) Also while adding-post put 1 text-field adding tags directly to that particular post
+(in views.py func after submitting the form)
+post=Post.objects.get(id=dynamicid)
+post.tags.add(form.cleaned_data['tagfield'])
+
+6) Also provide images/video uploads in Post-Form
+Ex:-
+<input type="file" name="" value="" />
+(use image/video files only)
+Hint:-
+------
+= Uploaded file should come to view-func
+= get that file-data(binary-files)
+= store that file in static/user/<<username>>
+(use binary-files read(rb) & write(wb))
+
+= this image/video display in post_detail page using
+<img /> tag (or) <video> tag
+
+
+
+
+

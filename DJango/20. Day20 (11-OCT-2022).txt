@@ -1,0 +1,471 @@
+(*****)
+------------------------------------------------------------------
+==>> Form Validations in DJango-Forms::-
+= Validation means checking whether our input-data in form is correct or not
+= Once we submit the DJango-form, we have to perform validations like
+Ex:-
+    Input-field should not be empty
+    The min & max number of characters should be 6 & 15
+    The first character of the name should be 'E' 
+	etc....
+
+=*** Basically we do client-side validations in HTML-regex or Jscript coding (not advisable)
+
+= However, We can implement validation logic in DJango-forms(Apps) 2-ways,
+   (1) Explicity(Manually) done by the programmer by using clean-methods (forms.py)
+   (2) By using Django inbuilt-validators-funcs(Auto.)
+
+Note: All validations should be implemented in the "forms.py" file only
+
+
+(****)
+(Form-Validations using Clean-Methods)
+1) Explicitly by the Programmer by using Clean Methods::-
+= These validations are done by developers(manually) by using below-method,
+= The syntax of clean method is,
+Syntax:-
+	def clean_fieldname(self):		#fieldname changes wrt form...
+Ex:-
+	def clean_rno(self):
+	def clean_sname(self):
+	def clean_password(self):
+
+NOTE:-	
+= In the FormClass for any field if we define clean method then at the time of submitting the form, and Django will call this method automatically to perform validations. 
+= If the clean-method won't raise any Error... then only form will be submitted o.w form is not submitted to server
+= Write all these clean-methods inside FormClass itself, after defining all the form-fields...
+(inside clean-methods only we give error-msgs)
+
+==> Re-use prev. Project & App with FeedBack-form program
+---------------------------------------------------------------
+Ex:- (forms.py)
+from django import forms;
+from django.core import validators      #with validations
+class FeedBackForm(forms.Form):
+    name = forms.CharField()
+    rollno = forms.IntegerField()
+    email = forms.EmailField()
+    feedback = forms.CharField(widget=forms.Textarea);
+
+    def clean_name(self):	#for "name" input-field
+        print('validating name-field');
+        inputname = self.cleaned_data['name'];
+        if len(inputname) < 5:
+            raise forms.ValidationError('Min. no-of-chars in name-field should be 5..!!');
+        return inputname;
+   
+= The returned value of clean method will be considered by Django at the time of submitting the form to server...
+
+**actual-program**
+Ex:-
+=> forms.py  (StudentDBApp folder)
+(already there, re-use it)
+-----------------------------------------
+Ex:-
+#another-project-form
+from django import forms;
+from django.core import validators
+class FeedBackForm(forms.Form):
+	name = forms.CharField()
+	rollno = forms.IntegerField()
+	email = forms.EmailField()
+	feedback = forms.CharField(widget=forms.Textarea)
+
+	def clean_name(self):
+		print('validating name-field...');
+		inputname = self.cleaned_data['name'];
+		if len(inputname) < 5:
+			raise forms.ValidationError('Min. no-of-chars in name-field should be 5..!!');
+		return inputname;
+
+	def clean_rollno(self):
+		inputrollno = self.cleaned_data['rollno'];
+		print('Validating rollno-field...');
+		if inputrollno == 0:
+			raise forms.ValidationError('Roll-number field cannot be EMPTY or ZERO...');
+		return inputrollno;
+
+	def clean_email(self):
+		inputemail = self.cleaned_data['email'];
+		print("Validating email-field...");
+		if len(inputemail) < 8:
+			raise forms.ValidationError('Email-field cannot be EMPTY or less than 3-chars...');
+		return inputemail;
+
+	def clean_feedback(self):
+		inputfeedback = self.cleaned_data['feedback']
+		print("Validating feedback-field...");
+		if len(inputfeedback) < 3:
+			raise forms.ValidationError('Feedback-field cannot be less than 3-chars...');
+		return inputfeedback
+
+
+Ex:- views.py(make-changes to prev-view-prog)
+-----------------------------------------
+from django.shortcuts import render;
+from StudentDBApp import forms;
+def feedbackview(request):
+    formsObj=forms.FeedBackForm();
+    sentdata = False;
+    if request.method=='POST':
+        formsObj=forms.FeedBackForm(request.POST);
+        if formsObj.is_valid():
+            print('Form Validation Success and printing information');
+            print('Name:',formsObj.cleaned_data['name'])
+            print('Roll No:',formsObj.cleaned_data['rollno'])
+            print('Email:',formsObj.cleaned_data['email'])
+            print('FeedBack:',formsObj.cleaned_data['feedback'])
+            formsObj=forms.FeedBackForm();
+            sentdata=True;
+    return render(request,'StudentDBApp/feedback.html',{'form1':formsObj,'sentdata':sentdata})
+
+
+
+Ex:-
+feedback.html (make-changes to prev-file)
+---------------------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="{%static "css/feedback.css"%}">
+        <title>Student Feeback</title>
+    </head>
+    <body>
+        <div align='center'>
+            <h1>Student Feedback Form</h1>
+            <hr />
+            {% if sentdata %}
+                <h3>Feedback Taken success...(submit-another)</h3>
+            {% endif %}
+            <form action="." method="post">
+                {{form1.as_p}}
+                {%csrf_token%}
+                <input type="submit" value="Submit Feedback">
+            </form>
+        </div>
+    </body>
+</html>
+
+NOTE:-
+<form class="" action="." method="post">
+(here . or #  or empty indicated form is submitted to itself or same-page or same-view-func or same-url...)
+i.e, same URL which is available on address-bar of browser
+Ex:-
+	http://localhost:8000/studentfeedback/
+(urls.py--->views.py(FeedbackForm() obj is taken from forms.py)
+i.e, formsObj=forms.FeedBackForm(request.POST);
+= Now, validation methods are called auto with our input-data
+(raised Errors-msgs and displays msgs above fields using <ul> with <li>  o.w form is submitted...)
+
+Ex:-
+feedback.css (add-in-last)
+----------------------
+li{
+    font-size: 10px;
+    color:red;
+}
+
+
+NOTE:-
+(Run-server & request url(studentfeedback/) & check the output...)
+=** Server Console::- (w.o errors...)
+validating name-field...
+Validating rollno-field...
+Validating email-field...
+Validating feedback-field...
+Form Validation Success and printing information
+Name: Ramsai
+Roll No: 9999
+Email: msrikanth08@gmail.com
+FeedBack: Hi Hello...
+
+**Note::-
+= Django will call these field level clean methods automatically and we are not required to call explicitly(manually).
+= Form validation by using clean methods is not recommended.
+(because we have write code manually)
+
+
+============================================================
+(*****)Now,
+Case-2(method) 
+Django's Inbuilt Core Validators::-
+-------------------------------------------
+= Django provides several inbuilt core validators to perform very common validations (simple & easy)
+= But we can use these validators directly and we are not required to implement it coding-also in forms.py
+= Djando's inbuilt validators are available in the "django.core" module
+Ex:-
+	from django.core import validators;
+	
+(case-study)
+= To validate Max/Min-number of characters in the feedback as 50/10,we have to use inbuilt validators as follows,
+
+Ex:-
+=> forms.py (StudentDBApp folder)
+(already-done, re-use-it)
+---------------------------------------
+from django import forms;
+from django.core import validators
+class FeedBackForm(forms.Form):
+	name = forms.CharField()
+	rollno = forms.IntegerField()
+	email = forms.EmailField()
+	#feedback = forms.CharField(widget=forms.Textarea)
+	feedback = forms.CharField(widget=forms.Textarea,validators=[validators.MinLengthValidator(10),validators.MaxLengthValidator(30)])
+
+    name = forms.CharField(validators=[validators.RegexValidator('[ASGZ].*')])
+    rollno = forms.IntegerField(validators=[validators.RegexValidator('[6-9]\d{5}')])
+    email = forms.EmailField(validators=[validators.EmailValidator])
+
+**Note:-
+= use validators directly for form field-var only inside constructor
+= We can use any number of validators for the same field as follows,
+Ex:-
+feedback = forms.CharField(widget=forms.Textarea,validators=[validators.MinLengthValidator(10),validators.MaxLengthValidator(30)])
+
+
+NOTE:-
+= Run-server & request url(studentfeedback/) & check for validation of feedback-field
+***(Error-msgs & raise-Errors are auto-given by DJango Validators itself & it makes developers work simple & easy...)
+
+**Note:-
+Usage of built-in validators is very easy when compared with clean_<fieldname>() methods & its coding
+
+==>> other-core-validators using regex-patterns::-
+Ex:- (forms.py) 
+
+name = forms.CharField(validators=[validators.RegexValidator('[ASGZ].*')])
+rollno = forms.IntegerField(validators=[validators.RegexValidator('[6-9]\d{5}')])
+email = forms.EmailField(validators=[validators.EmailValidator])
+#feedback = forms.CharField(widget=forms.Textarea)
+feedback = forms.CharField(widget=forms.Textarea,validators=[validators.MinLengthValidator(10), validators.MaxLengthValidator(50)])
+
+
+
+
+===================================================================
+==> Custom-validations(our-own-validations)
+==> How to implement Custom Validators by using the same inbuilt-Validator Parameter::-
+(combination of Custom-Validators & Inbuilt validations)
+
+case-study:-
+= The value of name parameter should starts with 'S' or 's'
+
+(write our own-mnethod)
+= We can implement this validation as follows, 
+Ex:- (code-it before "class FeedBackForm(forms.Form):" def only...)
+Ex:- (use it before Form-class(FeedBackForm-class))
+def starts_with_s(value):
+	if value[0].lower() != 's':
+		raise forms.ValidationError('Name should starts with s or S only...'); 
+
+Ex:- (forms.py)
+(make-changes to name-field only)
+--------------------------
+from django import forms;
+from django.core import validators      #with validations
+class FeedBackForm(forms.Form):
+    #name = forms.CharField()
+    name = forms.CharField(validators=[starts_with_s])
+    rollno = forms.IntegerField()
+
+
+NOTE:-
+= Run-server & request url(studentfeedback/) & check for validation of name-field(starts_with_s)
+(Error-msgs are auto-given by DJango Validators itself & makes developers work simple & easy...)
+
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+NOW(****)
+==> Validation of Total Form directly by using a single-Clean-Method::-
+(Validation-4-Types)
+	1) clean_fieldname() mulitple-funcs
+	2) django.core.validators (field constructor())
+	3) Custom-vali-func + Inbuilt-validators
+	4) all validations in single clean()
+	
+=*** Whenever we are submitting the form Django will call single clean() method (present in our Form super/parent-class)
+= In this method, we can code all validations of our form-fields at a time...
+
+Ex:-
+=> forms.py (StudentDBApp app-folder)
+--------------------------------------
+#using single clean() method for complete form validations
+from django import forms;
+from django.core import validators      #with validations
+class FeedBackForm(forms.Form):
+    name = forms.CharField()
+    rollno = forms.IntegerField()
+    email = forms.EmailField()
+    feedback = forms.CharField(widget=forms.Textarea);
+
+    	def clean(self):
+		print('Total Form validation... is getting done!!!')
+		total_cleaned_data = super().clean();  # gets complete form submitted data
+		inputname = total_cleaned_data['name'];
+		if inputname[0].lower() != 's':
+			raise forms.ValidationError('Name parameter should start with S or s only...');
+		inputrollno = total_cleaned_data['rollno'];
+		if inputrollno <= 0:
+			raise forms.ValidationError('Rollno should be > 0...')
+		inputfeedback = total_cleaned_data['feedback'];
+		if len(inputfeedback) < 10 or len(inputfeedback) > 50:
+			raise forms.ValidationError('Feedback should be min 10-chars & max 50-chars...')
+
+NOTE:-
+= Run-server & request url(studentfeedback/) & check for validation of name,rollno & feedback-field
+(Error-msgs are auto-given by DJango Validators itself & makes developers work simple & easy...)
+=** in single clean(), all validation-errors are displayed at the top of form only (but not individually)
+
+
+
+===============================================(continue in 2nd-session)==================================================
+==========================================================================================================================
+(****)
+==> How to Check Original pwd and reentered pwd are same OR not in signup Form:-
+
+***(Re-use StudentDBProject(project) & StudentDBApp(application)***
+=>forms.py (StudentDBApp folder)
+----------------------------------------
+(add new-class in the last...)
+#password & retype-pwd are same or not using validations
+from django import forms
+from django.core import validators
+class SignupForm(forms.Form):
+    name=forms.CharField(label='Enter your name :')
+    password=forms.CharField(widget=forms.PasswordInput)
+    repassword=forms.CharField(label='Reenter Password',widget=forms.PasswordInput)
+    email=forms.EmailField()
+    def clean(self):
+        total_cleaned_data=super().clean()
+        pwd=total_cleaned_data['password']
+        rpwd=total_cleaned_data['repassword']
+        if pwd!=rpwd:
+            raise forms.ValidationError('Both Passwords must be same...!!!')
+
+NOTE:-
+=>  total_cleaned_data=super().clean()
+= Here super().clean() means we are calling base-class(Form) clean() method
+= in doing so, we get complete form-data as dictionary
+= store that data in our own dict-var (total_cleaned_data)
+(pre-defined cleaned_data(dict-var) is provided by django to views.py)
+
+
+Ex:-
+==> views.py (StudentDBApp main-folder)
+-------------------------------------
+(add new-view-func in the last...)
+#pwd & retypepwd SignUp form...
+from django.shortcuts import render;
+from StudentDBApp.forms import SignupForm
+def signup_form_view(request):
+    sentdata = False;
+    formsObj=SignupForm();      #empty-form
+    if request.method=='POST':
+        formsObj=SignupForm(request.POST)       #formobj with submitted-data
+        if formsObj.is_valid():
+            print('Basic Validation completed and Printing Data...!!!')
+            print('Name:',formsObj.cleaned_data['name'])
+            print('Password:',formsObj.cleaned_data['password'])
+            print('Email:',formsObj.cleaned_data['email'])
+            formsObj = SignupForm();  #again-empty-form
+            sentdata=True;
+    return render(request,'StudentDBApp/signup.html',{'form1':formsObj,'sentdata':sentdata})
+
+
+
+
+Ex:-
+=> signup.html  (templates/StudentDBApp folder)
+-------------------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>SignUp Form</title>
+        <link href="{%static 'css/signup.css' %}" rel="stylesheet" />
+    </head>
+    <body>
+        <div align='centre'>
+            <h1>Student Signup Form</h1>
+			<hr />
+			{%if sentdata %}
+				<h3>Signup-process done success..!!!</h3>
+			{%endif%}
+            <form method="post" action="">
+                {{form1.as_p}}
+                {%csrf_token%}
+                <input type="submit" value="Signup">
+            </form>
+        </div>
+    </body>
+</html>
+
+Ex:-
+singup.css (static/css folder)
+----------------------------------------
+body{
+    background-color: lightyellow;
+    color:darkgreen;
+}
+h1{
+    text-align: center;
+    color:green;
+    background-color: yellow;
+    border:2px Solid Blue;
+}
+h2{
+    color:orangered;
+}
+
+li{
+    font-size: 10px;
+    color:red;
+}
+
+
+Ex:-
+urls.py (StudentDBProject proj-conf-folder)
+--------------------------------------
+	path('studentsignup/', views.signup_form_view),
+
+
+NOTE:-
+= Finally, Run-server & request url(studentsignup/) & check for validation of pwd-field & repwd-field
+(Error-msgs are auto-given by DJango Validators itself & makes developers work simple & easy...)
+
+**Note: 
+= Finally, if we want to perform validations by comparing multiple input fields then we should go for single clean() method
+= Here, <form method="post" action=""> empty "" string in action="" indicates form is submitted to same URL in address-bar			  
+		
+
+***other-cases***
+===> Other password validations in forms.py(class SignupForm)
+(1-upper, 1-lower,1-digit,1-spchar)
+Ex:-
+	def clean(self):
+		total_cleaned_data = super().clean()
+		pwd = total_cleaned_data['password']
+		rpwd = total_cleaned_data['repassword']
+		if pwd != rpwd:
+			raise forms.ValidationError('Both Passwords must be same...!!!')
+		if len(pwd) < 8 or len(pwd) > 15:
+			raise forms.ValidationError('Password should be min=8 & max=15 chars...')
+		if len(rpwd) < 8 or len(rpwd) > 15:
+			raise forms.ValidationError('Re-Password should be min=8 & max=15 chars...')
+		if not pwd.isupper() or not pwd.islower() or not pwd.isnum():
+			raise forms.ValidationError('Passwaord must contain 1-upper, 1-lower, 1-digit, 1-sp-char...')
+
+
+
+
+
+
+= Finally, Run-server & request url(studentsignup/) & check for validation of pwd-field & repwd-field
+(Error-msgs are auto-given by DJango Validators itself & makes developers work simple & easy...)
+
+
+

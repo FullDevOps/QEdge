@@ -1,0 +1,476 @@
+===>>> WORKING WITH ADVANCED TEMPLATE FEATURES				
+						
+==> DJANGO Advanced Templates::-
+(topics for discussion)
+= Templates provides html-view for our webpage(url)
+= it is coded under BASE_DIR/template/AppName folder
+= it is included in settings.py under TEMPLATES=[] list-var
+Ex:-  'DIRS': [BASE_DIR / 'templates']
+1) Template Inheritance(***)
+2) Template Filters
+3) Template tags for relative URLs
+
+
+1) Template Inheritance(code-reusability)::-
+= If multiple template files have some common html-code, it is not recommended to write that common code in every template html file. It increases length of the code and reduces readability. It also increases
+development time
+==Diagram==
+= In this case, we have to seperate that common code into a new template file,which is also known as base(parent)-template file. 
+= The remaining child-template files should extend base-template file so that the common code will be inherited automatically to child-template files
+= Inheriting common code from base-template to remaining child-templates is nothing but template-inheritance
+
+==>Steps:- 
+==>How to implement Template-Inheritane::-
+1)
+= Create a new project (TemplateProject1) & new-app(MyApps1)
+Ex:-
+base.html (templates/MyApps1) -> create MyApps1 folder under templates-folder
+-------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html>
+    <head>
+        <title>Template-Inheritance</title>
+        <link rel="stylesheet"  href="{%static 'css/base.css' %}" />
+    </head>
+    <body>
+        <h1>Common code for all child templates</h1>
+        <hr />
+        {%block child_block%}
+            Anything outside of this block available to child tag...
+            ***Non-visible-code***
+            In child template, its specific-code should be coded in this block only
+        {%endblock%}
+        <h3>End of common code from base.html!!</h3>
+		<hr />
+    </body>
+</html>
+
+=** in this file, we write special-block of  {%....%} template-code-tag
+Ex:-
+	{%block child_block%}
+		Anything outside of this block available to child tag...
+		***Non-visible-code***
+		In child template, its specific-code should be coded in this block only
+	{%endblock%}
+
+2)
+Ex:-
+child.html (templates/MyApps1)
+--------------------------------
+= in child template(.html file) we use sp-extends template-code-tag
+
+<!DOCTYPE html>
+{%extends "MyApps1/base.html" %}
+{%block child_block %}
+    <h2>child-template specific extra code</h2>
+    <h2>child-template is inherited from base.html</h2>
+    <hr />
+{%endblock%}
+
+= simply re-define parent special-block of  {%block....%} template-code-tag in child(.html) file with child-specific-html-code
+
+
+
+Ex:-(CSS in template-inheritance)::- 
+-------------------------------------
+base.css (static/css folder)	
+#create static(folder) & css(sub-folder)
+------------------------------
+body{
+    background-color: lightyellow;
+}
+h1{
+    color:blue;
+    background-color: yellow;
+    text-align: center;
+}
+h2{
+    color:green;
+}
+h3{
+    background-color: orange;
+    color: orangered;
+    text-align: center;
+}
+
+Ex:-
+views.py (MyApps1 main-folder)
+-------------------------------
+from django.shortcuts import render
+
+# Create your views here.
+def f1(request):
+    return render(request,'MyApps1/child.html');
+
+Ex:-
+urls.py (TemplateProject1 folder)
+-----------------------------------
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('tempinherit/',views.f1),
+]
+
+Ex:-
+settings.py (TemplateProject1 folder)
+---------------------------------------
+a) auto-done
+INSTALLED_APPS = [
+	.....
+    'MyApps1.apps.Myapp1Config',
+]
+
+b) auto-done
+TEMPLATES = [
+    {
+        ....
+        'DIRS': [BASE_DIR / 'templates']
+        ....
+    },
+]
+
+NOTE:- (auto-generated at begin of file...)
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+c)
+STATIC_URL = '/static/'
+import os;
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+
+NOTE:-
+= Finally, start the server & request below URL...
+http://localhost:8000/tempinherit/
+
+
+
+
+==>> Advantages of Template Inheritance::-
+1) What ever code available in base-template is by default available to child-templates and we are not required to write again. Hence it promotes Code Reusability
+2) It reduces length of the code and improves readability
+3) It reduces development time
+4) It provides unique and same look and feel for total web-application
+(website)
+
+****Note::-
+Based on our requirement we can extend any number of base templates in child-templates
+i.e, Multiple-Inheritance is applicable for templates
+==Diagram==
+(Refer-notes)
+(multiple-parents & single-child)
+Ex:-
+	base1.html/base2.html (2 or more parent-html-codes)
+			|
+			|
+			|
+		(child.html) (1-child-code)
+	{%extends "MyApps1/base1.html" %}  #extends parent-html-code
+	{%extends "MyApps1/base2.html" %}
+	#redefine child-blocks
+	{%block child_block1%}
+	...
+	{%endblock%}
+	{%block child_block2%}
+	...
+	{%endblock%}
+
+
+***(sp-case)***
+--------------------
+==>How to Add Seperate CSS-files to Child Templates?
+(Same-Project(TemplateProject1) & Same-App(MyApps1))
+
+Steps:-
+1)
+Ex:-
+base1.html (templates/MyApps1) -> create MyApps1 folder under templates-folder
+--------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="{% static "css/base1.css"%}">
+    {%block child_css %}
+        In child-template wirte child-html-file related .css file reference!!
+        ***NOT-Visible***
+    {% endblock %}
+</head>
+<body>
+    <h1>Common code for all child templates</h1>
+    <hr />
+    {%block child_block%}
+        Anything outside of this block available to child tag...
+        ***Non-visible-code***
+        In child template, its specific-code should be coded in this block only
+    {%endblock%}
+    <h3>End of common code from base.html!!</h3>
+    <hr />
+</body>
+</html>
+
+=** use sp-block of {%....%} template-code in <head>..section of base1.html for child-css-code
+Ex:-
+	{%block child_css %}
+        In child-template wirte child-html-file related .css file reference!!
+        ***NOT-Visible***
+    {% endblock %}
+=** redefine this block for css in child1.html
+
+2)
+Ex:-
+child1.html (templates/MyApps1) -> create MyApps1 folder under templates-folder
+----------------------
+<!DOCTYPE html>
+{% extends 'MyApps1/base1.html'%}
+{%load static%}
+{% block child_css%}
+    <link rel="stylesheet" href="{%static "css/child1.css" %}">
+{%endblock%}
+{% block child_block %}
+    <h2>child-template specific extra-code & specific extra-css</h2>
+    <hr />
+{% endblock %}
+
+
+3)
+Ex:-(CSS in template-inheritance)::- 
+-------------------------------------
+base1.css (static/css folder)	#create static(folder) & css(sub-folder)
+------------------------------
+body{
+    background-color: lightyellow;
+}
+h1{
+    color:blue;
+    background-color: yellow;
+    text-align: center;
+}
+h2{
+    color:green;
+}
+h3{
+    background-color: orange;
+    color: orangered;
+    text-align: center;
+}
+
+Ex:-
+child1.css (static/css folder)	#create static(folder) & css(sub-folder)
+------------------------------
+h2{
+    background-color: lightskyblue;
+    text-align: right;
+	border:2px Solid Red;
+}
+
+
+4)
+Ex:-
+views.py (MyApp1 folder)
+-------------------------------
+from django.shortcuts import render
+
+# Create your views here.
+def f11(request):
+    return render(request,'MyApps1/child1.html');
+
+5)
+Ex:-
+urls.py (TemplateProject1 folder)
+-----------------------------------
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('tempinherit/',views.f1),
+	path('tempinherit1/',views.f11),
+]
+
+6) perform necessary settings.py
+Ex:-
+settings.py (TemplateProject1 folder)
+---------------------------------------
+a) already-done
+INSTALLED_APPS = [
+	.....
+    'MyApp1.apps.Myapp1Config',
+]
+
+b) already-done
+TEMPLATES = [
+    {
+        ....
+        'DIRS': [BASE_DIR / 'templates']
+        ....
+    },
+]
+
+NOTE:- (auto-generated at begin of file...)
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+c) already-done
+STATIC_URL = '/static/'
+import os;
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+
+NOTE:-
+= Finally, start the server & request below URL...
+http://localhost:8000/tempinherit1/
+
+
+
+****Start-here****
+---------------------------------------------------------
+***imp-topic***
+-----------------
+2) Working with Template Filters::-
+= In the template ,html file, the injected data from views.py can be displayed by using template tags
+Ex:-
+	{{emp.eno}}
+= Before displaying to the end-user, if we want to perform some modification to the injected-data(text/str), like remove some information or converting to title-case etc, then we should
+go for Template-filters
+
+=> Syntax of Template Filter:-
+	{{value|filtername:[arguments]}}
+(Filter-func may take or may not take arguments i.e. arguments are optional)
+Ex:-
+	<li>{{msg1|lower}}</li>
+(msg1 will be displayed in lower-case)
+Ex:-   
+	<li>{{msg1|add:"Sai"}}</li>
+("Sai" will be added to msg1 and then display the result to the end user)
+Ex:-   
+	{{ msg|title }}
+	{{ mydate|date:"Y-m-d" }}
+
+**Note: 
+= There are many built in filters available for DJango templates
+https://docs.djangoproject.com/en/2.1/ref/templates/builtins/#ref-templates-builtins-filters
+
+
+
+
+
+###Program with Custom-Filters & Pre-defined Filters::-
+**(Now)**
+==>How to Create our own Filters::-
+= Based on our requirement we can create our own filter.
+Steps:-
+N-Req
+(
+create new-applicable C:\Users\Office\PycharmProjects\TemplateProject1> py manage.py startapp TemplateFilterApp
+)
+N-Req
+
+1) Create a folder 'templatetags' inside our application folder(MyApps1) [rt-click on app & create new-folder]
+
+2) Create a special empty-file named with __init__.py inside "templatetags" folder, so that Django will consider this folder as a valid python package [rt-click on templatetags & create new-py-file]
+
+3) Create a python file inside templatetags folder to define our own filters
+Ex:-
+   cust_filters.py (any-filename)
+   
+=>cust_filters.py (MyApps1/templatetags)
+---------------------------
+from django import template;
+register=template.Library()
+
+def first_five_upper(value):
+  #This is my own filter
+  result=value[:5].upper();
+  return result;
+register.filter('f5upper', first_five_upper);
+
+=====
+(1st import template-lib)
+(2nd register template-lib)  #tells Dj about out cust-template
+(3rd define our-own-filter)
+(4th register our-our-own-filter)
+=====
+
+**Note::-
+= We can also register filter with the decorator as follows,
+Ex:-
+#register filter with decorator
+from django import template
+register=template.Library();
+
+@register.filter(name='f5upper')
+def first_five_upper(value):
+  #This is my own filter
+  result=value[:5].upper();
+  return result
+
+
+=** Here "f5upper" is the name of the filter which can be used inside template-file using {{}} temp-var-tag
+
+4) Inside template file(.html-file) we have to load the filter file as follows
+(In the child-template but-not in base-template)
+{%load cust_filters%}
+
+(use filters in .html prog)
+5) We can invoke the filter as follows {{msg|f5upper}}
+Ex:-
+demo1.html (templates/MyApps1) --> child-template-file
+-------------------------------
+    <!DOCTYPE html>
+    {%extends 'MyApps1/base.html'%}
+    {%block child_block%}
+        <h2>Template-Filter-Information</h2>
+        <hr />
+        {%load cust_filters%}
+        <ul>
+            <li>{{msg1|lower}}</li>
+            <li>{{msg2|upper}}</li>
+            <li>{{msg3|add:" ----- Sai"}}</li>
+            <li>{{msg4|f5upper}}</li>
+            <li>{{msg5}}</li>
+        </ul>
+    {%endblock%}
+
+
+6)
+Ex:-
+views.py (MyApps1 folder)
+-----------------------------
+def demo1(request):
+    dict1 = {'msg1':'SaiRamKumar','msg2':'SaiRamKumar','msg3':'Hello','msg4':'SaiRamKumar','msg5':'SaiRamKumar'}
+    return render(request,'MyApps1/demo1.html',context=dict1);
+
+7)
+Ex:-
+urls.py (TemplateProject1 folder)
+-----------------------------------
+....
+from MyApps1 import views
+
+urlpatterns = [
+    .....
+	path('demo1/',views.demo1),
+]
+
+8)
+NOTE:-
+= Finally, start the server & request below URL...
+http://localhost:8000/demo1/
+
+
+
+

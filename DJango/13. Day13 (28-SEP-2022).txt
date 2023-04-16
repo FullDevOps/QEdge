@@ -1,0 +1,285 @@
+===>>> Django Templates & Static HTML-Files::-
+
+==> Django Templates:-
+==Diagram==
+**It is not recommended to write html code directly inside python script(views.py file)because:
+=> Dis-Adv:- (Reasons??)
+1) It reduces readability because Python code mixed with html code
+2) No seperation of roles.Python developer has to concentrate in both python code and HTML code.
+3) It does not provide reusability of html-code
+
+NOTE:-
+=**We can overcome these problems by seperating html code into a seperate html file. This html-code-file is nothing but template.(folder auto. created for every project)
+= From the python file(view.py file), we can use templates based on our requirement.
+
+=**we have to write templates(Folder) at project-level only once and we can re-use these in multiple-applications under same-project
+
+=** Under template-folder, we create 1-separate folder for every App(with same-name) & under this folder we create diff. html-files for diff-views
+
+
+***Imp-Steps for Templates***
+--------------------------------
+(For Practice only):-(Refer-notes)
+==>Basic-Python-coding required to develop Template Based Application:-
+1) To know the current Python file-name(complete-path)
+print(__file__); #demo.py
+Ex:-
+
+#Demo.py
+#F:\SAISIR\DJANGO(Folder)\Demo.py
+print(__file__)			#current prog file-name(complete path)
+
+
+2) To know absolute-path of current Python File Name
+import os
+print(os.path.abspath(__file__))
+Output:F:\SAISIR\DJANGO\Demo.py		(complete-path)
+
+
+
+3) To know Base/Parent Directory name of the current file
+Ex:-
+print(os.path.dirname(os.path.abspath(__file__)))
+Output:F:\SAISIR\DJANGO
+
+
+4) Inside F:\SAISIR there is one folder named with "templates"
+How to know, To know its absolute path
+Ex:-
+import os
+BASE_DIR=os.path.dirname(os.path.abspath(__file__)) 
+TEMPLATE_DIR=os.path.join(BASE_DIR,'templates')
+print(TEMPLATE_DIR)
+==>Output:F:\SAISIR\DJANGO\templates
+
+
+##Program(manually core-python prog to work with paths-os)
+#Demo.py
+#F:\SAISIR\DJANGO(Folder)\Demo.py
+
+print(__file__)			#current prog file-name(complete path)
+
+
+print()
+import os
+print(os.path.abspath(__file__))
+
+print()
+#parent-dir-name
+import os
+print(os.path.dirname(os.path.abspath(__file__)))
+
+print()
+#abs-path of another-folder(templates)
+import os
+BASE_DIR = os.path.dirname(os.path.abspath(__file__)) 
+TEMPLATE_DIR=os.path.join(BASE_DIR,'templates')
+print(TEMPLATE_DIR)  #this is another-folder complete-abs-path
+
+
+==>Note: The main advantage of this approach is we are not required to hard code system-specific-paths(locations)in our python script.
+
+
+(****)
+==>Steps to develop Template(.html) Based Application:-
+Steps:-
+-----
+1) Creation of new-project(SecondProject)
+cmd> django-admin start SecondProject
+(or)
+File--->New-project(Django)---->SecondProject (create-project-name)
+(give app-name(FirstApp, give templates folder-name(auto-given)
+  
+2) Creation of Application(FirstApp)
+(already-done in step1)
+cmd> py manage.py startapp FirstApp
+(or)
+Provide Application-name(FirstApp) while creating the project-itself
+   
+3) Add/Register this application-name to the project-level(SecondProject) in settings.py file(already done auto), so that Django-Framework(server) is aware of our-application 
+Ex:-
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    #'FirstApp',	#manual-old-style
+    'FirstApp.apps.FirstappConfig',	#auto-new-style(auto-generated)
+]
+
+4) Create a 'templates' folder inside main project folder(SecondProject main folder) auto-generated-> already-done-auto
+=*** In that 'templates' folder create a seperate folder named with "FirstApp" to hold that particular application specific templates separately
+(rt.click on templates-folder & create new-dir(FirstApp))
+
+(Imp-step)
+***5) Register/Add our "templates" folder to settings.py file in proj-conf-folder, 
+= so that Django-framework(Server) is aware of our templates(html-files)
+***(done auto-generated)***
+Ex:-
+TEMPLATES=[
+{
+  ...  'DIRS':['D:\SAISIR\DJANGO\SecondProject\templates'],
+  'DIRS': [BASE_DIR / 'templates'],	#new-auto.
+  
+},
+]
+
+NOTE:- 
+= "BASE_DIR" is auto-generated-var at begining of file(settings.py)
+Ex:-
+from pathlib import Path		#Path-class
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+= it represents complete-path of our project-main-folder
+(C:\Users\<<uname>>\PyCharmProjects\SecondProject)
+
+**It is not recommended to hard code system specific locations in settings.py file. To overcome this problem, we can generate templates directory path programatically as follows.
+Ex:-(OLD-STYLE)
+import os
+BASE_DIR=os.path.dirname(os.path.abspath(__file__)) 
+TEMPLATE_DIR=os.path.join(BASE_DIR,'templates')
+
+Specify this TEMPLATE_DIR inside settings.py as follows
+
+TEMPLATE=[
+{
+  ...,
+  'DIRS':[TEMPLATE_DIR,],
+  (or)
+  'DIRS': [BASE_DIR / 'templates'], 	##it is auto-generated...
+},]
+
+(very-imp-point)
+=**here BASE_DIR = Path(__file__).resolve().parent.parent is auto-generated in "settings.py" file as default-variable in begining to file
+= In DJANGO-Frwk, Path is a pre-defined-class
+= resolve() method is used to convert Path-class object to regular-object
+
+****
+6) Create html-file inside SecondProject/templates/FirstApp folder
+This html file is nothing but template
+Ex:-
+(rt.click on FirstApp --> New ---> HTML-File)
+Ex:-
+==> "wishes.html": (templates/FirstApp/)
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>First Template Wishes Page</title>
+    <style>
+        h1,h2,h3{
+            text-align: center;
+        }
+        h1{
+            color:blue;
+        }
+        h2{
+            color:green;
+        }
+        h3{
+            color:red;
+        }
+        #hr1{
+            width:95%;
+        }
+        #hr2{
+            width:85%;
+        }
+        #hr3{
+            width:75%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hello Welcome to Second-Project of DJANGO : Templates-File</h1>
+    <hr id="hr1" color="brown"/>
+    <h2>Have a nice day...</h2>
+    <hr id="hr2" color="green"/>
+    <h3>***ALL THE BEST***</h3>
+    <hr id="hr3" color="red"/>
+</body>
+</html>
+
+NOTES:- (HTML-program imp-points)
+i) Every html-program is divided in 2 sections,
+	a) <head> section (<title>,<style>,<script>)
+	b) <body> section (diff. <tags> for display)
+ii) Headings are of 6-types,
+	<h1>	+2 font-size + BOLD
+	<h2>	+2 font-size + BOLD
+	<h3>	+2 font-size + BOLD
+	<h4>	browser-default-font-size + BOLD (10)
+	<h5>	-2 font-size + BOLD
+	<h6>	-2 font-size + BOLD
+iii) Horizotal-rule:- <hr />
+(it is self closing-tag without any content to display)
+Ex:-
+<hr width="" color="" />
+= by default it is 100% width of page & center-aligned
+= width="", color="" are html-attributes, given with =(assignment)
+= they provide extra functionality to our html-tags
+iv) <style>...</style>  CSS-element
+= html-element means <open-tag>.....</close-tag>
+= <style> element is used under <head> section
+= using this element, we can provide diff-css-styles to our html-tags in <body>section
+= Here css is given in 3-ways
+	i) using tag-name(applied to all matchin-tags)
+	Ex:-
+		h1{
+			css-prop-name:css-prop-value;
+			color:blue;		#here ; is compulsory
+		}
+	(css-properties are give with :)
+	ii) using #idname (applied to unique-id to  particular-tag)
+	Ex:-
+		#hr1{
+		}
+	<hr id="hr1" .... />
+	(here id="" html-attribute is unique-identification of particular-tag)
+	iii) using .classname (applied to all matching class="" tags)
+	Ex:-
+		.pc{
+			color:green;
+		}
+	<p class="pc">Para1</p>
+	<p>Para2</p>
+	<p class="pc">Para3</p>
+v)
+= HTML-attributes are given with =(assignment)
+= CSS-properties are given with :(colon) and separated with ;(semi-colon)
+
+
+
+
+step7)
+7)Define Function based view inside views.py file of FirstApp
+Ex:- (FirstApp/views.py)
+from django.shortcuts import render;
+def wishes(request):
+	return render(request,'FirstApp/wishes.html')
+
+NOTE:-
+= if html-data is directly available in views.py then we use HttpResponse(html-data) class-obj as return-value	
+= if html-data is available in templates-folder then we use render(request,html-file) function as return-value		
+(render() function, combines both user-request with html-file togather & internally sends that reply as HttpResponse-class-obj only)
+
+
+8) Define URL Pattern either at application-level or at project-level
+Ex:-(project-level urls.py)
+from FirstApp import views
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('welcome/', views.wishes),
+]
+
+9) Run Server(project-tree-bar) and send Request your url-pattern in browser-address-bar
+http://localhost:8000/welcome/
+
+
+
+
+
+

@@ -1,0 +1,131 @@
+==>>>** Multiple-views(urls) for same view function??
+(Sp-cases)
+=** WE can have multiple-urls for same-single-view-function in particular-application
+Ex:-
+Step1:-
+------
+= For single-view-func i.e, demo() from FirstApp(views.py), we can have multiple-url-requests
+=** views.py(FirstApp)
+----------------------
+def demo(request):   
+	print("mulitple-Requests-URLs same respose");
+	htmldata='''<center>
+		<h1>Welcome Demo User!!!</h1>
+		<hr />
+		<h2>This is Same-Output for diff-mulitple-Requests-URLs</h2>
+		<hr />
+		<h3>Have a Great Day...</h3>
+		</center>''';
+	return HttpResponse(htmldata);
+
+Step2:-
+------
+= Configure mulitple-urls
+Ex:-
+"urls.py" (FirstProject)
+------------------------
+#mulitple-urls same view-func
+from FirstApp import views
+
+	path('firstdemo/',views.demo),
+	path('seconddemo/',views.demo),
+	path('thirddemo/',views.demo),
+
+step3:-
+---------	
+=** in this case, we can request, same view (demo() function) using 3-urls 	
+=** start the server & request the 3-urls(Same output)	
+Ex:-
+	http://localhost:8888/firstdemo
+	http://localhost:8888/seconddemo
+	http://localhost:8888/thirddemo
+	
+
+
+	
+===============================================================	
+==> Default-view for unkown URL-request or No-URL-Request ::-
+= When no-url/wrong-url is requested, we get list of urls configured in urls.py of our project(FirstProject)
+= When unknown-urls are request Ex:- /any, /hi, /unknown etc then we get "Page NOT Found" Error(404)
+Ex:-
+	http://localhost:8000/		[no-url]
+	http://localhost:8000/any	[/any url]
+	http://localhost:8000/hi	[/hi wrong-url]
+	http://localhost:8000/unknown	[/unknown url]
+=*** However, we can configure default-view for no-url-request or unknown-url-request with any Error(404)
+= This default-view works like a Homepage for our project. It is done as follows,
+
+Step1:-
+--------
+Ex:-
+views.py (FirstApp)
+---------------------
+#default-url-request-view-func
+def homepage(request):
+    htmldata='''<center>
+        <h1>Welcome to DEFAULT Home-Page!!!</h1>
+        <hr />
+        <h2>Your Request Page is Not-Found...</h2>
+        <hr />
+        <h3>Plz try other URL or Links!!!</h3>
+    </center>''';
+    return HttpResponse(htmldata);
+
+Step2:-
+urls.py (FirstProject-conf-folder)
+--------------------------------------
+(here we use url() func instead of path() func)
+(or else use re_path() function from django.urls module)
+Ex:-
+	re_path("^.*$",views.homepage),
+(from django.urls import re_path;)
+
+NOTE:-(dont use url() or path() for default-URLs/no-URLs)
+=** django url-pattern supports regex-patterns also
+Ex:-
+	"^.*$" ------> re-gex
+	(^ means begin-match)
+	($ means ending-match)
+	(. means any-char(a-z,A-Z,0-9,space-char or sp-char)
+	(* means 0 or more in quantity)
+
+---------------------------------------------------
+NOTE:- (Not-required old-style) DJango 4.1 not working
+= For this default-view, we have to configure default-url as follows in urls.py (use default-URL at the last-line compulsory)
+Ex:-
+	url(r'$', views.homepage), 
+	url(r'^.*$', views.homepage),  #reqex-url-pattern
+	
+	#default-url-url() or path()
+	#path('$', views.homepage), 
+	#path('.', views.homepage), 
+	#path('^.*$', views.homepage), 
+	re_path("^.*$",views.homepage),
+	#url(r'$', views.homepage), 
+	#url(r'^.*$', views.homepage),  #reqex-url-pattern
+	
+= For this url(), we have to import below module,
+Ex:-
+	from django.conf.urls import url;
+(Not-required old-style) DJango 4.1 not working
+----------------------------------------------
+
+Step3:-
+--------
+=** start the server & request the any-url or no-url or missing-url or wrong-url (we get homepage-view)
+Ex:-
+	http://localhost:8000/		(no-URL)
+	http://localhost:8000/hi	(missing/wrong-URL)
+	http://localhost:8000/hello	(available-URL)
+
+
+
+
+
+
+
+
+
+
+
+

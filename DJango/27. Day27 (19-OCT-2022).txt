@@ -1,0 +1,192 @@
+***USER AUTHENTICATION AND AUTHORIZATION***
+--------------------------------------------
+==> DJANGO User Authentication and Authorization
+==> Authentication:- The process of validating user is called authentication (Ex:- username & password)
+==> Authorization: The process of validating access permissions of user is called authorization (Ex:- Manager, Cashier, Clerk, Attender etc)
+
+**Now,
+= Generally our web pages can be accessed by any person without having any restrictions. But sometimes our business requirement is to access a web page compulsory we have to register and login. Then only end-user can able to access our page. To fulfill such type of requirements, we should go for Django-authentication and Django-authorization module
+
+(auth application)
+=>> Django provides the following 2 in-built applications for user authentication,
+	1) django.contrib.auth
+	2) django.contrib.contenttypes
+
+NOTE:-
+= "auth" application is authentication application of Django.
+= This auth application internally uses "contenttypes" application to track models installed in our database(table)
+
+**Note::- 
+= To use Django in built authentication  facility, compulsory these 2 applications should be there in INSTALLED_APPS=[] list-var of settings.py
+= But from Django 1.10 onwards automatically these are available and we are not required to add explicitly.
+
+
+***User Passwords****(for authentication)
+-------------------------------------------
+(use any prev-database)  --> mysql-db
+mysql> use empdb
+mysql> select * from auth_user;
++----+------------------------------------------------------------------------------------------+----------------------------+--------------+----------+------------+-----------+------------------------+----------+-----------+----------------------------+
+| id | password                                                                                 | last_login                 | is_superuser | username | first_name | last_name | email                  | is_staff | is_active | date_joined                |
++----+------------------------------------------------------------------------------------------+----------------------------+--------------+----------+------------+-----------+------------------------+----------+-----------+----------------------------+
+|  1 | pbkdf2_sha256$390000$OCdy3YGhtPIEp6yeUUFOQC$jCDcxCKruhPg8mep48hBdvnRDNNGevtersBMrAvzZfM= | 2023-03-27 11:06:04.340633 |            1 | Sidhu    |            |           | jojibabu1043@gmail.com |        1 |         1 | 2023-03-27 07:13:52.991567 |
++----+------------------------------------------------------------------------------------------+----------------------------+--------------+----------+------------+-----------+------------------------+----------+-----------+----------------------------+
+1 row in set (0.)
+
+mysql> describe auth_user;
+mysql> select id,password, username,email,is_superuser from auth_user;
+(password-column) ---> auto-encrypted with djanog inbuilt-algorithms
+
+NOTE:-
+=** Django uses "PBKDF2_Sha256" default-algorithm to encrypt passwords and hence passwords are-not stored in plain text form and we can expect more security. Even superuser also cannot see any user's password
+=*** Based on our requirement, we can use more secure hashing 3rd-party-algorithms also like "bcrypt and argon2". We can install with pip command as follows,
+Ex:-
+(Create new-project(UserAuthProject) & new-app(MyApps1))
+(In project Terminal-tab)
+cmd> pip install bcrypt
+cmd> pip install django[argon2]
+
+(or)
+
+C:\Users\Office\PycharmProjects\UserAuthProject> pip install bcrypt
+Collecting bcrypt
+  Downloading bcrypt-3.2.0-cp36-abi3-win_amd64.whl (28 kB)
+Requirement already satisfied: six>=1.4.1 in c:\users\office\appdata\local\programs\python\python39\lib\site-packages (from bcrypt) (1.15.0)
+Collecting cffi>=1.1
+  Downloading cffi-1.15.0-cp39-cp39-win_amd64.whl (180 kB)
+     |████████████████████████████████| 180 kB 69 kB/s
+Collecting pycparser
+  Downloading pycparser-2.21-py2.py3-none-any.whl (118 kB)
+     |████████████████████████████████| 118 kB 60 kB/s
+Installing collected packages: pycparser, cffi, bcrypt
+Successfully installed bcrypt-3.2.0 cffi-1.15.0 pycparser-2.21
+
+(and)
+PS C:\Users\Office\PycharmProjects\UserAuthProject> pip install django[argon2]
+Requirement already satisfied: django[argon2] in c:\users\office\appdata\local\programs\python\python39\lib\site-packages (3.2.7)
+Requirement already satisfied: asgiref<4,>=3.3.2 in c:\users\office\appdata\local\programs\python\python39\lib\site-packages (from django[argon2]) (3.4.1)
+Requirement already satisfied: sqlparse>=0.2.2 in c:\users\office\appdata\local\programs\python\python39\lib\site-packages (from django[argon2]) (0.4.1)
+Requirement already satisfied: pytz in c:\users\office\appdata\local\programs\python\python39\lib\site-packages (from django[argon2]) (2020.4)
+Collecting argon2-cffi>=19.1.0
+  Downloading argon2_cffi-21.3.0-py3-none-any.whl (14 kB)
+Collecting argon2-cffi-bindings
+  Downloading argon2_cffi_bindings-21.2.0-cp36-abi3-win_amd64.whl (30 kB)
+Requirement already satisfied: cffi>=1.0.1 in c:\users\office\pycharmprojects\userauthproject\venv\lib\site-packages (from argon2-cffi-bindings->argon2-cffi>=19.1.
+0->django[argon2]) (1.15.0)
+Requirement already satisfied: pycparser in c:\users\office\pycharmprojects\userauthproject\venv\lib\site-packages (from cffi>=1.0.1->argon2-cffi-bindings->argon2-
+cffi>=19.1.0->django[argon2]) (2.21)
+Installing collected packages: argon2-cffi-bindings, argon2-cffi
+Successfully installed argon2-cffi-21.3.0 argon2-cffi-bindings-21.2.0
+
+
+NOTE:-(***)
+= More secured algorithm  in order are as,
+	django[argon2] and then  (1st-priority)
+	bcrypt and followed by 
+	PBKDF2
+
+**(Now)
+(very-imp-step)
+Ex:-
+In settings.py we have to configure password hashers as follows,
+(in-last copy & paste below)
+PASSWORD_HASHERS=[
+ 'django.contrib.auth.hashers.Argon2PasswordHasher',
+ 'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+ 'django.contrib.auth.hashers.BCryptPasswordHasher',
+ 'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+ 'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+]
+
+NOTE:-
+= Django will always consider from first to last. 
+i.e, order is important
+
+
+==>concept not-req:-
+(= Just like "templates" and "static" folder, we have to create "media" folder also) ---> NReq
+==> DIFFERENCE BETWEEN STATIC AND MEDIA FOLDERS:- (Nreq)
+= "static" folder contains images, CSS files etc.. which are provided by application to the end-user
+= But "media" folder contains the resources like images/audio/videos etc  provided by end-user to the application (like profile-images, resumes etc..)
+
+
+***(Start-Here)***
+(Nreq)
+==>>HOW TO CONFIGURE MEDIA FOLDER IN settings.py file:
+(Create media folder under project main-folder)
+Ex::-
+settings.py (UserAuthProject-conf-folder) do-in-last
+---------------------------------------------
+#media-folder configuration
+import os;
+MEDIA_DIR = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = MEDIA_DIR
+MEDIA_URL = '/media/'
+----------------------------------------------------------
+
+***BAsic-Coding***
+(UserAuthProject-project & MyApps1-app)
+Ex:-
+views.py (MyApps1 main-folder)
+-------------------------------------
+from django.shortcuts import render
+# Create your views here.
+from django.contrib.auth.decorators import login_required
+@login_required
+def java_exams_view(request):
+    return render(request,'MyApps1/java.html');
+
+
+NOTE:-	
+= If we use @login_required decorator for any view function, then auth-application will check whether user login is correct or not. If the user does not login then the control will be automatically forwarded to login-page
+Ex:-
+http://localhost:8000/accounts/login/?next=/java/
+
+
+(in-built login-page urls & its views) ---> "auto-process"
+=** We should also configure auth-application url patterns in urls.py file
+Ex:- (urls.py) (UserAuthProject main-folder)
+---------------------------------------------
+from django.contrib import admin
+from django.urls import path
+from django.conf.urls import include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
+
+]
+=*** In our project "auth" application-urls are also included in project-level "urls.py"
+(hence we get login-page auto. when try to request and view in our project)
+
+NOTE:-
+= start server & request above url 
+http://localhost:8000/accounts/login/?next=/java/
+= We get below error...
+Exception Type:	TemplateDoesNotExist
+Exception Value:	
+registration/login.html
+(Template Does NotExist at /accounts/login/registration/login.html)
+
+=** Optinally verify below-urls also,
+= We can also request below-urls from browser address-bar for login & logout views
+a) login link of auth application: /accounts/login/
+(http://localhost:8000/accounts/login/)
+b) logout link of auth application: /accounts/logout
+(http://localhost:8000/accounts/logout/)
+
+==> logout-url:-
+---------------------
+=** After app-logout then Django default logout page will be displayed. Instead of this default target page we can configure our own target page inside settings.py as follows,
+Ex:- (settings.py) do-in-last
+	LOGOUT_REDIRECT_URL='/'	
+(i.e root-url of project http://localhost:8000/)
+ 
+ 
+==> optionally we can use login-url also,
+= ** If we click login-again link explicitly(http://localhost:8000/admin/login/?next=/admin/) and after login by default the control will goes to (http://localhost:8000/accounts/profile/)
+But we can configure our own target page after login inside settings.py as follows.
+Ex:-(settings.py) do-in-last
+	LOGIN_REDIRECT_URL='/'
+	
+	

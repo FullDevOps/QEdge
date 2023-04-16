@@ -1,0 +1,897 @@
+===>>>WORKING WITH DJANGO MODEL-FORMS
+------------------------------------------------------------
+==>DJango-Model-Forms (Forms based on DB-Models)::-
+= Model means data(DB)
+= Form means html-i/p-controls
+***= Sometimes we can create a form based on Model(py-class), such type of forms are called model-based-forms or model-forms
+= The main advantage of model-forms is we can accept end user input  in html- form and we can save that input data directly & easily into the database-tables (w.o writing any DB-SQL-commands)
+= Django Framework provides inbuilt support to develop model based forms very simple & very easy
+
+==>How to develop Model-based-Forms (model-forms):-
+Steps:-
+1) While developing Form-Class(in forms.py) instead of inheriting from "forms.Form" parent-class, we have to inherit "forms.ModelForm" parent-class
+Ex:-
+	class RegisterForm(forms.ModelForm):
+		....
+		#form-fields
+		....
+
+2) We have to write one nested-class(inner-class) (Meta-class) to specify Model information and required fields
+Ex:-
+	class RegisterForm(forms.ModelForm):
+		#field declarations, if we are performing any custom validations.If we are not defining any custom validations then here we are not required to specify any field
+		......
+		class Meta:
+			#here we have to specify Model class name(DB-table) and required fields
+			model=Student;	#make-sure it is defined in models.py
+			fields='__all__';
+			#hence when we fill reg-form & submit it, all data goes auto. to Student-table in DB with given fields
+  
+
+
+=> fields sp-cases::-
+-----------------------  
+=> Case-1:- Instead of all fields if we want only selected fields, then we have to specify as follows,
+Ex:-
+	class Meta:
+		model=Student;	#make-sure it is defined in models.py
+		fields=('field1','field2','field3'); #tuple()
+(In our form only given 3-fields will be considered/included...)
+= use this case-1 approach, if Model class contains huge number of fields and we required to consider very less number of fields in the form then we should use this approach
+
+=>Case-2:Instead of all fields if we want to exclude certain fields, then we have to specify as  follows,
+Ex:-
+	class Meta:
+		model=Student;	#make-sure it is defined in models.py
+		exclude=['field1','field2'];  	#list[]
+(In our form all fields will be considered except field1 and field2)
+= use th is case-2, if the Model-class contains huge number of fields and if we want to exclude very few fields then we have to use this approach
+
+case-3:-
+		fields="__all__";
+		(it means all fields are taken by default)
+
+=> Q) In Model based Forms, how many ways are there to specify Fields Information??
+Ans: 3-ways
+1) All fields  (fields='__all__';)
+2) Include certain fields (fields=('field1','field2','field3');)
+3) Exclude certain fields (exclude=['field1','field2'];)
+
+**Note: The most commonly used approach is to include all fields
+
+
+3)step3:-
+(***very-imp-step***)
+==>How to Save User-Input-Data in form to Database in Model based Forms??
+= For this, we have to use 'save()' method
+Ex:-
+def student_view(request):
+	...
+	if request.method=="POST":
+		formObj=RegisterForm(request.POST);
+			if formObj.is_valid():
+				formObj.save(commit=True); 	
+				#make changes permanent on DB-table
+
+
+***Example***		
+==>Demo Project-1 (ModelFormProject)::-
+= Create a New Project (ModelFormProject) in PyCharm IDE
+(also add ModelFormApp, while creating the project)
+
+Ex:-
+models.py:- (ModelFormApp app-folder)
+--------------------------------------
+from django.db import models
+#Create your models here.
+class Student(models.Model):
+    name=models.CharField(max_length=30)
+    marks=models.IntegerField()
+
+
+Ex:-
+forms.py:- (ModelFormApp app-folder)
+(create new-file under ModelFormApp folder)
+---------------------------------------
+from django import forms
+from ModelFormApp.models import Student
+
+class StudentForm(forms.ModelForm):
+    #fields with validations(Not-Required...)
+	#model-field are taken-here automatically
+    class Meta:
+        model=Student;
+        fields='__all__';
+		
+=*** here Student-db-table fields are auto. taken for Student-Form in html-<form>-tag as i/p-controls
+
+
+Ex:-
+views.py:- (ModelFormApp app-folder)
+-------------------------------------
+from django.shortcuts import render
+from ModelFormApp import forms
+
+#Create your views here.
+def student_view(request):
+    sentdata = False;
+    formObj=forms.StudentForm();
+    if request.method=="POST":
+        formObj=forms.StudentForm(request.POST);
+        if formObj.is_valid():
+            print('Given or Submitted Form data..!!')
+            print('Name:', formObj.cleaned_data['name'])
+            print('Marks:', formObj.cleaned_data['marks'])
+            formObj.save(commit=True)
+            sentdata = True;
+            formObj = forms.StudentForm();
+    return render(request, 'ModelFormApp/studentform.html',{"form1":formObj,'sentdata':sentdata });
+
+
+Ex:-
+studentform.html:- (templates\ModelFormApp folder)
+----------------------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Student-Form</title>
+        <link href="{% static 'css/studentform.css' %}" rel="stylesheet" />
+    </head>
+    <body>
+    <!--<h1>Student Entry Form</h1>
+    <hr />-->
+    <div align="center">
+        {%if sentdata%}
+            <h1>Thanks for Providing Information..!!</h1>
+            <h2>Enter Next Student Marks</h2>
+        {%else%}
+            <h1>Student marks Submit Form</h1>
+        {%endif%}
+        <hr />
+        <form method="post">
+            {{form1.as_p}}
+            {%csrf_token%}
+            <input type="submit" name=""value="Submit">
+        </form>
+    </div>
+</body>
+</html>
+
+
+Ex:-
+studentform.css (static\css folder)
+------------------------------------------
+body{
+    background-color: lightyellow;
+    color:darkgreen;
+}
+h1{
+    text-align: center;
+    color:green;
+    background-color: yellow;
+    border:2px Solid Blue;
+}
+form{
+    color:orangered;
+}
+
+=** Also add below configuration in settings.py for static-files,
+Ex:-
+settings.py  (ModelFormProject)
+---------------------------------
+STATIC_URL = '/static/'
+import os;
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+
+
+=*** Finally, follow below steps to create DB-table on MySQL-DB,
+i) install mysqlclient in Django-project by using pip-command in Pycharm-terminal/command-prompt as follows, 
+Ex:-
+C:\Users\Office\PycharmProjects\ModelFormProject> pip install --only-binary :all: mysqlclient
+
+Collecting mysqlclient
+  Using cached mysqlclient-2.1.0-cp39-cp39-win_amd64.whl (180 kB)
+Installing collected packages: mysqlclient
+Successfully installed mysqlclient-2.1.0
+
+ii)
+= Now, goto ModelFormProject(settings.py) & configure your mysql-database properties as follows,
+settings.py:(ModelFormProject)
+-------------------------------
+DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'PORT': '3302',		#3306 or 3308
+        'NAME': 'studdb',	#make-sure this DB is in MySQL8-DB
+        'USER': 'root',
+        'PASSWORD': 'root',
+    }
+}
+(put #comment for prev-default-database-properties i.e, sqlite3)
+
+=> create studdb database in mysql:-
+(#make-sure this DB is in MySQL8-DB, if not create and keep it ready)
+Ex:- (login to MySQL8 & use below commands...)
+mysql> create database studdb;
+Query OK, 1 row affected
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| empdb              |
+| information_schema |
+| mysql              |
+| performance_schema |
+| studdb             |
+| studentdb          |
+| sys                |
++--------------------+
+7 rows
+
+mysql> use studdb
+mysql> show table
+(empty)
+
+=> Checking/Verify Configurations(MySQL8-connection)::-
+ C:\Users\Office\PycharmProjects\DBModelProject> py manage.py shell
+>>> from django.db import connection;
+>>> mycursor = connection.cursor();
+>>> print(mycursor);
+(done if no-error...)
+>>>exit();
+
+(perform-migrations(3))
+iii) Converting Model Class into Database specific SQL-Code in python
+= For this, we have to use "makemigrations" command
+Ex:-
+cmd\ModelFormProject> python manage.py makemigrations
+It results the following:
+-----------------------------------------
+Migrations for 'ModelFormApp':
+  DBModelApp\migrations\0001_initial.py
+    - Create model Student
+-----------------------------------------
+NOTE:-
+= Open "0001_initial.py" file under migrations-folder(DBModelApp) & verify SQL-Code in python-class
+
+=> How to see corresponding SQL Code of Migrations??
+= To verify the generated SQL-Code, we have to use the following command "sqlmigrate"
+cmd\ModelFormProject>python manage.py sqlmigrate ModelFormApp 0001
+
+iv) How to execute generated SQL Code?? (migrate Command)
+= After generating sql-code, we have to execute that sql-code to create table in database(mysql)
+= For this, we have to use 'migrate' command
+cmd\ModelFormProject> python manage.py migrate
+
+(***)Note::-
+= Now tables will be created in the database (verify in MySQL8-DB)
+Ex:-
+mysql> use studdb;
+Database changed
+mysql> show tables;
++----------------------------+
+| Tables_in_studdb           |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
+| modelformapp_student(**)   |
++----------------------------+
+11 rows in set
+
+mysql> select * from modelformapp_student;
+Empty set (0.01 sec)
+
+v) How to Check-also created Table in Django admin Interface::-
+(***)
+= We have to register model-class in 'admin.py' file of our Application-Folder
+Ex:-
+admin.py (ModelFormApp app-folder)
+----------------------------------
+from django.contrib import admin
+from ModelFormApp.models import Student
+
+# Register your models here.
+admin.site.register(Student)
+
+vi) Creation of Super-User to login to admin Interface,
+= We can create super-user with the following command by providing username, mailid, password
+cmd\ModelFormProject>python manage.py createsuperuser
+Ex:-
+Username (leave blank to use 'office'): sai
+Email address: sai@gmail.com
+Password: sai
+Password (again): sai
+The password is too similar to the username.
+Bypass password validation and create user anyway? [y/N]: y
+(Superuser created successfully)
+
+NOTE:-
+(once super-user is created, we can verify as follows)
+= We can login to admin interface
+= Start/RUN the server and login to admin interface using the created credentials (username,mailid,password)
+cmd\ModelFormProject> python manage.py runserver
+= Open the following in browser: 
+	http://127.0.0.1:8000/admin/
+	http://localhost:8000/admin/
+(In Django-admin-page, we can view MODELFORMAPP created tables from DJango-project on to MySQL-database)
+(It also provides 2-option for (i.ADD-option)Adding-New-Record, as well as (ii.Change-option)Changing or updating existing-records option)
+(preform necessary changes...)
+Add:-
+------
+Sai  98
+Ram   86
+Ali  72
+
+=**(also verify in mysql-db)
+mysql> select * from modelformapp_student;
+
+(Not-Req**)
+vii) To Display table-Data in admin-Interface in Browser::-
+Ex:-
+models.py (add __str__() method)
+-----------
+from django.db import models
+# Create your models here.
+class Student(models.Model):
+    #sno = models.IntegerField();
+    name = models.CharField(max_length=30)
+    marks = models.IntegerField()
+    def __str__(self):
+        return 'Student Object with Sno: '+str(self.id);
+		
+Ex:-
+admin.py (ModelFormApp) -> add StudentAdmin-class
+---------------------------
+from django.contrib import admin
+from ModelFormApp.models import Student
+
+#Register your models here.
+#admin.site.register(Student)
+
+class StudentAdmin(admin.ModelAdmin):
+    list_display=['id','name','marks'];
+admin.site.register(Student,StudentAdmin)
+
+
+=**(also verify in mysql-db/admin-Interface after adding data...)
+mysql> select * from modelformapp_student;
+
+viii)
+Ex:-
+urls.py (ModelFormProject)
+-------------------------------------
+from django.contrib import admin
+from django.urls import path
+from ModelFormApp import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('studentform/', views.student_view),
+]
+
+NOTE:-
+= Run Django Server and request below URL,
+	http://localhost:8000/studentform/
+
+(also verify in mysql-db/admin-Interface after adding data...)
+mysql> select * from modelformapp_student;
+
+
+
+
+=========================================second session===========================================
+------------------------------------------------------------------
+-------------------------------------------------------------------
+==>Demo Another-Project-2::-(movieproject based on Model-Forms)
+= Create new Project (MovieProject)
+= Also create new-app (MovieApp)
+
+Ex:- 
+models.py (MovieApp app-folder)
+----------------------------------------
+from django.db import models
+#Create your models here.
+class Movies(models.Model):
+    releasedate=models.DateField()
+    moviename=models.CharField(max_length=30)
+    actor=models.CharField(max_length=30)
+    actress=models.CharField(max_length=30)
+    rating=models.IntegerField()
+
+
+
+Ex:-
+admin.py (MovieApp folder)
+-----------------------------
+from django.contrib import admin
+from MovieApp.models import Movies
+
+#Register your models here.
+class MoviesAdmin(admin.ModelAdmin):
+    list_display=['releasedate','moviename', 'actor','actress','rating'];
+
+admin.site.register(Movies,MoviesAdmin);
+
+
+Ex:-(model-form (or) form based on model)
+forms.py (MovieApp folder)
+------------------------------
+from django import forms;
+from MovieApp.models import Movies
+
+class MoviesForm(forms.ModelForm):
+    #no-separate fields are required(taken from model-Movies-class)
+    class Meta:
+        model=Movies
+        fields='__all__'
+
+
+Ex:-
+views.py (MovieApp folder)
+-----------------------------
+from django.shortcuts import render
+from MovieApp.forms import MoviesForm
+from MovieApp.models import Movies
+
+#Create your views here.
+def index_view(request):
+    return render(request,'MovieApp/index.html')
+
+def add_movie_view(request):
+    formObj=MoviesForm()
+    if request.method=="POST":
+        formObj=MoviesForm(request.POST)
+        if formObj.is_valid():
+            print(formObj.cleaned_data['releasedate'])
+            print(formObj.cleaned_data['moviename'])
+            print(formObj.cleaned_data['actor'])
+            print(formObj.cleaned_data['actress'])
+            print(formObj.cleaned_data['rating'])
+            formObj.save()	#auto-commit
+            return index_view(request)
+    return render(request, 'MovieApp/addmovie.html',{'form1':formObj})
+
+def list_movie_view(request):
+    movies_list=Movies.objects.all().order_by('-rating') #(-)desc-order
+    return render(request,'MovieApp/listmovie.html',{'movies_list':movies_list})
+
+
+Ex:-
+index.html (templates/MovieApp)
+-----------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>HomePage</title>
+        <link rel="stylesheet" href="{% static "css/movies.css"%}">
+    </head>
+    <body>
+        <div align="center">
+            <div >
+                <h1>Telugu Movies..!!</h1>
+                <hr />
+                <p>Up-to-date movies details..!!</p>
+                <a href="/addmovie/" >Add-Movie</a>
+                <a href="/listmovies/" >List-Movies</a>
+            </div>
+        </div>
+    </body>
+</html>
+
+
+Ex:-
+listmovie.html  (templates/MovieApp folder)
+----------------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Movies-List</title>
+        <link rel="stylesheet" href="{% static "css/movies.css"%}">
+    </head>
+    <body>
+        <h1>Movies-List Details..!!</h1>
+        <hr />
+        {%if movies_list%}
+            <table>
+                <thead>
+                    <th>Release-Date</th>
+                    <th>Movie-Name</th>
+                    <th>Actor</th>
+                    <th>Actress</th>
+                    <th>Rating</th>
+                </thead>
+                <tbody>
+                {%for movie in movies_list%}
+                    <tr>
+                        <td>{{movie.releasedate}}</td>
+                        <td>{{movie.moviename}}</td>
+                        <td>{{movie.actor}}</td>
+                        <td>{{movie.actress}}</td>
+                        <td>{{movie.rating}}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+			<a href="/" >Home-Page</a>
+        {%else%}
+            <p>OOPs...No Movies Found!!</p>
+        {%endif%}
+</body>
+</html>
+
+
+
+Ex:-
+addmovie.html (templates/MovieApp folder)
+-------------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Add Movies</title>
+        <link rel="stylesheet" href="{%static "css/movies.css"%}">
+    </head>
+    <body>
+        <div align='center'>
+            <h1>Add Movie Information</h1>
+            <hr />
+			<a href="/" >Home-Page</a>
+            <form method="post">
+                {{form1.as_p}}
+                {%csrf_token%}
+                <input type="submit" value="Add-Movie">
+            </form>
+        </div>
+    </body>
+</html>
+
+
+Ex:-
+movies.css	(static/css folder)
+----------------------------------
+body{
+    background-color: LightYellow;
+	color:darkgreen;
+}
+table,tr,td,thead,th{
+    border:2px solid white;
+    font-size: 30px;
+    color:white;
+    background:red;
+    margin:auto;
+}
+thead, th{
+    border:2px solid red;
+    font-size: 30px;
+    color:blue;
+    margin:auto;
+    background:yellow;
+}
+h1{
+    text-align: center;
+}
+
+
+Ex:-
+urls.py	(MovieProject conf-folder)
+-------------------------------
+from django.contrib import admin
+from django.urls import path,re_path
+from MovieApp import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('addmovie/', views.add_movie_view),
+    path('listmovies/', views.list_movie_view),
+    re_path('^.*$', views.index_view),
+]
+
+
+
+=** Also add below configuration in settings.py for static-files,
+Ex:-
+settings.py  (MovieProject)
+---------------------------------
+STATIC_URL = '/static/'
+import os;
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+
+NOTE:-
+--------
+=*** Finally, follow below steps to create DB-table on MySQL-DB,
+i) install mysqlclient in Django-project by using pip-command in Pycharm-terminal/command-prompt as follows, 
+Ex:-
+C:\Users\Office\PycharmProjects\MovieProject> pip install --only-binary :all: mysqlclient
+(or)
+cmd> pip install --only-binary :all: mysqlclient
+Collecting mysqlclient
+  Using cached mysqlclient-2.1.0-cp39-cp39-win_amd64.whl (180 kB)
+Installing collected packages: mysqlclient
+Successfully installed mysqlclient-2.1.0
+
+
+ii)
+= Now, goto MovieProject(settings.py) & configure your mysql-database properties as follows,
+settings.py:(MovieProject)
+-------------------------------
+DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'PORT': '3302',		#3306 or 3308
+        'NAME': 'moviedb',	#make-sure this DB is in MySQL8-DB
+        'USER': 'root',
+        'PASSWORD': 'root',
+    }
+}
+(put #comment for prev-default-database-properties i.e, sqlite3)
+==> (#make-sure this DB is in MySQL8-DB, if not create and keep it ready)
+Ex:- (login to MySQL8 & use below commands...)
+mysql> create database moviedb;
+Query OK, 1 row affected
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| empdb              |
+| information_schema |
+| moviedb			 |	
+| mysql              |
+| performance_schema |
+| studdb             |
+| studentdb          |
+| sys                |
++--------------------+
+8 rows
+
+mysql> use moviedb;
+mysql> show tables;
+(empty)
+
+==> Checking/verify DB-Configurations(MySQL8-connection)::-
+(goto-terminal)
+cmd> py manage.py shell
+>>> from django.db import connection;
+>>> mycursor = connection.cursor();
+>>> print(mycursor);
+(done if no-error...)
+>>>exit()
+
+
+(perform migrations(3))
+iii) Converting Model Class into Database specific SQL-Code in python
+= For this, we have to use "makemigrations" command
+Ex:-
+cmd\MovieProject> python manage.py makemigrations
+It results the following:
+-----------------------------------------
+Migrations for 'MovieApp':
+  MovieApp\migrations\0001_initial.py
+    - Create model Movies
+-----------------------------------------
+NOTE:-
+= Open "0001_initial.py" file under migrations-folder(MovieApp) & verify SQL-Code in python-class
+
+=> How to see corresponding SQL Code of Migrations??
+= To verify the generated SQL-Code, we have to use the following command "sqlmigrate"
+cmd\MovieProject>python manage.py sqlmigrate MovieApp 0001
+
+iv) How to execute generated SQL Code?? (migrate Command)
+= After generating sql-code, we have to execute that sql-code to create table in database(mysql)
+= For this, we have to use 'migrate' command
+cmd\MovieProject> python manage.py migrate
+
+(***)Note::-
+= Now tables will be created in the database (verify in MySQL8-DB)
+Ex:-
+mysql> use moviedb;
+Database changed
+mysql> show tables;
++----------------------------+
+| Tables_in_moviedb          |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
+| movieapp_movies            |
++----------------------------+
+11 rows in set
+
+v) How to Check/verify created Table in Django admin Interface::-
+(***)
+= We have to register model-class in 'admin.py' file of our Application-Folder
+Ex:-
+admin.py (MovieApp folder) --> (already-done) not-required
+----------------------------------
+from django.contrib import admin
+from MovieApp.models import Movies
+
+#Register your models here.
+class MoviesAdmin(admin.ModelAdmin):
+    list_display=['releasedate','moviename', 'actor','actress','rating'];
+admin.site.register(Movies,MoviesAdmin);
+
+vi) Creation of Super-User to login to admin Interface,
+= We can create super-user with the following command by providing username, mailid, password
+cmd\MovieProject>python manage.py createsuperuser
+Ex:-
+Username (leave blank to use 'office'): sai
+Email address: sai@gmail.com
+Password: sai
+Password (again): sai
+The password is too similar to the username.
+Bypass password validation and create user anyway? [y/N]: y
+(Superuser created successfully)
+
+NOTE:-
+(once super-user is created, we can verify as follows)
+= We can login to admin interface
+= Start the server and login to admin interface using the created credentials (username,mailid,password)
+cmd\MovieProject> python manage.py runserver
+= Open the following in browser: 
+	http://127.0.0.1:8000/admin/
+	http://localhost:8000/admin/
+(In Django-admin-page, we can view MODELFORMAPP created tables from DJango-project on to MySQL-database)
+(It also provides 2-option for (i.ADD-option)Adding-New-Record, as well as (ii.Change-option)Changing or updating existing-records option)
+(preform necessary changes...)
+	April 14, 2023	Bhola Shankar	Chiru	Pooja	4
+	Jan. 12, 2023	Adipurush	Prabhas	Kriti	5
+
+
+=**(also verify in mysql-db)
+mysql> select * from movieapp_movies;
+
+(Not-Req**)
+vii) To Display Data in admin-Interface in Browser::-
+Ex:-
+models.py 
+-----------
+from django.db import models
+# Create your models here.
+class Student(models.Model):
+    #sno = models.IntegerField();
+    name = models.CharField(max_length=30)
+    marks = models.IntegerField()
+    def __str__(self):
+        return 'Student Object with Sno: '+str(self.id);
+		
+Ex:-
+admin.py (ModelFormApp) ---> not-required
+---------------------------
+from django.contrib import admin
+from ModelFormApp.models import Student
+
+#Register your models here.
+#admin.site.register(Student)
+
+class StudentAdmin(admin.ModelAdmin):
+    list_display=['id','name','marks'];
+admin.site.register(Student,StudentAdmin);
+
+(till-here Not-Req**)
+--------------------------------------------
+
+=**(also verify in mysql-db/admin-Interface after adding data...)
+Ex:-
+RELEASEDATE MOVIENAME ACTOR ACTRESS RATING
+	April 14, 2023	Bhola Shankar	Chiru	Pooja	4
+	Jan. 12, 2023	Adipurush	Prabhas	Kriti	5
+	
+mysql> select * from movieapp_movies;
++----+-------------+---------------+---------+---------+--------+
+| id | releasedate | moviename     | actor   | actress | rating |
++----+-------------+---------------+---------+---------+--------+
+|  1 | 2023-01-12  | Adipurush     | Prabhas | Kriti   |      5 |
+|  2 | 2023-04-14  | Bhola Shankar | Chiru   | Pooja   |      4 |
++----+-------------+---------------+---------+---------+--------+
+
+viii) (N-Req done already)
+Ex:-
+urls.py (MovieProject)
+-------------------------------------
+from django.contrib import admin
+from django.urls import path,re_path
+from MovieApp import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('addmovie/', views.add_movie_view),
+    path('listmovies/', views.list_movie_view),
+    re_path('^.*$', views.index_view),
+]
+
+
+(Finally, do this...)
+NOTE:-
+= Run Django Server and request below base-URL,
+	http://localhost:8000/ 		#No-URL by default goes to index.html
+
+(and)
+(also verify in mysql-db/admin-Interface after adding data...)
+mysql> select * from movieapp_movies;
+
+
+(*****)
+(Finally) "Assignment for all"
+-----------------------------------
+==>How to Add Date Widget:
+=> Write a DateInput class in forms.py as follows:-
+Ex:-
+forms.py (MovieApp folder)
+---------------------
+#using date-widget...
+class DateInput(forms.DateInput):
+    input_type = 'date';
+
+	
+	
+=> Now define/modify ModelForm class as follows:-
+class MoviesForm(forms.ModelForm):
+    releasedate = forms.DateField(widget=DateInput())
+    moviename = forms.CharField()
+    actor = forms.CharField()
+    actress = forms.CharField()
+    rating = forms.FloatField()
+    class Meta:
+        model = Movies
+        fields = ('releasedate','moviename', 'actor', 'actress', 'rating');
+		
+(or)		
+class MoviesForm(forms.ModelForm):
+    releasedate = forms.DateField(widget=DateInput(attrs={'class': 'form-control'}))
+    moviename = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    actor = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    actress = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    #director_name = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    rating = forms.FloatField(widget=forms.TextInput(attrs={'class': 'form-control'}))
+    class Meta:
+        model = Movies
+        fields = ('releasedate','moviename', 'actor', 'actress', 'rating');
+
+NOTE:-
+= Here 'class':'form-control' is a bootstrap class used to format the date field
+= link for DateInput class https://docs.djangoproject.com/en/2.1/ref/forms/widgets/#dateinp
+
+
+

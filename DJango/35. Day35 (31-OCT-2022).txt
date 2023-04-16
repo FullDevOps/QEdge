@@ -1,0 +1,385 @@
+***Program-coding*** (Custom-Managers-Project)
+----------------------
+==> Re-use prev-project(AdvModelsProject) & prev-app(MyApps1)::-
+(also create mysql-db(advmodeldb))
+
+=*** When we say Employees.objects.all()
+(We get all records as per default-insertion-order)
+
+Ex::-
+However, we can retrieve all empolyees data as per our req-order
+Ex:-
+asc/desc order of eno/ename/sal
+(for this we have to define Custom-Manager class)
+
+Ex:-
+models.py (MyApps1 main-folder)
+----------------------------------------
+#Custom-Manager
+from django.db import models
+class CustomManager(models.Manager):
+	def get_queryset(set):
+		return super().get_queryset().order_by('eno')
+		
+#Create your models here.
+class Employees(models.Model):
+	eno = models.IntegerField()
+	ename = models.CharField(max_length = 64)
+	esal = models.FloatField()
+	eaddr = models.CharField(max_length = 256)
+	objects = CustomManager()
+
+
+Ex:- (admin-interface)
+admin.py (MyApps1 main-folder)
+----------------------------------------
+from django.contrib import admin
+from MyApps1.models import Employees
+
+class EmployeesAdmin(admin.ModelAdmin):
+	list_display = ['eno','ename','esal','eaddr'];
+    
+admin.site.register(Employees,EmployeesAdmin)
+
+
+Ex:-
+=> Now, create a superuser,
+cmd> py manage.py createsuperuser
+(uname:sai)
+(password:sai)
+
+Ex:- (perform-migrations)
+cmd> py manage.py makemigrations
+cmd> py manage.py sqlmigrate.....
+cmd> py manage.py migrate
+
+Ex:-
+=> Now, start the server & request below URL,
+http://localhost:8000/admin/
+(login & select your table-name(Employees) and perform add/update/del operations)
+Ex:-
+ENO		ENAME	ESAL	EADDR	
+1122	Sai		5600.0	Hyderabad
+1133	Ram		6500.0	Secbad
+1144	Ali		4500.0	Hitech
+1155	Tom		3600.0	Ameerpet
+1166	Pop		2800.0	KPHB
+(5-employees)
+
+
+Ex:-
+=> Optionally, also verify in mysql-db,
+mysql> use advmodeldb
+Database changed
+mysql> show tables;
+mysql> select * from myapps1_employees;
++----+------+-------+------+-----------+
+| id | eno  | ename | esal | eaddr     |
++----+------+-------+------+-----------+
+|  1 | 1122 | Sai   | 5600 | Hyderabad |
+|  2 | 1133 | Ram   | 6500 | Secbad    |
+|  3 | 1144 | Ali   | 4500 | Hitech    |
+|  4 | 1155 | Tom   | 3600 | Ameerpet  |
+|  5 | 1166 | Pop   | 2800 | KPHB      |
++----+------+-------+------+-----------+
+5 rows in set (0.00 sec)
+
+(****)
+==> Now,(let us perform advanced-model operations)	
+= Whenever we are using all() method it will always get employees in ascending order of eno
+Now,
+Ex:- (verify...Model-Manager)	
+(Terminal-tab)
+cmd> py manage.py shell
+>>> from MyApps1.models import Employees
+>>> emps = Employees.objects.all();   
+>>> print(emps.query);
+SELECT `MyApps1_employees`.`id`, `MyApps1_employees`.`eno`, `MyApps1_employees`.`ename`, `MyApps1_employee
+s`.`esal`, `MyApps1_employees`.`eaddr` FROM `MyApps1_employees` ORDER BY `MyApps1_employees`.`eno` ASC    
+>>> emps
+(we gets emps-data with empno in ASC order)
+>>> exit();
+
+
+
+***(NR)****
+**Another-Example**
+---------------------
+=> Based on our requirement we can define our own new methods also inside Custom Manager class.
+Ex:-
+models.py (MyApps1 main-folder)
+------------------------------------
+class CustomManager(models.Manager):
+    def get_queryset(self): #0-arg
+        return super().get_queryset().order_by('eno')
+
+    def get_emp_sal_range(self, esal1, esal2):  #2-args
+        return super().get_queryset().filter(esal__range=(esal1, esal2))
+
+    def get_employees_sorted_by(self, param):   #1-args
+        return super().get_queryset().order_by(param)
+
+
+Ex:-(optional)
+Now,
+=> perform makemigrations
+cmd> py manage.py makemigrations
+=> also run migrate
+cmd> py manage.py migrate
+
+		
+NOTE:-
+Q) To customize all() Method Behaviour , which Method we have to override inside CustomManager Class?
+A)	get_queryset Method
+		
+Q)	In CustomManager Class, is it Possible to define New Methods?
+A) Yes
+
+
+Ex:-
+views.py (MyApps1 main-folder)
+------------------------------------
+from django.shortcuts import render
+from MyApps1.models import Employees
+# create your views here
+def display_view(request):
+	#employees = Employees.objects.get_emp_sal_range(3000,5000)
+	#employees = Employees.objects.get_employees_sorted_by('esal')
+	employees = Employees.objects.get_employees_sorted_by('-esal')
+	dict1 = {'employees':employees}
+	return render(request,'MyApps1/index.html',dict1)
+
+	
+
+Ex:-
+index.html (templates/MyApps1 main-folder)
+--------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h2>Employee Information</h2>
+    <hr />
+    <table border='2'>
+        <thead>
+            <th>EmpNo</th>
+            <th>EmpName</th>
+            <th>Salary</th>
+            <th>Address</th>
+        </thead>
+        {%for emp in employees%}
+            <tr>
+                <td>{{emp.eno}}</td>
+                <td>{{emp.ename}}</td>
+                <td>{{emp.esal}}</td>
+                <td>{{emp.eaddr}}</td>
+            </tr>
+        {%endfor%}
+    </table>
+    <br /><br /><br />
+{%endblock%}
+
+
+Ex:-
+base.html (templates/MyApps1 main-folder)
+--------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Base HTML Page</title>
+</head>
+<body>
+    <h1>Advanced Models in DJANGO</h1>
+    <hr />
+    {% block body_block %}
+    {% endblock %}
+    <hr />
+    <h4>End of base.html page</h4>
+</body>
+</html>
+
+Ex:-
+urls.py (AdvModelsProject conf-folder)
+------------------------------------------
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('display/', views.display_view),
+]
+
+Ex:-
+==> Finally start the server and request belwo URL,
+http://localhost:8000/display/
+
+
+
+
+(****Next-type of Model-Information****)
+5) 	Proxy Model Inheritance ::
+----------------------------------------
+= For the same model we can provide a customized views without touching the database is possible by using Proxy Model Inheritance
+= In this inheritance, a seperate new table won't be created and the new model also points to the same old table in database
+(Proxy-model acts like Proxy-table)
+(views in any DBase)
+
+***prog-code***
+---------------
+(models.py)
+Ex:- (already there, re-use it...)
+class Employees(models.Model):
+	eno = models.IntegerField()
+	ename = models.CharField(max_length = 64)
+	esal = models.FloatField()
+	eaddr = models.CharField(max_length = 256)
+	objects = CustomManager()
+	
+class ProxyEmployees(Employees):
+	class Meta:
+		proxy = True
+		
+= Both Employees and ProxyEmployees are pointing  to the same table only
+= In the admin interface if we add a new record to either Employees or ProxyEmployees, then automatically those changes will be reflected to other model view
+
+
+***Start-Coding****
+Ex:-
+models.py (MyApps1 main-folder)
+---------------------------------
+#proxy model inheritance
+from django.db import models
+class CustomManager1(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(esal__gte=5000)
+
+class CustomManager2(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().order_by('ename')
+
+class CustomManager3(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(esal__lt=5000)
+
+# create your models here.
+class Employees(models.Model):
+    eno = models.IntegerField()
+    ename = models.CharField(max_length=64)
+    esal = models.FloatField()
+    eaddr = models.CharField(max_length=256)
+    objects = CustomManager1()
+
+class ProxyEmployees1(Employees):
+    objects = CustomManager2()
+    class Meta:
+        proxy = True
+
+class ProxyEmployees2(Employees):
+    objects = CustomManager3()
+    class Meta:
+        proxy = True
+
+
+
+
+Ex:-		
+admin.py (MyApps1 main-folder)
+-----------------------------------
+from django.contrib import admin
+from MyApps1.models import Employees
+from MyApps1.models import ProxyEmployees1
+from MyApps1.models import ProxyEmployees2
+
+class EmployeesAdmin(admin.ModelAdmin):
+	list_display = ['eno','ename','esal','eaddr'];
+admin.site.register(Employees,EmployeesAdmin)
+
+class ProxyEmployees1Admin(admin.ModelAdmin):
+	list_display = ['eno','ename','esal','eaddr'];
+admin.site.register(ProxyEmployees1,ProxyEmployees1Admin)
+
+class ProxyEmployees2Admin(admin.ModelAdmin):
+	list_display = ['eno','ename','esal','eaddr']
+admin.site.register(ProxyEmployees2,ProxyEmployees2Admin)
+
+
+
+Ex:-	
+views.py (MyApps1 main-folder)
+--------------------------------------
+#proxy model inheritance
+from django.shortcuts import render
+from MyApps1.models import Employees, ProxyEmployees1,ProxyEmployees2
+#create your views here.
+def display_view2(request):
+	employees = Employees.objects.all()
+	employees = ProxyEmployees1.objects.all()
+	employees = ProxyEmployees2.objects.all()
+	dict1 = {'employees':employees}
+	return render (request ,'MyApps1/index.html' , dict1)
+	
+	
+Ex:-(Same-re-use)
+index.html (templates/MyApps1 main-folder)
+--------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h2>Employee Information</h2>
+    <hr />
+    <table border='2'>
+        <thead>
+            <th>EmpNo</th>
+            <th>EmpName</th>
+            <th>Salary</th>
+            <th>Address</th>
+        </thead>
+        {%for emp in employees%}
+            <tr>
+                <td>{{emp.eno}}</td>
+                <td>{{emp.ename}}</td>
+                <td>{{emp.esal}}</td>
+                <td>{{emp.eaddr}}</td>
+            </tr>
+        {%endfor%}
+    </table>
+    <br /><br /><br />
+{%endblock%}
+
+
+Ex:- (Same-re-use)
+base.html (templates/MyApps1 main-folder)
+--------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Base HTML Page</title>
+</head>
+<body>
+    <h1>Advanced Models in DJANGO</h1>
+    <hr />
+    {% block body_block %}
+    {% endblock %}
+    <hr />
+    <h4>End of base.html page</h4>
+</body>
+</html>
+
+Ex:-
+urls.py (AdvModelsProject conf-folder)
+------------------------------------------
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views
+
+urlpatterns = [
+    .....
+	path('display2/', views.display_view2),
+]
+
+Ex:-
+==> Finally start the server and request belwo URL,
+http://localhost:8000/display2/
+

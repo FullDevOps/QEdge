@@ -1,0 +1,517 @@
+-------------------------------------------------------------------
+***New-Topic***
+--------------------------------------------------------------------
+==>Working with Static Files in .html-code(Images/CSS-files)::-
+(audio/video/mp3/graphics/downloadable-files....)
+= Till now, we just inserted only normal-text data/variables into our template from views.py by using templates-tags {{}}
+= but sometimes our requirement is to insert static files like images,css-files etc inside our template-file
+
+==>** Process/Steps to include Static Files inside Template(.html files):-
+(Create ThirdProject & FirstApp and keep it ready...)
+steps:-
+i) Create a folder named with 'static' inside project-main-folder, it is exactly same as that of creating 'templates' folder 
+ii) In that 'static' folder create 'images' folder to place image files(or other-static-files)
+Ex:-	image1.jpg,image2.jpg,image3.jpg,image4.jpg,image5.jpg
+**iii) Add/register "static" folder-path or directory-path to "settings.py" file, so that Django-project is aware of our images used in our Django-Applications (Similar to templates folder-path)
+Ex:-
+==>settings.py (Project-folder)
+--------------------
+STATIC_URL = 'static/'
+import os;
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+((very-imp-point)
+=**here BASE_DIR = Path(__file__).resolve().parent.parent is auto-generated in "settings.py" file as default-variable in begining to file)
+
+4)*** Make sure all images-paths are working correctly or not 
+(Verify in browser-address-bar with online-server(run-server))
+http://127.0.0.1:8000/static/images/image1.jpg
+http://127.0.0.1:8000/static/images/image2.jpg
+http://127.0.0.1:8000/static/images/image3.jpg
+http://127.0.0.1:8000/static/images/image4.jpg
+http://127.0.0.1:8000/static/images/image5.jpg
+(hence all images from our server should be displayed in browser)
+(images are working properly)
+
+5)** Use on Special-Template-Tag to insert images(static-files)
+= At the begining of HTML-program just after <!DOCTYPE html> we have to include the following template-tag
+Ex:-
+	{%load static%}
+	{%load staticfiles%}	#staticfiles or static is foldername
+	
+(it is Just we are telling or requesting Django-framework to load all static files in current webpage i.e, .html file)
+
+6) Finally, we have to include/use image-files as follows in html-program using html <img> tag
+Syntax:-
+	<img src="path" width="80%" height="500" alt="alt-text"... />
+Ex:-
+	<img src="{%static "images/image1.jpg"%}" />
+
+
+##Program (using static-files in Django-application)
+step1:-
+==> wishes3.html
+(templates/FirstApp templates-folder)
+-------------------------------------------
+<!DOCTYPE html>
+{% load static %}   <!-- folder name-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Static Files in DJango App</title>
+    <style>
+        #h11{
+            color:blue;
+        }
+        #h22{
+            color:green;
+        }
+        #img1{
+            width:400px;
+            height:280px;
+            border:10px Groove Red;
+        }
+    </style>
+</head>
+<body>
+    <h1 id=h11>{{msg1}}</h1>
+    <hr />
+    <h2 id=h22>Current Server Date & Time :: {{date1}}</h2>
+    <hr />
+    <h3>At this time your image is:</h3>
+    <img src="{%static 'images/'%}{{imgs}}" alt="Time-Line-Image" id="img1" />
+</body>
+</html>
+
+
+step2:-
+---------
+==> views.py (FirstApp app-folder)
+-----------------------------------
+from django.shortcuts import render
+import datetime
+def wishes3(request):
+    date1=datetime.datetime.now()
+    msg1='Hello User/Client...GOOD';
+    hr=int(date1.strftime('%H'));
+    imgs='image1.jpg';
+    if hr<12:
+        msg1+=' Morning!!'
+        imgs = 'image1.jpg';
+    elif hr<16:
+        msg1+=' Afternoon!!'
+        imgs = 'image2.jpg';
+    elif hr<20:
+        msg1+=' Evening!!'
+        imgs = 'image3.jpg';
+    else:
+        msg1='Hello User/Client...Very Good Night!!'
+        imgs = 'image4.jpg';
+    dict1={'date1':date1,'msg1':msg1,'imgs':imgs}
+    return render(request,'FirstApp/wishes3.html',context=dict1);
+	
+step3:-
+=*** make url-pattern in urls.py(project-main-folder-level)
+Ex:-
+from FirstApp import views
+	path('wishes3/', views.wishes3),
+
+step4:-
+=*** Re-Start the server & request below url in browser-address-bar
+http://localhost:8000/wishes3/
+
+
+NOTE:-
+**(html-concept)**
+==> Images in HTML-program::-
+= To display images in html-page, we use below <tag>
+Ex:-
+	<img src="images/image1.jpg" alt="" width="" height="" id="" />
+
+= Here,
+src="" source of the image-file(complete-path)
+width="" width of the image
+height="" height of the image
+alt="" alternate-text of image, displayed when image is missing or corrupted
+id=""	unique-id if image(used of css #img1{....})
+
+(****)
+#sp-case of Static-Files::-
+(working with .css files)
+Step1:
+= create css-folder under static-folder
+Step2:-
+= create one common .css file in above css-folder
+Ex:- (static/css/styles.css)  ---> #external-css-file
+#h11{
+    color:blue;
+}
+#h22{
+    color:green;
+}
+#img1{
+    width:400px;
+    height:280px;
+    border:10px Groove Red;
+}
+
+step3:-
+= use this .css file in wishes3.html code
+Ex:-(html-code)
+<head>
+	<link href="static/css/styles.css" rel="stylesheet" />
+</head>
+Ex:- (template-tag-code)
+<head>
+	<link href="{%static 'css/styles.css'%}" rel="stylesheet" />
+</head>
+
+=*** make-sure to load static-folder at begining of html-file
+Ex:-
+	{%load static%}
+
+step4:-
+= Re-Start the server & request below-url
+http://localhost:8000/wishes3/
+(Verify external-css-file applied or working or not)
+
+
+NOTE:-
+1)
+= CSS are of 2-categories,
+	A) Internal-css(2-types)  -> inside .html-code
+		i) Inline-css (Directly to tag using style="" html-attr)
+		Ex:-
+			<h1 style="color:Blue;text-align:center;">Welcome to Django</h1>
+		ii) Internal-css (under <head> section using <style>....</style>)
+		Ex:-
+		<style>
+			h1{
+			}
+			h2{
+			}
+		</style>
+		
+	B) External-css(1-type) (here we use separate .css file styles.css)
+	Ex:- (use this file in .html prog using <link>tag)
+	<head>
+		<link href=".css" rel="stylesheet" />
+	</head>
+
+2)
+= use inline-css, if only 1-particular <tag> requires specific css
+= use internal-css(<style>), if group of <tags> require common-css in that particular-file (Tagname/#Idname/.Classname)
+= use external-css(<link>), if group of <tags> require common-css in that multiple-html-file (Tagname/#Idname/.Classname)
+
+
+
+
+
+=====================second class =========================================================
+
+---------------------------------------------------
+***New Topic***
+-----------------
+===> Django-Template Language::-
+= HTML in webpage is used for presentation of data
+Ex:-
+	Headings,Paragraphs,List,Tables,Forms etc
+= CSS is used in webpage to make website stylish & attractive
+Ex:-
+colors,background-colors,fonts,borders,alignments etc...
+= Javascript is used to perform programming in webpage
+Ex:-
+	variables,logics,control-structures etc...
+	
+NOTE:-
+= As alternative to Javascript, in Django-Applications we use Django-Template-Language
+Ex:-
+a) DJango-Template-Variables tag
+	Ex:-
+		{{variable-name}}
+	(here variable-name is defined in dictionary as key in views.py and it used in render() with context="" keyword-args)
+
+b) DJango-Template-Coding tag
+	Ex:-
+		{%....code....%}
+		{%load static%}
+		src="{%static 'images/image1.jpg' %}"
+		src="{%static 'images'%}{{imgs}}"
+		href="{%static 'css/styles.css'%}"
+
+
+------------------------------------
+***Image-Gallery-Program***
+##Another-Program (using static-files in Django-application)
+(Create ThirdProject & FirstApp --> already created, re-use them)
+
+step1:-
+==> imgsgallery.html
+(templates/FirstApp folder)
+(use same 'static/images' folder)
+------------------------
+<!DOCTYPE html>
+{% load static %}   <!-- folder name-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image-Gallery DJango-App</title>
+    <style>
+        body{
+            background-color: lightyellow;
+        }
+        h1{
+            background-color: yellow;
+            text-align: center;
+            color:blue;
+            border:2px Solid Brown;
+        }
+        h4{
+            background-color: lightpink;
+            text-align: center;
+            color:red;
+            width:75%;
+            margin:auto;
+            border:1px Solid Red;
+        }
+        #div1{
+            border: 5px Solid Red;
+            height:300px;
+        }
+        #div2,#div3{
+            border:2px Solid green;
+            height:49%;
+        }
+        .indiv{
+            border:1px Solid Maroon;
+            float:left;
+            width:24.5%;
+            height:135px;
+            margin:1px;
+        }
+        img{
+            border:1px dotted blue;
+            width:90%;
+            height:126px;
+            margin:3px;
+            margin-left:8px;
+        }
+        img:hover{
+            border:4px Solid Blue;
+            width:95%;
+            height:130px;
+        }
+    </style>
+</head>
+<body>
+    <h1 id=h11>{{msg1}}</h1>
+    <h4 id=h22>Current Server Date & Time :: {{date1}}</h4>
+    <hr />
+    <div id="div1">
+        <div id="div2">
+            <div class="indiv"><img src="{%static 'images/image1.jpg'%}" alt="image1.jpg" /></div>
+            <div class="indiv"><img src="{%static 'images/image2.jpg'%}" alt="image2.jpg" /></div>
+            <div class="indiv"><img src="{%static 'images/image3.jpg'%}" alt="image3.jpg" /></div>
+            <div class="indiv"><img src="{%static 'images/image4.jpg'%}" alt="image4.jpg" /></div>
+        </div>
+        <div id="div3">
+            <div class="indiv"><img src="{%static 'images/image1.jpg'%}" alt="image1.jpg" /></div>
+            <div class="indiv"><img src="{%static 'images/image2.jpg'%}" alt="image2.jpg" /></div>
+            <div class="indiv"><img src="{%static 'images/image3.jpg'%}" alt="image3.jpg" /></div>
+            <div class="indiv"><img src="{%static 'images/image4.jpg'%}" alt="image4.jpg" /></div>
+        </div>
+    </div>
+</body>
+</html>
+
+
+
+step2:-
+---------
+==> views.py (FirstApp app-folder)
+-----------------------------------
+from django.shortcuts import render
+import datetime
+def imagegallery(request):
+    date1 = datetime.datetime.now()
+    msg1 = '***DJango-Image-Gallery***';
+    dict1 = {'date1': date1, 'msg1': msg1}
+    return render(request, 'FirstApp/imgsgallery.html', context=dict1);
+	
+step3:-
+=*** make url-pattern in urls.py(project-conf-folder-level)
+Ex:-
+from FirstApp import views
+   path('imggallery/', views.imagegallery),
+   
+   
+step4:-
+=*** Re-Start the server & request below url in browser-address-bar
+http://localhost:8000/imggallery/
+
+
+
+
+
+-------------------------------------------------
+***HTML-Topic***
+==> Working with division in HTML-page::-
+Syntax:-
+	<div>
+		....
+		....
+		....
+	</div>
+(division-element or division-tag)
+= <div> element is used to divide webpage in different sections
+Ex:-
+	header/footer/left/right/center sections
+==Diagram==
+(Gmail)
+= <div> is block-element, it occupies 100% width of page & every <div> starts in new-line
+(same-like headings <h1> to <h6>)
+= intially <div> is not-visible, we have to make it visible by providing css-properties
+Ex:-
+	#div1{
+		border:2px Solid Brown;
+		width:500px;
+		height:300px;
+		.....
+	}
+= we can have <div> with-in <div> (nested-divisions)
+Ex:-
+	<div id="outdiv">
+		<div id="indiv1">
+		</div>
+		<div id="indiv2">
+		</div>
+	</div>
+
+
+-------------------------------------------------
+##Another-Program 
+(using static-files in Django-application)
+##Django-App to display Product-Gallery in Shopping website (small-imgs & big-img)
+
+(Create ThirdProject & FirstApp --> already created, re-use them)
+step1:-
+==> imgsgallery2.html
+(templates/FirstApp folder)
+(use same 'static/images' folder)
+------------------------
+<!DOCTYPE html>
+{% load static %}   <!-- folder name-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image-Gallery DJango-App</title>
+    <style>
+        body {
+            background-color: lightyellow;
+        }
+        h1{
+            background-color: yellow;
+            text-align: center;
+            color:blue;
+            border:2px Solid Brown;
+        }
+        h4{
+            background-color: lightpink;
+            text-align: center;
+            color:red;
+            width:75%;
+            margin:auto;
+            border:1px Solid Red;
+        }
+
+        #div1{
+            border:2px Solid Gray;
+            width:50%;
+            height:300px;
+        }
+        #div2{
+            border:1px Solid Green;
+            width:20%;
+            height:296px;
+            margin:1px;
+            float:left;
+        }
+        #div3{
+            border:1px Solid Green;
+            width:77.6%;
+            height:296px;
+            margin:1px;
+            float:left;
+        }
+
+        .smallimg{
+            border:1px dotted blue;
+            width:90%;
+            height:48px;
+            margin-top:4px;
+            margin-left:3px;
+            margin-right:3px;
+        }
+        .smallimg:hover{
+            border:1.5px solid blue;
+        }
+       .bigimg{
+            border:1px dotted blue;
+            width:96%;
+            height:288px;
+            margin:4px;
+        }
+
+    </style>
+</head>
+<body>
+    <h1 id=h11>{{msg1}}</h1>
+    <h4 id=h22>Current Server Date & Time :: {{date1}}</h4>
+    <hr />
+    <div id="div1">
+        <div id="div2">
+            <img class="smallimg" src="{%static 'images/image1.jpg'%}" alt="image1.jpg" />
+            <img class="smallimg" src="{%static 'images/image2.jpg'%}" alt="image2.jpg" />
+            <img class="smallimg" src="{%static 'images/image3.jpg'%}" alt="image3.jpg" />
+            <img class="smallimg" src="{%static 'images/image4.jpg'%}" alt="image4.jpg" />
+            <img class="smallimg" src="{%static 'images/image5.jpg'%}" alt="image5.jpg" />
+        </div>
+        <div id="div3">
+            <img class="bigimg" src="{%static 'images/image1.jpg'%}" alt="image1.jpg" />
+        </div>
+    </div>
+</body>
+</html>
+
+
+step2:-
+---------
+==> views.py (FirstApp app-folder)
+-----------------------------------
+from django.shortcuts import render
+import datetime
+def imagegallery2(request):
+    date1 = datetime.datetime.now()
+    msg1 = '***DJango-Image-Gallery(Product)***';
+    dict1 = {'date1': date1, 'msg1': msg1}
+    return render(request, 'FirstApp/imgsgallery2.html', context=dict1);
+
+	
+step3:-
+=*** make url-pattern in urls.py(project-conf-folder-level)
+------------------------------------
+Ex:-
+from FirstApp import views
+   path('imggallery2/', views.imagegallery2),
+   
+   
+step4:-
+=*** Re-Start the server & request below url in browser-address-bar
+http://localhost:8000/imggallery2/
+
+
+
+

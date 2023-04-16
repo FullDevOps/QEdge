@@ -1,0 +1,478 @@
+===>> Http Request flow in PyCharm-DJango Application::-
+==Diagram==
+(Http Flow Request Diagram(PyCharm))
+
+[End-User]-----Request------>[welcome/(urls.py in DJMyProject1-project)--->display()(views.py in MyApps1-application)]
+(client)  <----Response-----(Django-Server)
+ 
+1) Whenever End-User sends 1st-request to Django Development Server, such request is accepted by server
+2) From the accepted Request django-Server identifies url-pattern using "urls.py in DJMyProject1-project" file, and its corresponding view will be identified in "views.py in MyApps1-application"
+3) The request will be forwared to the view(views.py in MyApps1-application) & the corresponding function will be executed to provide response to the End-user(client)
+
+
+NOTE:-
+***Summary of Sequence of Activities related to Django Project(PyCharm-IDE):-
+1)
+Creation of Django project
+(File-->Project ---> Django(DJMyProject1, Inherit-Pkgs,Make-Avail)---->More-settings(MyApps1)--->Create)
+(or manually)
+cmd> django-admin startproject DJMyProject1
+2)
+Creation of Application in that project 
+cmd> py manage.py startapp MyApps1 
+3)
+Adding our-application(MyApps1) to the Project(DJMyProject1-project) 
+(using settings.py in DJMyProject1-project)
+(done automatically->not-required)
+4)
+Define view function inside "views.py" (of MyApps1-application) 
+(for client url-request & its http-response)
+5)
+Define url-pattern for our view inside "urls.py"
+Ex:-
+path('welcome/',views.display) 
+#from MyApps1 import views;
+6)
+Start Server
+C:\Users\Office\PycharmProjects\DJMyProject1> py manage.py runserver
+(or)
+Under Project Tree Bar, select project-name & click RUN button
+7)
+open Browser & Send the request with given url-pattern
+(http://localhost:8000/welcome/)
+8)
+Verify output of the URL-request
+
+
+NOTE:-
+= Use CTRL-BREAK to stop server manually in Terminal
+= Optionally start & stop the server from Project-Tree Bar by selecting project-name(DJMyProject1) & its buttons
+
+
+
+
+
+
+==>> How to change Django Server Port::-(manually)
+= By default Django develoment server will run on port number: 8000
+= However, we can change port number as per our requirement
+Ex:-
+cmd> py manage.py runserver 8888 
+---------------
+Now Server running on port number: 8888 
+We have to send the request with this port number only 
+http://127.O.O.1:8888/welcome/  (your will get the response)
+http://127.O.O.1:8000/time 	(Error...)
+
+NOTE:-
+= We can also change Port Number & default-Browser-App to start after starting the server as follows,
+= From Project-Tree Bar by selecting project-name(DJMyApps1) & select Edit-Configurations from drop-down-menu
+(Change Port-number & tick-mark(Run-browser) option)
+= Finally Run the DJMyApps1-project from project-tree-bar
+
+
+---------------------------------------------------------------------
+(*****)
+==>> Single-application with multiple views::-
+(MultiViewsApp)
+Steps:-
+-------
+i) Create your Application, (also register in settings.py)
+**= The following is the command to create own-application(app)
+cmd\DJMyProject1>python manage.py startapp MultiViewsApp
+(goto project-folder(DJMyProject1) & give this above command)
+
+= Also, register our MultiViewsApp under INSTALLED_APPS=[] var in settings.py(project-folder)
+
+
+ii) goto "views.py"
+Ex:-
+"views.py" (MultiViewsApp)
+----------------------------
+from django.shortcuts import render
+from django.http import HttpResponse
+
+#Create your views here...
+def f1(request):
+	return HttpResponse("<h2 style='color:blue;'>Good Morning User..!! Have a Nice day...</h2><hr/>")
+
+def f2(request):
+	return HttpResponse("<h2 style='color:green;'>Good Afternoon User..!! Hope doing good...</h2><hr/>")
+
+def f3(request):
+	return HttpResponse("<h2  style='color:red;'>Good Evening User..!! How was ur day...</h2><hr/>")
+ 
+
+
+=>>
+iii) Add your URL-patterns(3-views)
+"urls.py" (DJMyProject1-conf-folder)
+-----------
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views
+from MultiViewsApp import views as v1
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('welcome/', views.display),
+
+    # single-app(MultiViewsApp) & multiple-views
+    path('mrng/', v1.f1),
+    path('aftr/', v1.f2),
+    path('even/', v1.f3),
+]
+
+iv)
+=> Start the DJango-Server from (DJMyProject1-folder)::-
+= Start the server & send the request from Browser URL
+(Start the server from Project-Tree-Bar, select your Project-Name(DJMyProject1) & click on Green(>) start-button)
+
+= "http://localhost:8888/mrng"	(calls f1())
+= "http://localhost:8888/aftr"	(calls f2())
+= "http://localhost:8888/even"	(calls f3())
+
+NOTE:-
+= Any changes done to Project-Folder(urls.py-file or settings-file) or Project-Application-Folder(MultiViewsApp - views.py file), it makes the DJango Live Development-Server to Reload its status auto. for new-changes or new-updates
+
+
+
+
+------------------------------------------------------------------
+(***)
+===>>> Single project with multiple applications::- 
+(Multiple-Apps with Multiple-views)
+
+(***)
+= Whenever we are creating a New-App then stop the server (ctrl+C or STOP button)
+(Use Ctrl+C or Ctrl+Pause-Break to stop running server or optionally use Red STOP button from Project-Tree-Bar)
+=*** ONLY 1st-app is created auto.along with Project-creation, remaining apps are created manually
+(using cmd> py manage.py startapp AppName)
+
+
+STEPS:-
+---------
+i)
+=> Create your Application1, (App1)
+**= The following is the command to create own-application(app) in Terminal-tab
+cmd\DJMyProject1>python manage.py startapp App1
+(goto project-folder & give the above command)
+
+= Also, register our App1 under INSTALLED_APPS=[] var in settings.py(project-folder)
+
+
+ii) goto App1 (views.py)
+Ex:-
+"views.py" (App1)
+---------------------------
+from django.shortcuts import render
+from django.http import HttpResponse
+
+#Create your views here...
+def f11(request):
+	return HttpResponse("<h2 style='color:Blue;'>Hello, Good Morning User..!! Have a Nice day...</h2><hr/>")
+	
+
+iii)
+***NOW,	
+=> Create your another Application, (App2)
+**= The following is the command to create own-application(app)
+cmd\DJMyProject1>python manage.py startapp App2
+(goto project-folder & give the above command)
+
+= Also, register our App2 under INSTALLED_APPS=[] var in settings.py(project-folder)
+
+
+iv) goto views.py(App2)
+***NOW,
+Ex:-
+"views.py" (App2)
+-------------------
+from django.shortcuts import render
+from django.http import HttpResponse
+import datetime;
+
+#Create your views here...
+def f22(request):
+	time = datetime.datetime.now()
+	msg = "<h2 style='color:Green;'>Hello User..!!<br /><br />Server Date & Time :: "+str(time)+"</h2><hr/>"
+	return HttpResponse(msg)
+
+
+NOTE:-
+= datetime is a module, with datetime-class and having now() static-method
+= now(), method gives current system date & time in proper-format
+= str(time), this function converts datetime-type to str-type
+= <br /> it is HTML tag, it means break-line(new-line) in webpage
+= <hr /> tag means horizontal-rule(line)
+ 
+ 
+step:- 
+v) Add your URL-patterns
+= Generally, we have only 1-file views.py in all the Applications, hence we use below approach 1&2
+Ex:-
+"urls.py" (DJMyApps1-conf-folder)
+-------------------------------
+from django.contrib import admin
+
+from django.urls import path	#new
+from django.conf.urls import url;	#old
+
+from FirstApp import views;
+from MultiViewsApp import views as v1;
+
+#from App1 import views;
+#from App2 import views;
+
+#multiple-apps and mulitple-views
+#approach1(specific-content)
+from App1.views import f11;
+from App2.views import f22;
+#approach2(alias)
+from App1 import views as v11;
+from App2 import views as v22;
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+	
+	#firstApp
+	#url(r'^welcome/',views.display) #old-method
+	path('welcome/',views.display),
+	
+	#multiViewsApp
+	path('mrng/',v1.f1),
+	path('aftr/',v1.f2),
+	path('even/',v1.f3),
+	
+	#multiple-apps with multiple-views
+    #approach1
+    path('hello/', f11),
+    path('datetime/', f22),
+
+    # approach2
+    path('hello1/', v11.f11),
+    path('datetime1/', v22.f22)
+	
+]
+
+(NReq)
+=** Also add Project-Application details in setttings.py(Project-Folder)
+Ex:-
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'MyApps1',
+    'MultiViewsApp',
+    'App1',
+    'App2'
+]
+
+
+vi)
+=> Start the DJango-Server from (DJMyProject1-folder)::-
+= Start the server & send the request from Browser URL
+cmd\DJMyProject1>py manage.py runserver
+(or)
+Start the server from Project-Tree-Bar using Green Start-Button by selecting your Project-Name(DJMyApps1)
+
+#approach1
+= "http://localhost:8888/hello/"	(calls f11())
+= "http://localhost:8888/datetime/"	(calls f22())
+#approach2
+= "http://localhost:8888/hello1/"	(calls f11())
+= "http://localhost:8888/datetime1/"(calls f22())
+
+
+
+---------------------------------------------------------------
+==>Sp-case::-(***)
+NOTE:-
+=** Multiple-views(urls) for same-view-function??
+= We can have multiple-urls for same single-view(display() of MyApps1-application)
+= It is done as follows,
+
+step1:-
+---------
+Ex:-
+"urls.py" (DJMyProject1)
+------------------------	
+#multiple-urls for same-view
+from MyApps1 import views;
+
+-------------------------------------------
+from django.urls import path,re_path
+from django.urls import re_path
+from MyApps1 import views;
+
+#multiple-urls with same single-view
+path('welcome/', views.display), 	#new
+
+#add-these-2
+path('test/', views.display),
+re_path('^.*$', views.display),	#any-url or no-url or default-url
+--------------------------------------------
+
+step2:-
+--------
+=> Now start the server & make below url-request from browser
+Ex:- (make a request from Browser)
+http://localhost:8888/welcome/	(MyApps.display())
+http://localhost:8888/ 			
+http://localhost:8888/test/		
+http://localhost:8888/any/
+
+
+
+==> Another-Concept::-
+***(Configure App-Level URLs in Project-Level-Urls)***
+----------------------------------------------------------------------
+==>> How to define URL Patterns at Application Level instead of Project Level???
+= Django project can have multiple applications
+Ex:-
+	DJMyProject1(MyApps1/MultiViewsApp/App1/App2)
+= Each application has multiple views(functions)
+= And we define, url-patterns for all views of all different-applications inside "urls.py" file of our-project(DJMyProject1-folder)
+= It has maintenance & confusion problems and reduces reusability of applications (when no.of.url-patterns increases)
+
+=> then Solution??
+= We can define url-patterns at application level only
+= But, for every application we have to create a separate urls.py file separately and define all that particular-application urls in that file
+= Finally, link these application-level urls.py files to project-level(DJMyProject1-project) "urls.py" file by using "include()" method
+
+=> EXAMPLE::-
+Step-1) 
+Create a Completely new-Project ("DemoProject")
+(File-->New-Project-->DJANGO(left)-->(Location/Name :: DemoProject))
+(Put ticks for Inherit-global, Make-Available options)
+(Click Create-button)
+NReq [D:\PythonORG\DJANGO\Programs>django-admin startproject DemoProject] NReq
+
+
+Step-2)
+Create 2-diff-Applications manually
+(From Terminal-tab at bottom of window)
+cmd\DemoProject> py manage.py startapp DemoApp1
+cmd\DemoProject> py manage.py startapp DemoApp2 
+
+Step-3)
+Add/register our apps(DemoApp1,DemoApp2), to the DemoProject inside "settings.py" file
+Ex:-
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+	"DemoApp1",
+	"DemoApp2",
+];
+
+Step-4)
+Define our View Functions in "views.py" of DemoApp1, DemoApp2
+Ex:-
+DemoApp1 (views.py)
+--------------------
+from django.shortcuts import render;
+from django.http import HttpResponse
+
+#Create your views here...
+def f1(request): 
+	return HttpResponse("<h1>Hello from DemoApp1 f1()</h1><hr />"); 
+def f2(request): 
+	return HttpResponse("<h1>Hello from DemoApp1 f2()</h1><hr />"); 
+
+Ex:-
+DemoApp2 (views.py)
+-------------------- 
+from django.shortcuts import render;
+from django.http import HttpResponse
+
+#Create your views here...
+def f3(request): 
+	return HttpResponse("<h1>Hello from DemoApp2 f3()</h1><hr />"); 
+def f4(request): 
+	return HttpResponse("<h1>Hello from DemoApp2 f4()</h1><hr />"); 
+
+
+Step-5)***
+Create a new-seperate urls.py file inside both applications
+"DemoApp1/urls.py"
+Ex1:- 
+"DemoApp1/urls.py"
+------------------
+from django.urls import path;	#new
+from DemoApp1 import views;
+
+urlpatterns = [ 
+	path('first/', views.f1), 
+	path('second/', views.f2),
+]
+
+Ex:- 
+"DemoApp2/urls.py"
+-------------------
+from django.urls import path;	#new
+from DemoApp2 import views;
+
+urlpatterns = [ 
+	path('third/', views.f3), 
+	path('fourth/', views.f4),
+]
+
+
+
+Step-6)***
+= Include these application-level "urls.py"(DemoApp1,DemoApp2) inside project-level(DemoProject) "urls.py" file
+Ex:-
+from django.contrib import admin
+from django.urls import path
+from django.conf.urls import include;
+#import DemoApp1,DemoApp2;
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path("DemoApp1/",include("DemoApp1.urls")),
+	path("DemoApp2/",include("DemoApp2.urls"))
+]
+
+ 
+Step-7)
+= Run Server,
+cmd\DemoProject> py manage.py runserver 
+
+Step-8)
+= Start the server for your Demo-Project &
+= Send the Request, using given-urls
+Ex:-
+	http://localhost:8000/DemoApp1/first/
+	http://localhost:8000/DemoApp1/second/
+	(or)
+	http://localhost:8000/DemoApp2/third/
+	http://localhost:8000/DemoApp2/fourth/
+
+***(Finally verify output of the Project)
+
+
+(***)
+NOTE: 
+= We can see reusability of application in other project just with only 2-lines addition 
+Ex:-
+	settings.py -->add application name  (DemoApp1,DemoApp2) under INSTALLED_APPS [list]
+	urls.py --->just add:  path("DemoApp1/",include("DemoApp1.urls")),
+
+=> Advantage::-
+= To define urlpatterns at application-level instead of project level,
+a) Reusability of Django-Applications across multiple-projects
+b) Project level urls.py file will be more readable for update/modify
+(w.o confusions with same views.py files & same view-function-names in diff-proj-apps)
+
+
+
+
+
+

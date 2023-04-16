@@ -1,0 +1,908 @@
+==> Collections in Python::-
+(Data-Structures)
+= Collections means group of values(Same-type/Diff-type)
+= Data-Structures means org. of data in proper-way
+=** Advantages of DS,
+	a) Operations on Data are Easy
+	Ex:-
+		Add-data
+		Del-Data
+		Update-Data
+		Search-Data
+		Sort-Data
+	b) Access-data is also Easy
+	
+==*** Python supports 5-types of Collections or DS
+	A) List
+	B) Tuple
+	C) Set
+	D) FrozenSet
+	E) Dictionary
+	
+	
+A)*** List Collection::-
+def:-
+	= It is collection of diff-objects as single-unit
+=> Tech-Points???
+(ref-notes)
+= In list(Features),
+	= Order is preserved
+	= Duplicate objs are allowed
+	= Heterogeneous/Homogeneous objects are allowed (diff-type or same-type)
+	= Size is dynamic 
+	(incre/decre as per adding/deleting)
+	= Values/Objs are represented in [....] with commas(,) separator
+	= It provides indexes for values/objs (0 to n-1) or (-n to -1)
+	= Both +ve and -ve indexes are supported
+	= +ve indexes (L->R or First->Last) Forward and -ve indexes (R->L or Last->First) Backward-direction
+Ex:-
+list1 = [10,20,30,40,50];
+		 0, 1, 2, 3, 4		(Forward)
+		-5,-4,-3,-2,-1 	(Backward)
+==Diagram==
+NOTE:-
+=** List-DS elements are "Mutable"
+(org-data can be modified...)
+
+
+==> Creation of List Objs:- 
+(WORKING WITH LIST OBJECT)
+Ex:- (Empty-List)
+list1 = [];		#empty []
+print(list1);
+print(type(list1));
+
+##Program (ListEx1.py)
+(Program to work with List DS)
+
+Ex:- (List with Elements)
+list1 = [10,20,30,40,50];
+
+
+Ex:- (List with Dynamic-Elements)
+list1 = [];
+list1 = eval(input("Enter some list elements : ")); #[]11,22,33,44,55
+print(list1);
+print(type(list1));
+
+=** Give Elements in list format only i.e, [11,22,33,44,55]
+=** eval() converts input-list-data to list-type-values & stores in list1-variable
+
+Ex:- (using list() and range() functions)
+list1 = list(range(0,20,2));
+print(list1);
+print(type(list1));
+
+=** range() is used to generate a range of values
+i.e, range(beginValue,endValue,stepValue);
+= stepValue can be +ve or -ve
+=** list() conversion-function converts coll-of-values to list-type
+
+==> other-extra-oprations on list:-
+Ex:- (using a string with list())
+ss = "Sai Ram Kumar";
+list1 = list(ss);
+print(list1);
+
+Ex:- (using a string with split())
+=**split() splits our string into sub-strings
+(such sub-strings are kept in list)
+ss = "Sai Ram Kumar";
+list1 = ss.split();
+print(list1);
+print(type(list1));
+
+Ex:- (Nested-List)
+= It is list inside another-list
+list1 = [11,22,33,[99,88]];	#here [99,88] is sub-list
+print(list1);
+print(list1[3]);
+
+
+##Program ListEx1.py
+#Program to work with List DS (ListEx1.py)
+
+'''
+#Empty-List (empty-[] brackets)
+list1 = [];
+print(list1);
+print(type(list1));
+'''
+
+'''
+#List with Elements
+list1 = [10,20,30,40,50];
+print(list1);
+print(type(list1));
+'''
+
+'''
+#List with Dynamic-Elements #given in [] sqr-brackets
+list1 = [];
+list1 = eval(input("Enter some list elements : "));
+print(list1);
+print(type(list1));
+'''
+
+''''
+#using list() conversion-function and range() functions
+list1 = list(range(0,20,2));
+print(list1);
+print(type(list1));
+
+list1 = list(range(0,20,-2));
+print(list1);	#empty-list
+print(type(list1));
+
+list1 = list(range(20,0,-2));
+print(list1);
+print(type(list1));
+'''
+
+'''
+#using a string with list()
+ss = "Sai Kumar";
+list1 = list(ss); #each char is converted to list-values
+print(list1);
+'''
+
+'''
+#using a string with split()
+ss = "Sai Ram Kumar have a nice day";
+list1 = ss.split(" ");		#by default splits data wrt space
+print(list1);
+print(type(list1));
+'''
+
+#Nested-List
+list1 = [11,22,33,[99,88]];
+print(list1);
+
+-----------------------------------------------------------
+(Advanced Operations on List-DS)
+==> Accessing List Elements:-
+= List Elements can be accessed using index or slice operator (:)
+1) Using index:-
+= Index are both +ve and -ve
+= +ve indexes are (0 to n-1) (F->L)
+= -ve indexes are (-1 to -n) (L->F)
+Ex:-
+list1 = [54,64,74,84,94];
+print(list1[0]);
+print(list1[1]);
+....
+print(list1[-1]);
+print(list1[-2]);
+....
+print(list1[10]);	#IndexError: list index out of range
+
+//Program (ListEx2.py)	
+(Program to  work with list DS)
+
+2) using Slice operator:-
+= Slice Operator is : (colon) used with [](subscript-operator)
+Syntax:-
+	list2 = list1[startIndex:endIndex:stepValue]
+= startIndex, its default value is 0
+= endIndex, its default value is (len of list) (it is not included)
+= stepValue, its default value is 1
+(it work for both +ve,-ve indexes and also for stepValue)
+Ex:-
+list1 = [11,22,33,44,55,66,77,88,99,110];
+print(list1[2:7:2]);
+print(list1[4::2]);	
+print(list1[3:7]);
+print(list1[8:2:-2]);
+print(list1[4:100]);
+
+NOTe:-
+list1[::]
+list1[:]
+
+=> List v/s Mutability:-
+= List object values can be modified i.e, Mutable
+Ex:-
+list1 = [11,22,33,44,55];
+print(list1);
+list1[1]=2222;
+print(list1);
+
+
+==> Traversing List Elements:- (linear/sequential access of list)
+= Best-way is using a loop,
+1) using while loop:-
+list1 = [11,22,33,44,55,66,77,88,99,110];
+i=0;
+while i<len(list1):
+	print(list1[i]);
+	i=i+1;
+
+2) using for-loop:-
+list1 = [11,22,33,44,55,66,77,88,99,110];
+for x in list1:
+	print(x);
+	
+3) display only even numbers:-
+list1 = [11,22,33,44,55,66,77,88,99,110];
+for x in list1:
+	if x%2==0:
+		print(x);
+
+4) display elements index-wise:-
+Ex:-
+list1 = [11,22,33,44,55];
+x = len(list1);
+for i in range(x):	
+	print(list[i] :"index is",i,"and -ve index is":(i-x));
+	
+
+##Program...(ListEx2.py)
+#Program to work with List DS (ListEx2.py)
+'''
+#Using indexes (0 to n-1) or (-1 to -n)
+list1 = [54,64,74,84,94];
+print(list1[0]);
+print(list1[1]);
+print(list1[2]);
+print(list1[3]);
+print(list1[4]);
+print()
+print(list1[-1]);
+print(list1[-2]);
+print(list1[-3]);
+print(list1[-4]);
+print(list1[-5]);
+#print(list1[10]);	#IndexError: list index out of range
+'''
+
+'''
+#Using slice-operator(Slicing)
+#list1[startindex:endindex:stepindex]
+list1 = [11,22,33,44,55,66,77,88,99,110];
+print(list1);
+print(list1[2:7:2]);
+print(list1[4::2]);	
+print(list1[3:7]);
+print(list1[8:2:-2]);
+print(list1[4:100]);	#No-Error(for 100) but takes till last-index
+'''
+
+'''
+#List is Mutable (org-data can be modified)
+list1 = [11,22,33,44,55];
+print(list1);
+list1[1]=222;
+print(list1);
+'''
+
+'''
+#using for-loop:-
+list1 = [11,22,33,44,55,66,77,88];
+for x in list1:
+	print(x);
+'''
+
+#using while loop:-
+list1 = [11,22,33,44,55,66,77,88];	#len=8
+i=0;
+while i<len(list1):
+	print(list1[i]);
+	i=i+1;
+
+
+--------------------------------------------------------
+==> Different Functions of List DS:-
+1) len():
+= it is common for all-collections
+= gives no of elements/values/objs in a list DS
+Ex:-
+list1 = [11,22,33,44,55];	
+print(len(list1));
+	
+//Program (ListEx3.py)	
+(Program to  work with list DS)	
+	
+2) count():-
+= Gives element occurred how many times in a list	
+list1 = [11,22,33,11,22,33,44,55,55];	
+print(list1.count(11));
+print(list1.count(22));
+print(list1.count(33));
+print(list1.count(44));
+print(list1.count(55));
+	
+	
+3) index():-
+= It gives 1st index position of given element in a list
+Ex:-
+list1 = [11,11,22,22,33,33,44,44,55];	
+print(list1.index(11));
+print(list1.index(22));
+print(list1.index(33));
+print(list1.index(44));
+print(list1.index(55));
+#print(list1.index(66));	#ValueError	
+
+=** If element is not available then we get "ValueError"
+= Hence, we can check for element using "in" operator
+Ex:-
+print(66 in list1);
+
+
+==> Manipulation Functions in list DS:-
+1) append():-
+= Adds item/element/value/obj at the end of list
+Ex:-
+list1=[];
+list1.append("A");
+list1.append("B");
+list1.append("C");
+list1.append("D");
+list1.append("E");
+print(list1);
+
+Ex:- (Add elements in list divisible by 5)
+list1=[];
+for x in range(51):
+	if (x%5==0):
+		list1.append(x);
+print(list1);		
+
+
+2) insert():-
+= adds element at specified index position
+Ex:-
+list1 = [11,22,33,44,55];
+list1.insert(1,999);
+print(list1);
+
+NOTE:-
+= If specified index is greater than max-index then element is added at last
+= If specified index is lesser than min-index then element is added at begin
+
+3) extend():-
+= Adds elements of one-list into another-list 
+Ex:-
+list1.extend(list2);
+
+list1 = [11,22,33];
+list2 = ["Hi","Hello","Welcome"];
+list1.extend(list2);
+print(list1);
+
+Ex:-
+list1 = [11,22,33];
+list1.extend("World");
+print(list1);
+
+=** Here string is added/appended as individual chars to 1st list
+
+
+4) remove():-
+= removes specified element from the list
+= If element is more than once then only 1st occurance is removed
+Ex:-
+list1 = [11,22,11,22,33,11];
+list1.remove(11);
+print(list1);
+list1.remove(22);
+print(list1);
+list1.remove(44);	#ValueError
+
+=** If element is not available then we get "ValueError"
+
+
+5) pop():-
+= it removes and gives/returns last element of list DS
+list1 = [11,22,33,44,55];
+print(list1.pop());
+print(list1.pop());
+print(list1);
+
+list1=[];
+print(list1.pop());		#IndexError
+=** If list is empty then we get "IndexError"
+
+NOTE:-
+= pop() and append() functions can be used to implement stack DS operations (LIFO approach)
+
+= pop() with indexes,
+Ex:-
+pop(index); #removes and returns specified indexed element
+Ex:-
+list1 = [11,22,33,44,55];
+print(list1.pop());
+print(list1.pop(1));
+print(list1);
+print(list1.pop(10));	#IndexError
+
+==> Difference between remove() and pop():-
+1) 
+remove() removes given element from list (1st occurance)
+pop() removes only last-element from list
+
+2)
+remove() just removes element and doest not return any value
+pop() removes last-element and return that value (or using index)
+
+3)
+If element is not there we get "ValueError"
+If element is Empty or index is not there then we get "IndexError"
+
+
+NOTE:-
+= List size is dynamic (incre/decre as per elements)
+= append(), insert(), extend() increases the size
+= remove(), pop() decreases the size
+
+##Program ListEx3.py	
+#Program to  work with list DS (ListEx3.py)
+
+'''
+#len()
+list1 = [11,22,33,44,55];	
+print(len(list1));
+list1 = [11,22,33];	
+print(len(list1));
+list1 = [];	
+print(len(list1));
+'''
+
+''''
+#count()
+list1 = [11,22,33,11,22,33,44,55,55];	
+print(list1.count(11));
+print(list1.count(22));
+print(list1.count(33));
+print(list1.count(44));
+print(list1.count(55));
+'''
+
+'''
+#index() gives 1st-index-postion(Search)
+list1 = [11,11,22,22,33,33,44,44,55];	
+print(list1.index(11));
+print(list1.index(22));
+print(list1.index(33));
+print(list1.index(44));
+print(list1.index(55));
+#print(list1.index(66));	#ValueError
+##print(66 in list1);
+'''
+
+'''
+#append() adds from last
+list1=[];
+print(list1);
+list1.append("A");
+list1.append("B");
+list1.append("C");
+print(list1);
+list1.append("D");
+list1.append("E");
+print(list1);
+'''
+
+'''
+#insert() -> inserts element in b/w(other moves to aside)
+list1 = [11,22,33,44,55];
+print(list1);
+list1.insert(1,999);
+print(list1);
+list1.insert(10,987);	#inserted at last
+print(list1);
+list1.insert(-10,789);	#inserted at begin
+print(list1);
+'''
+
+''' 
+#extend() -> adds other-coll to our list-coll
+list1 = [11,22,33];
+list2 = ["Hi","Hello","Welcome"];
+list1.extend(list2);
+print(list1);
+print()
+list1 = [11,22,33];
+list1.extend("World"); #here each-char is added as list-element
+print(list1);
+'''
+
+'''
+#remove() -> dels 1st-occurance element
+list1 = [11,22,11,22,33,11];
+print(list1)
+list1.remove(11);
+print(list1);
+list1.remove(22);
+print(list1);
+list1.remove(44);	#ValueError
+'''
+
+'''
+#pop() removes last or random element o.w Error for empty
+list1 = [11,22,33,44,55];
+print(list1)
+print(list1.pop());
+print(list1.pop());
+print(list1);
+#list1=[];
+#print(list1.pop());		#IndexError
+'''
+
+
+#pop(index) remmoves elements using indexes
+list1 = [11,22,33,44,55];
+print(list1)
+print(list1.pop());
+print(list1.pop(0));
+print(list1);
+#print(list1.pop(10));	#IndexError (out of range)
+
+
+--------------------------------------------------------------
+(List Ordering)
+==> Ordering the elements of list DS:-
+1) reverse():-
+= Gives reverse-order of elements in a list
+Ex:-
+list1 = [11,22,33,44,55];
+list1.reverse();
+print(list1);
+
+//Program (ListEx4.py)
+
+2) sort():-
+sort(reverse=true/false);
+= Default order is preserved
+= For Numbers, it is ASC order (false)
+= For Strings, it is Alphabetical order (false)
+Ex:-
+list1 = [44,11,55,22,33];
+list1.sort(); #default sort() order is ASC-order (reverse=False)
+print(list1);
+
+Ex:-
+list1 = ["hyd","delhi","chennai","apple","ball"];
+list1.sort();
+print(list1); 
+
+NOTE:-
+= For sort(), compulsory use same-dtype elements o.w "TypeError"
+list1 = ["B",11,"C",22,"A"];
+list1.sort();
+print(list1); 
+
+=** However it is supported in Python2(1st Nums and 2nd Strs) not in Python3
+
+=** For DESC order or nums or strs, we use
+Ex:-
+list1 = [44,11,55,22,33];
+list1.sort(reverse=True);
+print(list1);
+list1.sort(reverse=False);
+print(list1);
+
+Ex:-
+list1 = ["hyd","delhi","chennai","apple","ball"];
+list1.sort(reverse=True);
+print(list1);
+list1.sort(reverse=False);
+print(list1);
+
+
+
+==> Alias and Clone of list DS:-
+= Alias means alternate-name
+(same data in list but 2 or more names)
+= It is done by giving reference to other list-variable
+Ex:-
+list1 = [11,22,33,44,55];
+list2 = list1;
+print(id(list1));
+print(id(list2));
+==Diagram==
+
+=** Here changes done with any variable is update to other variable also
+
+Ex:-
+list2[0]=1111;
+print(id(list1));
+print(id(list2));
+
+NOTE:-
+= To avoid above problem, we go for Cloning
+= It is done using slice-operator or copy() function
+(here we get new-list-ds in memory)
+
+Ex:- (slice-operator)
+list1 = [11,22,33,44,55];
+list2 = list1[:];
+list2[0]=1111;
+print(id(list1));
+print(id(list2));
+
+Ex:- (copy())
+list1 = [11,22,33,44,55];
+list2 = list1.copy();
+list2[0]=1111;
+print(id(list1));
+print(id(list2));
+
+NOTE:-
+"=" operator means Aliasing
+copy() or slicing means Cloning
+
+
+==> Mathematical Operators on List DS:-
+= For this we use + and * operators
+
+1) Concatenation using (+):-
+= It will combine 2 lists into single one
+Ex:-
+list1 = [11,22,33];
+list2 = [44,55,66];
+list3 = list1+list2;
+print(list3);
+
+Ex:-
+list3 = list1+77;	#TypeError
+list3 = list1+[77];	#Valid
+
+
+2) Repetition using (*):-
+= It is used to repeat a list given no.of times
+Ex:-
+list1 = [11,22,33];
+list2 = list1*3;
+print(list2);
+
+=> Comparing List values:-
+= It is done with ==, != operators
+Ex:-
+list1 = [11,22,33];
+list2 = [11,22,33];
+list1 = [44,22,33];
+print(list1==list2);
+print(list1==list3);
+print(list2!=list3);
+
+NOTE:-
+= Using comparison operators(==,!=) then make sure,
+	= No.of Elements
+	= Order of Elements
+	= Content of Elements (Case-Sensitive)
+Ex:-	
+list1 = ["hi","hello","welcome"];
+list2 = ["hi","hello","welcome"];
+list3 = ["HI","HELLO","WELCOME"];
+print(list1==list2);
+print(list1==list3);
+print(list2!=list3);
+	
+NOTE:-
+= Using comparison operator (<,<=,>,>=)	then only 1st Element comparison is done
+Ex:-
+list1 = [11,22,33];
+list2 = [44,55,66];
+print(list1<list2);
+print(list1<=list2);
+print(list1>list2);
+print(list1>=list2);
+
+Ex:-
+list1 = ["Sai","Ram","Ali"];
+list2 = ["Ram","Ali","Sai"];
+print(list1<list2);
+print(list1<=list2);
+print(list1>list2);
+print(list1>=list2);
+
+
+
+==> Membership Operator:-
+= Check whether elements are there in list or not
+= It is done using "in", "not in" operators
+
+Ex:-
+list1 = [11,22,33,44,55];
+print(11 in list1);
+print(11 not in list1);
+print(111 in list1);
+print(111 not in list1);
+
+==> clear():-
+= It removes all the elements of a list
+list1 = [11,22,33,44,55];
+print(list1);
+list1.clear();
+print(list1);
+
+
+=> Nested-List:-
+= One list inside another list is called as Nested-List
+Ex:-
+list1 = [11,22,33,[44,55]];
+print(list1[0]);
+print(list1[1]);
+print(list1[2]);
+print(list1[3]);
+print(list1[3][0]);
+print(list1[3][1]);
+==Diagram(with indexes)==
+
+
+"Assignment"
+==> Nested-List as Matrix:- (Representation)
+= Nested-List can be used to represent a matrix (rows & cols)
+= Each inner-list/sub-list/nested-list represents 1-row
+= inner-list/sub-list/nested-list values represents column-values
+Ex:-
+A = [[11,22,33],[44,55,66],[77,88,99]];
+print(A)
+print("Row-wise Elements :");
+for rw in A:
+	print(rw);
+print("Matrix-Style Elements :");
+for i in range(len(A)):
+	for j in range(len(A[i])):
+		print(A[i][j],end=" ");	
+	print();
+
+
+
+##Program (ListEx4.py)
+#Program to work with list DS
+
+'''
+#list ordering (ASC/DESC)
+#reverse()
+#list1 = [11,22,33,44,55];
+list1 = ["hi","hello","welcome"]
+print(list1)
+list1.reverse();
+print(list1);
+'''
+
+'''
+#sort() -> sorts elemnts ASC/DESC
+list1 = [44,11,55,22,33];
+print(list1);
+list1.sort();	#sort() default-order is ASC(False)
+print(list1);
+print()
+list1 = ["hyd","delhi","chennai","apple","ball"];
+list1.sort();	#sort() default-order is ASC(False)
+print(list1);
+'''
+
+#list1 = ["B",11,"C",22,"A"];
+#list1.sort();	#Not-possible with diff-type of data
+#print(list1); 
+
+'''
+#sort(reverse=True) #DESC-order
+list1 = [44,11,55,22,33];
+list1.sort(reverse=True);
+print(list1);	#DESC
+list1.sort(reverse=False);
+print(list1);	#ASC
+'''
+
+'''
+list1 = ["hyd","delhi","chennai","apple","ball"];
+list1.sort(reverse=True);
+print(list1);
+list1.sort(reverse=False);
+print(list1);
+'''
+
+
+'''
+#Alias(alternate-name)
+list1 = [11,22,33,44,55];       #org-list(list1)
+list2 = list1;	#in memeory, list1 & list2 both points to same-location-values
+print(id(list1));
+print(id(list2));
+print(list1);
+print(list2);
+#operation on alias-var-name
+list2[0]=1111;	#mutable-object
+print(list1);
+print(list2);
+'''
+
+'''
+#list-cloning(we get separate data for memory)
+#dup-obj or separate-obj
+list1 = [11,22,33,44,55];
+list2 = list1[:];	#slicing-operator
+print(id(list1));
+print(id(list2));
+list2[0]=1111;
+print(list1);
+print(list2);
+'''
+'''
+#copy() for list-ds(we get new memory location)
+#it is also cloning (new dup-obj or separate-obj)
+list1 = [11,22,33,44,55];
+list2 = list1.copy();
+print(id(list1));
+print(id(list2));
+list2[0]=1111;
+print(list1);
+print(list2);
+'''
+
+''''
+#list-concatenation(+)
+#using concatenation-operator(+)
+list1 = [11,22,33];
+list2 = [44,55,66];
+list3 = list1+list2;
+print(list3);
+print()
+list1 = [11,22,33];
+#list3 = list1+77;	#TypeError
+list3 = list1+[77];	#Valid
+print(list3);
+list3 = list1+[77,88];	#Valid
+print(list3);
+'''
+
+'''
+#List Repeatition(*)
+list1 = [11,22,33];
+list2 = list1*3;
+print(list2);
+list2 = 5*list1;
+print(list2);
+'''
+
+'''
+#Listcomparisons (relational-oper) <,>,<=,>=,==,!=
+list1 = [11,22,33];
+list2 = [11,22,33];
+list3 = [44,22,33];
+print(list1==list2);
+print(list1==list3);
+print(list2!=list3);
+print()
+list1 = ["hi","hello","welcome"];
+list2 = ["hi","hello","welcome"];
+list3 = ["HI","HELLO","WELCOME"];
+print(list1==list2);
+print(list1==list3);
+print(list2!=list3);
+'''
+
+'''
+#membership operator (in, not in)
+list1 = [11,22,33,44,55];
+print(11 in list1);
+print(11 not in list1);
+print(111 in list1);
+print(111 not in list1);
+'''
+
+'''
+#clear() -> removes all elements at a time
+list1 = [11,22,33,44,55];
+print(list1);
+list1.clear();
+print(list1);	#empty-list
+'''
+
+#Nested-List (sub-list) 
+#list with-in list
+list1 = [11,22,33,[44,55]];
+print(list1[0]);
+print(list1[1]);
+print(list1[2]);
+print(list1[3]);	#[44,55]
+print(list1[3][0]);		#sub-index
+print(list1[3][1]);
+
+
+
+

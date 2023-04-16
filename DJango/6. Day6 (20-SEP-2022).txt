@@ -1,0 +1,136 @@
+*****(Working with FirstApp (DJ-App in DJ-Project)*****
+--------------------------------------------------------
+==> Activities/Steps required for Application(FirstApp)::- 
+= After creating 1st-Django-App(FirstApp), we have configure our DJANGO-App using below steps,
+
+1) Step1:-
+= Add our application-name(FirstApp) in "settings.py" file of Project-Folder
+Ex:-
+"settings.py"  ***WARNING:-Dont do any un-necc-changes to file***
+---------------
+(F:\SAISIR\DJANGO\FirstProject\FirstProject) [proj-conf-folder]
+---------------
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+	'FirstApp'
+] 
+#open settings.py, add 'FirstApp' in the last value of list-var("INSTALLED_APPS")
+= In doing so, our Django-project gets aware about our application(FirstApp)
+(hence our app is registed with Project)
+
+= Finally, save the file(settings.py)
+
+
+2) Step2:-
+= Create our own-view-function for our application in "views.py" file of our "FirstApp"
+= View-func is responsible to prepare required response(reply) to the end-user(client-request)
+= Response-data is "html-webpage-page"
+=** View also contains business-logic (logics used in our app)
+(coding to process data)
+Ex:-
+	totalmarks=s1+s2+s3+s4+s5
+	avgmarks=totalmarks/5
+(or)
+	atm-trans (finalbal = initialbal-wamt)
+
+=* There are 2-types of views,
+	a) Function Based Views  (direct-func)
+	b) Class Based Views  (class-method/func)
+
+= As of now, we are using "Function based views"
+(here we write python-function Ex:- display(), which accepts client-request, process-request and give client-response(html-webpage)
+Ex:-
+"views.py" (of FirstApp app-folder)
+------------
+from django.shortcuts import render
+from django.http import HttpResponse;
+
+# Create your views here.
+def display(request): #view-function
+	ss = "<center><h2 style='color:Blue;'>Hello User, Welcome to Django First-Project First-App</h2><hr /></center>";
+	return HttpResponse(ss);
+
+
+=**Save the views.py prog
+
+
+NOTE:-
+(Tech-points)
+-----------------
+= For each view, we have one function in views.py
+= Here display() is a function, which is one-view
+= Each view(function) take atleast 1-input-parameter(request), its mandatory
+= this request-obj is of type HttpRequest-class(type)
+(it contains client-request info)
+Ex:-
+	username,password (for login-page-request)
+	(client-ip-addr, client-req-url/page, client-req-time,client-req-browser-name)
+= Each view-func returns HttpResponse-obj with required response-data(string with html-webpage-code) to client
+Ex:-
+	return HttpResponse(ss);
+= this response-data(html-data) i.e, "ss" will goto same-client as response & displays in client-browser
+
+=** django.http is as "Django-module" to work with http-request & response
+(from this module, we use HttpRequest, HttpResponse 2-classes)
+
+ 	
+==Diagram==
+	Request------->[View]-------->Response
+(View can accept client-request as input, and performs required operations & provides proper response to End-user(client))
+
+Step3:- (urls.py) ---> proj-conf-folder
+= Now, define URL-pattern for our view-func in "urls.py" file
+= url-pattern, is used by end-user(client in webpage) to send request for our views(in FirstApp-application)
+= "urlpatterns" list-var routes URLs to views in our app(FirstApp)
+
+(open urls.py file from FirstProject conf-folder)
+**"urls.py" file** ***WARNING:-Dont do any un-necc-changes to file***
+-----------------------------------
+= goto urlpatterns list[] variable
+=** For functional-views,we perform 2-steps,
+a) add import-statement
+Ex:-
+	from FirstApp import views;
+b) add our URL to urlpatterns-variable
+Ex:-
+url(r'^welcome/',views.display); (or) #from django.conf.urls import url; #old-style
+(or)
+#new-style
+path('welcome/',views.display)	#from django.urls import path
+
+=**path() is available in below module
+Ex:-
+	from django.urls import path
+
+
+=** When End-user(client), requests url(welcome/) then display() function(from views.py of First) is executed & provides required response(HttpResponse)
+
+
+Step4::-
+= Re-Start the server & send the request from Browser-URL
+(proj-main-folder)
+cmd\FirstProject> py manage.py runserver
+= "http://127.0.0.1:8000/welcome"
+= "http://localhost:8000/welcome"
+
+NOTE:-
+= Any changes/modify done to views.py or other files in app-folder or proj-conf-folder, they are auto.detected & DJ-live-server is "RELOADED-auto" & for new-requets from client, we get new-updated-repsonse
+(everythig auto. on server)
+
+----------------------------------------------------------------
+===>> Http Request flow in Diango-Server-Application::-
+(FirstApp of FirstProject)
+==Diagram==
+[End-User]-----Request------>[/welcome(urls.py)--->display()(views.py)]
+(client)  <----Response-----(Django-Server)
+ 
+1) Whenever End-User sends 1st-request to Django Development Server, such request is accepted by server
+2) From the accepted Request django-Server identifies url-pattern using "urls.py" file, and its corresponding view will be identified in views.py
+3) The request will be forwared to the view(views.py) & the corresponding function will be executed to provide response to the End-user(client)
+
+

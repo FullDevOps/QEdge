@@ -1,0 +1,404 @@
+===>>>*******Working with PyCharm IDE
+(Downloading, Installating, First-Project in IDE)
+
+= IDE stands for Integrated-Development-Environment
+= It is a develoment-tool for developing real-time apps at-one-place
+(i.e, write-code, debug-code, test-code, run-code and also deploy our code directly on live-server at one-place)
+
+(STEPS)
+1) Make sure Python is already installed in our system 
+Ex:- (Type the command in prompt)
+cmd> python --version 
+
+2) Make sure DJango is already installed in our system 
+(Checking & Verifying DJango version)
+Ex:-
+cmd> py -m django --version 
+
+***(once both the softwares are compulsory installed, now start with PyCharm)
+
+Step3:-
+=> PyCharm IDE::-
+= Install PyCharm IDE from the following link 		
+	https://www.jetbrains.com/pycharm/
+
+(Download & install PyCharm-IDE from Internet using Google Search)
+- Goto https://www.jetbrains.com/
+- Click on Developer-Tools Menu -> Goto IDEs Option -> Select PyCharm option -> Click Download-button(in next-page)
+(Go for PyCharm-IDE Professional-Edition)
+(Download starts automatically)
+**NOTE:-
+** It supports Python Web-Application Development(Websites) using DJango Framework & its Development Server
+= Afer downloading the setup file, double-click the file to start the installation
+(During installation, Put-Tick mark for all options especially "bin-path")
+
+Step4:-
+= In the last screen click reboot your system option & close-button
+
+
+(****)
+==>> First-Project in PyCharm-IDE:-
+Step1:-
+= Open PyCharm-IDE (Professional-Edition) 1st-time
+(select Trial-option & verify with gmail/google a/c)
+= Click on File & Select New-Project (or)
+(Select New-Project button in 1st-screen)
+
+Step2:-
+= Types of Projects on left-side (select "DJANGO")
+= In Project-location, give Project-name in Last ("DJMyProject1")
+C:\Users\<<uname>>\PycharmProjects\"DJMyProject1"
+= Put tick-mark for 2-checkboxes
+(Inherit global site-packages)
+(Make available to all projects)
+= Under More-settings, give application-name (MyApps1)
+= Put tick-mark for Enable "django-admin"
+= Finally, click on "Create" button
+
+=** In PyCharm, default location for DJANGO-project is "C:\Users\<<uname>>\PycharmProjects"
+
+
+Step3::-
+NOTE:-(****)
+=> Starting/Running DJANGO-server:-(GUI)
+	Goto DJango-Project(Tree) Bar at Top -> Select ur DJango-Project(DJMyProject1) -> Click RUN(Green-Button, Triangle-shape(right))
+= DJango-Server starts RUN and can be viewed and confirmed at the bottom using RUN-tab
+= Once DJango-Server status is Online, we can request above URL in browser & verify DJango-Server Home-page
+(http://localhost:8000/)
+(Optinally use RED Stop button(square-shape) on side to Stop the Running DJango Development-Server)
+
+
+(*****)
+(Optionally)
+***=> How to run DJango Project in PyCharm-IDE::-
+(manually-runserver)
+= We have to move to the "manage.py" file-location in Terminal-tab(cmd-prompt) and we have to execute the following command
+Ex:-
+**[py manage.py runserver]**
+
+= Goto Terminal (Local)tab at the bottom of IDE
+(it opens DJango project-folder for PyCharm in command-prompt)
+"C:\Users\<<uname>>\PycharmProjects\DJMyProject1>"
+(give above command)
+cmd:...> py manage.py runserver
+
+= Once DJango Development Server is started, goto browser and issue this URL in address-bar
+http://127.0.0.1:8000/
+http://localhost:8000/
+
+= it open DJango Development-Server home-page with success & congrats message
+
+== Use Ctrl+C in Terminal (Local)Tab to stop the DJango Server...
+(Once DJango-Server stops in Terminal, request to http://localhost:8000/ given address in Browser gives "Site cannot be reached")
+
+
+
+
+==> How to change Port Number in PyCharm-IDE??
+(also run in browser directly)
+= By default here also the port on which DJango Development-Server is 8000
+= However, we can change it using below steps
+(Goto Project(DJMyApps) Tree-bar, select your Project-name -> click drop down button -> Edit Configurations)
+= Goto Port-option & change to "8888" (From 8000)
+= Click Run-browser(option) tick-mark & if required change Port-number in URL by typing manually
+(http://127.0.0.1:8888/)
+= Finally, Click "Apply" button & OK
+
+= And then, click on RUN button to open DJango-project directly in Browser
+(Once DJango-Server starts, automatically browser is opened with above URL and given PORT-number...)
+
+
+==> How to change default-Browser-App??
+= Goto Project Settings option
+(File ---> settings) or
+(Project-Tree-Bar with setting button)
+= Goto Tools-option on left-side & select "Web-Browser" option
+= On right-side, select only "Chrome" browser
+= Select Default-Browser as "First-Listed"(above)
+= Click "Apply" & OK
+
+NOTE:-
+= Re-run the server & verify whether project-url is opening directly in default-Browser auto./not
+
+
+
+
+==>> DJango-Project Tree in PyCharm-IDE::-
+C:\Users\Office\PycharmProjects\DJMyProject1>
+	+-- DJMyProject1	#proj-conf-folder
+		-- __init__.py
+		-- asgi.py
+		-- settings.py 
+		-- urls.py 
+		-- wsgi.py
+	+-- MyApps1		#app-folder
+		+-- migrations
+		-- __init__.py
+		-- admin.py
+		-- apps.py
+		-- models.py
+		-- tests.py
+		-- views.py
+	+-- templates(Folder) 	#used for html-files
+	-- db.sqlite3 			#Default Database(After 1st run-server)
+	-- manage.py		#running-server/db-migrations
+
+
+
+(***Desc of all files in Proj-folder***)		
+--------------------------------------------
+(refer-notes)
+-----------------
+=> __init__.py file:-
+= It is a blank python script. Because of this special file name, Django treated this folder as python package
+
+NOTE:- 
+= If any folder contains __init__.py file then only that folder is treated as Python package. However, this rule is applicable until Python 3.3 Version only
+
+=> settings.py:-
+= In this file, we have to specify all our project settings and configurations like installed applications, middileware configurations, database configurations etc 
+ 
+=> urls.py:-
+= Here we have to store all our url-patterns of our project
+= For every view(web-page), we have to define separate url-patterns
+(End user can use url-patterns to access our webpages)
+
+=> wsgi.py:-
+= wsgi means "Web Server Gateway Interface"
+= We can use this file while deploying our application in production on online server (live to access for clients)
+
+=> asgi.py:-
+= asgi means "App Server Gateway Interface"
+= it is used whenever we add or remove our apps(views or urls) from our project on live-server
+
+
+(****)
+=> manage.py:-
+= The most commonly used python script is manage.py 
+= It is a command line utility to interact with Django project in various ways like to run development server, run tests, create DB migrations etc. 	
+
+
+==> Role of Web Server(DJANGO):-
+= DJANGO is a Web-Server
+= Web-Server provides environment to run our web applications
+= DJANGO Web-Server is responsible to receive the URL-request and forward request to the corresponding web-component(views.py) based on url-pattern and to provide response to the end user(client)
+==Diagram==
+=** By Default, Django framework is providing "Development-Server" & Even Django framework is providing one inbuilt database "sqlite"
+= Hence DJango Framework is full-fleged working environment for developing dynamic Web-Apps using Python Programming
+
+
+***NOTE:-(Imp-Point)
+= Once we started Server(1st-time) a special default database(DB) related file will be generated in our project folder structure
+Ex:-
+	**[db.sqlite3]**
+C:\Users\Office\PycharmProjects\DJMyProject1>
+
+= It is very light-weight database with less features
+= However, we are going to use MySQL8 Database for DJANGO4 version
+
+
+
+
+(*****)PyCharm First-App (MyApps1)::-
+------------------------------------------
+==>Creation of First Web Application in PyCharm-IDE: 
+= We can create our Web-App in our Project in 2-ways,
+	1) Auto while creating Project (More-settings)
+	2) Manually from Terminal-tab(cmd> py manage.py startapp MyApps1)
+	
+1) Auto Web-App::-
+= While creating New-Project, under More-settings option, we can give our web-app-name(MyApps1) & it is created auto. with project(DJMyProject1)
+
+2) Manual Web-App::-
+= After creating the project, we can also create our web-app manually in Terminal-tab using below command,
+cmd>python manage.py startapp MyApps1 (already-created)
+(or)
+cmd>python manage.py startapp DemoApp (create-now)
+
+
+NOTE:-
+= Once we creates Django project, under that we can create any number of applications(apps) in that project
+(Coll-of-Apps is => 1-Project)
+
+
+
+
+NOTE:- 
+= By default in PyCharm-IDE when we create DJMyApps1 Project, by default we get DJMyApps1(App) application
+
+**= However, we can use the following command to create own-application(app)
+(do-it in Terminal at below tab of PyCharm-IDE)
+**= Follow below-steps to create own-application(app)
+C:\Users\Office\PycharmProjects\DJMyApps1> python manage.py startapp MyApps1
+
+Ex:-(***)
+**C:\Users\Office\PycharmProjects\DJMyApps1>python manage.py startapp MyApps1]**
+
+
+
+***DJango App Folder-structure***
+----------------------------------
+=> Now for "MyApps1" application, folder-structure is created as follows,
+C:\Users\Office\PycharmProjects\DJMyProject1> project-folder
+	|-> DJMyProject1> project-folder
+		|-> __init__.py 
+		|-> asgi.py
+		|-> settings.py 
+		|-> urls.py 
+		|-> wsgi.py 
+	
+	|-> MyApps1> app-folder (6-files)****
+		|-> migrations> folder
+			|-> __init__.py 
+		|->	__init__.py 	
+		|-> admin.py 
+		|-> apps.py 
+		|-> models.py 
+		|-> tests.py 
+		|-> views.py 
+	
+	|-> db.sqIite3 
+	|-> manage.py 
+	
+	
+Note:-
+= Observe that App-Folder contains 6-files and Project-Folder contains 5 files & one special file: manage.py(at-last)
+
+***DESC of App-Folder files***
+----------------------------------
+(Refer-notes)
+1) __init__.py:-
+= It is a blank Python script. Because of this special name, Python treated this folder as a package
+
+2) admin.py:-
+= We can register our models in this file. Django will use these models with Django's admin interface. 
+
+3) apps.py:-
+= In this file, we have to specify application's specific configurations
+
+4) models.py:-
+= In this file, we have to store application's data models
+
+5) tests.py:-
+= In this file, we have to specify test functions to test our code (Unit-Testing)
+
+6) views.py:-
+= In this file, we have to save functions that handles client's requests and return required responses
+
+7) migrations:- (folder)
+= It stores database specific information related to models
+
+NOTE:-
+= In this application related files, most commonly used files in every project are "views.py" and "models.py"
+
+
+
+(Working with "MyApps1" application)
+==> Activities/Steps required for Application(MyApps1)::- 
+1) Step1:-
+Add our application in "settings.py"(project-folder) file, so that Django gets aware about our application(MyApps1)
+Ex:-
+"settings.py" 
+---------------
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+	'MyApps1'
+] 
+#add 'MyApps1' in the last value of List "INSTALLED_APPS"
+
+=*** this step is done auto.by Django-Framework in PyCharm-IDE as follows
+Ex:-
+INSTALLED_APPS=[
+	....
+	....
+	....
+	'MyApps1.apps.Myapps1Config',	#new-style-auto
+	'MyApps1',				#old-style-manually
+];
+
+
+2) Step2:-
+= Create a view for our application in "views.py"
+= View is responsible to prepare required response(reply) to the end-user(client-url-request)
+=** View contains business-logic(coding to process data)
+=* There are 2-types of views,
+	a) Function Based Views (def func(request):)
+	b) Class Based Views 	(def class:)
+
+= As of now, we are using "Function based views"
+Ex:-
+"views.py" (MyApps1-folder)
+--------------------------------
+from django.shortcuts import render
+from django.http import HttpResponse
+
+#Create our views here...
+def display(request):
+	ss = "<h1>Hello User, Welcome to Django First-Project(DJMyProject1) & First-App(MyApps1)</h1><hr />"
+	return HttpResponse(ss)
+
+
+NOTE:-
+= For every view, we have one function in views.py
+= Here display() is a function, which is one-view
+= Each view(function) take atleast 1-input-parameter(request), its mandatory & it has information about client-request
+Ex:- uname/pwd/submit
+= Each view-func returns HttpResponse-obj with required html-data as response to client
+==Diagram==
+	Request------->[Corresponding-View]-------->Response
+(View can accept client-request as input, and performs required operations & provides proper response to End-user(client))
+
+
+Step3:-
+= Now, define URL-pattern for our view in "urls.py" file of project-folder
+= url-pattern, is used by end-user(client) to send request for our views(in MyApps1)
+= "urlpatterns" list routes URLs to views in our app(firstApp)
+
+**"urls.py" file**
+--------------------
+=** For functional-views,we perform 2-steps,
+i) add import-statement
+Ex:-
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('welcome/', views.display),
+]
+
+
+(or)->Not-req
+Ex:-
+	from firstApp import views;
+ii) add URL to urlpatterns
+Ex:-
+url(r'^welcome/',views.display); #from django.conf.urls import url; #old-style
+(or)
+path('welcome/',views.display)	#from django.urls import path #new-style
+
+=** When End-user(client), requests url(welcome/) then display() function is executed from views.py & provides required response(HttpResponse with required html-data)
+
+
+Step4::-
+= Start the server manually or automatically(Run button) & send the request from Browser URL
+
+[cmd\DJMyProject1> py manage.py runserver]
+
+= "http://127.0.0.1:8000/welcome/"
+= "http://127.0.0.1:8888/welcome/"
+
+
+Assignment::-
+1) Perform different steps for MyApps1 to request first-view(welcome/ with display()) -->already-done
+2) Perforom different steps for DemoApp to request first-view(hello/ with show())
+
+
+
+

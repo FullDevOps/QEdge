@@ -1,0 +1,689 @@
+================================================================
+(NOW*****)
+==> How to Configuration of MySQL Database::- 
+(in DJango-Project)
+=> Download & Install MySQL-DB in your system (MySQL 8.0.30)
+https://dev.mysql.com/downloads/installer/
+(if already installed then simply re-use it)
+*****
+Version support(mysql)
+Django supports MySQL 5.7 and higher. 
+(for DJango4 or later)
+******
+(make-sure to install mysql 5.7 or above for Django 4.0 or later)
+
+
+***Now After Installation,
+(Click-Windows-START-key ----> Select "MySQL" from installed prog-files ----> MYSQL 8.0 Cmd-Line-Client)
+
+=>DB-commands::-
+= First we have to create our own logical database in the mysql-command-line as follows,
+(connect to root/root & show databases)
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mydb               |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+mysql> create database empdb;
+
+mysql> show databases; (verify)
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| empdb              |
+| mydb               |
+| mysql              |
+| performance_schema |
+| test               |
++--------------------+
+6 rows in set (0.00 sec)
+
+
+**Very-Imp-Steps**::-
+----------------------
+= Now, we have to install mysqlclient by using pip-command in Pycharm-terminal/command-prompt as follows,
+(*****Django requires mysqlclient 1.4.0 or later*****)
+cmd> 	
+------------------------
+C:\Users\Office\PycharmProjects\DBModelProject> 
+cmd> pip install --only-binary :all: mysqlclient
+Collecting mysqlclient
+  Downloading mysqlclient-2.1.0-cp39-cp39-win_amd64.whl (180 kB)
+     |████████████████████████████████| 180 kB 136 kB/s
+Installing collected packages: mysqlclient
+Successfully installed mysqlclient-2.1.0
+C:\Users\Office\PycharmProjects\DBModelProject>
+
+NOTE:-
+= mysqlclient is a small piece of program, that helps to make connectivity or communication from Django-Project to MySQL-DB
+-----------------------------------
+
+**Imp-Step*
+---------
+= Now, goto DBModelProject(settings.py) & configure/register your mysql-database properties as follows,
+settings.py:(DBModelProject)
+-------------------------------
+DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'PORT': '3302',		#3306 or 3308
+        'NAME': 'empdb',
+        'USER': 'root',
+        'PASSWORD': 'root',
+    }
+}
+(put #comment for prev-default-database-properties i.e, sqlite3)
+
+**Imp-Step**
+==> Checking & Verifying Configurations(MySQL8)::-
+ C:\Users\Office\PycharmProjects\DBModelProject> py manage.py shell
+>>> from django.db import connection; 
+>>> mycursor= connection.cursor();    
+>>> print(mycursor) 
+<django.db.backends.utils.CursorDebugWrapper object at 0x000002A36C58B9A0> 
+>>>  
+(done if no-error...)
+
+-------------------------------------------------------------------
+***(NReq)***
+==> Configuration of Oracle Database::- 
+1) DATABASES = {
+2) 'default': {
+3) ENGINE': 'django.db.backends.oracle',
+4) 'NAME': 'XE',
+5) "USER':'scott',
+6) 'PASSWORD':'tiger'
+    'PORT' : '1521'
+    'HOST' : 'localhost'
+7) }
+8) }
+Note: We can find oracle database name by using the following command.
+SQL> select * from global_name;
+---------------------------------------------------------------------
+
+
+***Programming Technical-Concepts***
+----------------------------------------
+(*****)
+===>>>DJango Model Class::-
+= A Model is a Python-class which contains database information
+= A Model is a single, definitive source of information about our data used in program
+= It contains fields(vars) and behavior(methods) of the data what we are storing
+=** Each model(python-class) maps to one table in database(mysql)
+= Every model-class is a Python class which is inherited the child class of (django.db.models.Model parent-class)
+= Each attribute(var) of the model(python-class) represents a database field(column) in a table
+= We have to write all model python-classes inside 'models.py' file of our Application in our Project
+
+==>> Steps for Programming::-
+step1:-
+(Re-use prev project & its app)
+Ex:- DBModelProject & DBModelApp
+= Create a project and application and link them
+cmd> django-admin startproject DBModelProject
+cmd\DBModelProject> python manage.py startapp DBModelApp
+(optionally add ModelApp to settings.py(INSTALLED_APPS=[...] list)) -> NReq done automatically...
+
+
+***= After creating a Project and Application, now goto "models.py" file in our DBModelApp, and write the following code,
+Ex:-
+models.py(DBModelApp)
+-------------------------
+from django.db import models
+# Create your models here.
+class Employee(models.Model):
+    eno=models.IntegerField();
+    ename=models.CharField(max_length=30);
+    esal=models.FloatField();
+    eaddr=models.CharField(max_length=30);
+	
+	
+**Note:-**(Imp)
+= This model-class(Employee), it is automatically converted into Database-table in MySQL
+= Django is responsible for this auto-conversion
+Ex:-
+table_name: AppName_Employee 
+(dbmodelapp_employee table on mysql-database)
+fields(cols): eno, ename, esal and eaddr. (1-extra-field: id)
+behaviors: eno is Integer-type, ename is Char-type and max_length is 30 chars etc...
+= Hence,    
+Model-Class = Database-TableName+Field-Names+Field-Behaviors(type)
+
+=** Here in models(module/pkg), IntegerField, CharField, FloatField are inbuilt classes
+(we are creating their objects)
+
+
+
+(***)	
+==>>Converting Model Class into Database-Table specific SQL-Code in python::-
+= Once we write Model class, we have to generate the corresponding SQL Code 
+= For this, we have to use "makemigrations" command
+Ex:-
+cmd\DBModelProject> python manage.py makemigrations
+It results the following:
+-----------------------------------------
+Migrations for 'DBModelApp':
+  DBModelApp\migrations\0001_initial.py
+    - Create model Employee
+-----------------------------------------
+NOTE:-
+= Open "0001_initial.py" file under migrations-folder(DBModelApp) & verify SQL-Code in python-class
+Ex:-
+from django.db import migrations, models
+
+class Migration(migrations.Migration):
+
+    initial = True
+
+    dependencies = [
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Employee',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('eno', models.IntegerField()),
+                ('ename', models.CharField(max_length=30)),
+                ('esal', models.FloatField()),
+                ('eaddr', models.CharField(max_length=30)),
+            ],
+        ),
+    ]
+
+
+
+==>> How to see/verify corresponding SQL Code of Migrations::-
+= To verify the generated SQL-Code, we have to use the following command "sqlmigrate"
+cmd\ModelProject>python manage.py sqlmigrate DBModelApp 0001
+--
+-- Create model Employee
+--
+CREATE TABLE `DBModelApp_employee` (`id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY, `eno` integer NOT NULL, `ename` varchar(30) NOT NULL, `esal` double precision
+NOT NULL, `eaddr` varchar(30) NOT NULL);
+
+(**)Note:-
+= Here 0001 is the file-name passed as an argument to the command
+(migration filename no.)
+Now,
+"id" field:
+1) For every table(model), Django will generate a special column named with "id"
+2) ID is a Primary Key. 
+(Unique & NOT NULL Identifier for every row inside table is considered as a primary key)
+3) This field(id) is auto increment field and hence while inserting data, we are not required to provide data for this field
+4) This id field is of type "AutoField"
+5) We can override the behavior of "id" field and we can make our own field as "id"
+6) By default every Field is by default "NOT NULL"
+(unique ---> no-dup-value)
+(NOT NULL ---> compulsory-value)
+
+
+
+==>> How to execute/run generated SQL-cmd Code 
+(migrate Command):
+= After generating sql-code, we have to execute that sql-code to create table in database(mysql)
+= For this, we have to use 'migrate' command
+cmd\DBModelProject> python manage.py migrate
+
+=> Below Operations are performed:-
+Operations to perform:
+  Apply all migrations: DBModelApp, admin, auth, contenttypes, sessions
+Running migrations:
+  Applying DBModelApp.0001_initial... OK
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+
+(***)Note::-
+= Now tables will be auto-created in the mysql-database.
+
+mysql> describe dbmodelapp_employee 
+
+==> What is the Advantage of creating Tables with 'migrate' Command
+= If we use 'migrate' command, then all Django required tables will be created in addition to our application specific tables. 
+= If we create table manually with sql-code in MySQL command-line, then only our application specific table will be created and django may not work properly. Hence it is highly recommended to create tables with 'migrate' command
+
+NOTE:-
+=> Verify tables in MySQL-DB
+cmd> show tables
+(total 11-tables are created)
+(1->our models.py table)
+(10->app-related tables) Ex:- groups/users/permissions/sessions etc
+
+4-Imp-things:-
+1) Make Model-class
+2) makemigrations-cmd
+3) sqlmigrate-cmd
+4) finally, migrate-cmd
+(Verify in mysql-db-tables)
+
+
+
+
+
+
+==================================== second class =============================================================================================================
+
+
+----------------------------------------------------------------------
+"Working with Django-admin-interface"
+-------------------------
+(Checking DB-tables in DJANGO-admin)
+==> How to Check created Table in Django admin Interface::-
+(***)
+
+=** We have to register model-class in 'admin.py' file of our Application-Folder
+Ex:-
+admin.py (DBModelApp app-folder)
+------------
+from django.contrib import admin
+from DBModelApp.models import Employee
+#Register your models here...
+admin.site.register(Employee)
+
+NOTE:-
+= Once our model-class(Employee) is registered with application admin.py, we can access DB-tables from Django-server(admin-user)
+Ex:-
+	http://localhost:8000/admin/
+
+
+(***)
+==> Creation of Super-User to login to admin Interface::-
+(Stop Django-server & goto Terminal-tab)
+
+= We can create super-user with the following command by providing username, mailid, password
+cmd\DBModelProject>python manage.py createsuperuser
+Ex:-
+Username (leave blank to use 'office'): saisir
+Email address: srikanth.sai.sir@gmail.com
+Password: Saisir123@
+Password (again): Saisir123@
+(Superuser created successfully...)
+
+NOTE:-
+(once super-user is created, we can verify as follows)
+= We can login to admin interface
+= Re-Start the server and login to admin interface using the created credentials (username,mailid,password)
+cmd\DBModelProject> python manage.py runserver
+= Open the following in browser: 
+	http://127.0.0.1:8000/admin/
+	http://localhost:8000/admin/
+	
+=*** Now,
+(In Django-admin-page, we can view DBMODELAPP Employee-created tables from DJango-project on to MySQL-database)
+(It also provides 2/3-option for (i.ADD-option)Adding-New-Record, as well as (ii.Change-option)Changing or updating existing-records option) (iii) Delete-option)Deleting a record
+
+
+-------------------------------------------------------
+(theory-topic)-IQ**
+==> Difference between makemigrations and migrate:
+= "makemigrations” is responsible to generate SQL-code for Python-model-class whereas,
+= "migrate" is responsible to execute that SQL-code so that tables will be created in the database as per DJango-App standards
+----------------------------------------------------------
+
+==> Insert/Update/Delete Sample-Records in Admin-interface::-
+(DBMODELAPP/Employee-table)
+1) Add
+1001,Sai,5600,Hyderabad
+1002,Ram,4500,Secbad
+1003,Ali,3500,Hitech
+Ex:-
+#Student-class objects display using print(), using __str__() sp-method
+#Student.py
+
+class Student:
+	def __init__(self,sno,sname,height):
+		self.sno=sno;
+		self.sname=sname;
+		self.height=height;
+	def __str__(self):
+		ss=str(self.sno)+"\t"+self.sname+"\t"+str(self.height);
+		return ss;
+	
+s1 = Student(1001,"Sai",6.2);
+s2 = Student(1002,"Ram",5.9);
+print(s1)
+print(s2)
+#s1.display()
+#s2.display()
+
+
+
+***very-imp***
+==> To Display Employee-Table-Data in admin-Interface in Browser::-
+= By default in admin-interface, we can perform insert/update/delete operations but we cannot list/display total table at a time
+= For this displaying whole table at-a-time in admin-interface, we follows below 2-steps
+i)models.py
+ii)admin.py
+
+-------------------------------------------
+#sp-prog to print any obj-data using __str__(self) method
+#Program is __str__(self) method
+#StudentStr.py
+
+class Student:
+    def __init__(self):
+        self.rollno=1001;
+        self.sname="Sai";
+        self.height=6.2;
+    def display(self):
+        print(self.rollno,self.sname,self.height);
+    def __str__(self):
+        return "Student-data ::"+str(self.rollno)+self.sname+str(self.height);
+
+s1 = Student();
+#s1.display();
+print(s1);  #calls __str__() method & returns string-data
+-------------------------------------------
+i)
+=> using __str__() in Employee-model-class::-
+Ex:-
+models.py
+-----------
+from django.db import models
+# Create your models here.
+class Employee(models.Model):
+    eno=models.IntegerField();
+    ename=models.CharField(max_length=30);
+    esal=models.FloatField();
+    eaddr=models.CharField(max_length=30);
+    def __str__(self):
+        return 'Employee Object with eno: '+str(self.eno);
+
+
+ii) make necessary changes in admin.py file		
+Ex:-
+admin.py
+-----------
+from django.contrib import admin
+from DBModelApp.models import Employee
+
+#Register your models here...
+#admin.site.register(Employee);
+#model(table) for adming-interface but-not mysql-table
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display=['eno','ename','esal','eaddr'];
+
+admin.site.register(Employee,EmployeeAdmin);
+
+**Note:-
+= We should do this registration in a single-line otherwise we are getting error...
+Ex:-
+admin.site.register(Employee)
+admin.site.register(EmployeeAdmin)
+
+
+=****Finally, restart the server and login to /admin interface and check for table-display
+
+
+NOTE:-
+= list_display=[] variable from admin.py is taken as reference for displaying records in admin-Interface using __str__() method from Employee-model-class
+
+
+
+
+
+
+
+
+===================================================================
+===> Other Assignment Activities::-
+= Create the following tables(model-classes) and populate with some sample-data
+	a) Job(postingdate,location,offeredsalary,qualification)
+	b) Book(number,title,author, publisheddate)
+	c) Customer(name,ano,mailid, phonenumber,age)
+====================================================================
+
+(****)
+===> Access/Display Model-data in our views::-
+=> Model VIEWs::-
+==============================================================================
+= End-user or client doest not have access to Admin-login or MYSQL-DB-commands
+= For End-user, we design a view in views.py & its url-pattern in urls.py
+**NOTE:-	
+= Now we can write model-views to get data from the database and use to templates(.html file)
+= Before writing model views.py file, create "templates" and "static" folder with respective application folders having HTML and CSS files and register/add them in "settings.py" file
+Ex:-
+TEMPLATES = [
+    {
+		....
+        'DIRS': [BASE_DIR / 'templates']
+		....
+	}
+}
+
+STATIC_URL = '/static/'
+import os;
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+
+Ex:-
+----------
+views.py  (DBmodelApp app-folder)
+----------
+from django.shortcuts import render
+from DBModelApp.models import Employee
+
+#Create your views here.
+def empdata(request):
+    emplist=Employee.objects.all()
+    dict1={'emplist':emplist}
+    return render(request, 'DBModelApp/emp.html', context=dict1);
+
+NOTE::-
+= Here, emplist=Employee.objects.all(), this statment gets all records from DB-table into our program using our Model-class(Employee)
+= All such records are stored as list of dicts
+Ex:-
+	emplist = [
+			{........},		---> 1st-rec
+			{........},		---> 2nd-rec
+			{........},		---> 3rd-rec	
+			{........},		---> 4th-rec
+			{........},		---> 5th-rec
+	];
+
+	
+(and)
+Ex:-
+emp.html (templates/DBModelApp)
+---------------------------------
+<!DOCTYPE html>
+{%load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Employee DBModel</title>
+    <link rel="stylesheet" href="{%static '/css/mystyles.css'%}">
+</head>
+<body>
+    <h1>The Employees list is ::</h1>
+    <hr />
+    <br />
+    {% if emplist%}
+    <table border="2" width="350">
+        <caption>Employees-Details</caption>
+        <thead>
+            <th>EmpNo</th>
+            <th>EmpName</th>
+            <th>ESal</th>
+            <th>EAddr</th>
+        </thead>
+        <tbody>
+            {% for emp in emplist%}
+            <tr>
+                <td> {{emp.eno}}</td>
+                <td>{{emp.ename}}</td>
+                <td>{{emp.esal}}</td>
+                <td> {{emp.eaddr}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {%else%}
+        <p>No records found </p>
+    {% endif %}
+
+</body>
+</html>
+
+NOTE:-
+= Add emp.html in settings.py(of Project-Folder) under TEMPLATES=[] list-var
+Ex:-
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [BASE_DIR/'templates'],		##***imp
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+(here BASE_DIR(var) is automatically defined at begining of file, which is our project-base-path reference or url)
+(BASE_DIR = Path(__file__).resolve().parent.parent)
+
+Ex:-
+----------
+mystyles.py (static/css folder)
+----------
+h1{
+    color:Blue;
+    border:2px Solid Brown;
+    text-align: center;
+    background-color: yellow;
+}
+table{
+    border: 2px Solid Blue;
+    background-color: beige;
+    text-align: center;
+}
+caption{
+    border-top: 2px Solid Blue;
+    border-left: 2px Solid Blue;
+    border-right: 2px Solid Blue;
+    background-color: yellow;
+    text-align: center;
+    font-size: 23px;
+    font-weight: bolder;
+    color:Green;
+}
+
+=** Also add below configuration in settings.py for static-files,
+Ex:-
+settings.py
+-------------
+STATIC_URL = '/static/'
+import os;
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+=** Now, create a url-pattern for our view(DBModelApp) in urls.py(Project-Folder) as follows,
+Ex:-
+urls.py
+----------
+from django.contrib import admin
+from django.urls import path
+from DBModelApp import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('empdata/', views.empdata),
+]
+
+
+NOTE:-
+= Finally, start the server and request the below URL,
+	http://localhost:8000/empdata/
+(intially, No records are found)	
+= Now, goto to admin-login-page (http://localhost:8000/admin/) & add records into mysql-database from django-project-admin-page under DBMODELAPP section
+(Add-option)
+1001	Sai	5600.0	Hyderabad
+1002	Ram	4500.0	Secbad
+1003	Ali	3500.0	Hitech
+(Add 3-records)
+= Again request,
+http://localhost:8000/empdata/
+(we get 3-records in table)
+= (Add-option 2-more-records)
+1004	Tom	2800.0	Hitech
+1005	Pop	1500.0	DSNR
+= Again request,
+http://localhost:8000/empdata/
+(Now, we get 5-records in table)
+= (Click on Employees table link)
+(Select any record 1001 & modify or change ename to "Sai Baba" & Click SAVE option)
+= Again request,
+http://localhost:8000/empdata/
+(Now, we can see 1001 name is modified to 'Sai Baba')
+= (Click on Employees table link)
+(Select any record 1005(check-box) & Action(Delete-option) & Click GO) (Are your sure? & Click YES option)
+= Again request,
+http://localhost:8000/empdata/
+(Now, we can only 4-records -> 1005 is deleted)
+
+NOTE:-
+= This is how we have to work with DJango-App with Models(DB-operations)
+
+==> DJango Template Language::- (Basics)
+= This language helps us to write programming in html-templates(emp.html file)
+= It is of 2-types,(basically)
+	i) DJango-template-var tag
+		Ex:-
+			{{emp.empno}}
+			{{emp.ename}}
+			{{emp.esal}}
+			{{emp.eaddr}}
+	ii) DJango Template Coding-tag
+		Ex1:-
+			{%if emplist%}
+				...display-html-table...
+			{%else%}
+				<p>No-Records Found</p>
+			{%endif%}
+		Ex2:-
+			{%for emp in emplist%}
+				<tr>
+					<td>{{emp.empno}}</td>
+					....
+				</tr>
+			{%endfor%}
+
+
+
+
+

@@ -1,0 +1,140 @@
+****Development of our DJ-App. in the live Enviornment(Server)::-
+-------------------------------------------------------
+===>> DJANGO Project Deployment::-
+=====================================
+(Deployment means putting our proj. on live-server)
+= There are several deployment options are available to deploy our django web application(project in live servers)
+
+(Why deployment???)
+-----------------------
+*** These options for deployment on live-enviroment(server) will be based on,
+1) Scalability (access from diff.loc.)
+2) Performance (Access for many.no.of.people)
+3) Price (based on features)
+4) Security (secure level of access i.e, uname/pwd)
+5) Easy to use (user-friendly access to people)
+etc...
+
+*** The following are various deployment options
+(Diff. servers for deployment)
+1) PythonAnywhere.com (free open-source)
+(It is very simple and easy to host our django-project/app)
+2) Digital-Ocean → VPS(Virtual Privater Server)
+3) Heroku
+4) Amazon Cloud
+etc...
+*** Note: For every platform clear documentation steps are available in respective sites
+
+
+===>> Need of Version Control Systems::-
+(our app has diff updates from time to time, that need to be recorded as versions)
+1. To maintain multiple versions of the same product
+Ex:- android 11,12,13,14.....
+2. At any point of time we can have a backup of previous version
+(provide backward compatibility...)
+3. We can see the difference between 2 or more versions of our code base
+(provide support for old-os & new-os version access)
+4. We can run mutliple versions of the same product simultaneously
+(same old-hardware old-version & new-hardware new-version)
+5. It helps us to track project history over time and to collaborate easily with others. etc
+(project development process)
+
+NOTE:-
+*** The following is the list most popular version-control-systems(s/w),
+Ex:-
+1) GIT
+2) Apache Subversion
+3) Mercurial
+4) Concurrent Version System(CVS)
+5) GNU Bazaar
+etc...
+
+
+(***)
+===>> Git vs GitHub::-
+-----------------------------
+1) Git is a Version-control-system that helps to track changes in our code
+2) GitHub is a company/website that helps to manage git and and host our proj-files-storage on their website. 
+i.e GitHub is remote hosting service to host our code repository on any website(domain/live-server)
+(inside GitHub website, Git is a small-app to control our code-version)
+3) Similar other alternatives to GitHub there are several hosting platforms like Gitlab, BitBucket etc
+
+***Note: 
+If our application is at remote hosting platform then deployment on various platforms will become very easy.
+
+
+
+===>> Version-Control vs Hosting-Platform vs Deployment-Platform::-
+(Version-Control ---> git)
+(Hosting-Platform  ---> github.com)
+(Deployment-Platform ---> pythonanywhere.com)
+
+
+I) Version-control-system::- (git, small piece of s/w)
+=>> How to install git: -
+(Version-control-system)
+https://git-scm.com/downloads
+(Downloads for windows & select Standalone-installer(64-bit windows))
+(Latest version is 2.38.1)
+(After download, and also install in your system)
+Ex:-
+	Git-2.38.1-64-bit.exe
+	(during installing use all default options)
+
+Now,
+===>> How to create account in github.com::-
+= Just login to github.com and create FREE account
+(Signup-option)
+email:srikanth.sai.sir@gmail.com (prem777chandu@gmail.com)
+uname:srikanth-sai-sir (prem777chandu)
+pwd: Lwd123@   (Chanduprem@77)
+(Go for Free-Account only...)
+
+
+
+(***)
+===>> Git Respository:
+= Git is a set of layers(Sections).
+= Each layer has a function. 
+= We can use git to move files between these layers.
+
+
+=**(Git Repository Activtities)
+===>> Activtities related to Git Repository:
+= Create a folder named with my_repo1 which acts as Git Repository.
+(do it here, C:\Users\Office)
+= Copy the required .py files to this folder for tracking purposes.
+Ex:-
+	test.py
+	
+#Program
+#test.py C:\Users\MAXHUB\my_repo1> folder
+
+print("Hello Students!!");
+
+
+=** Come to git-bash::-(terminal/prompt)
+= Initialize Git by using the following command
+bash-cmd> git init
+Ex:-
+Office@SriSaiBaba-PC MINGW64 ~
+$ git init
+Initialized empty Git repository in C:/Users/Office/.git/
+
+= By default git won't track any files. 
+We have to add some-files to the Staging area(moniter-area)
+such files only can be tracked/monitered by GIT.
+= We can add files to the staging area by using the following command
+bash$>git add filename1
+=  To add all files present in current working directory we have to use 
+Ex:-
+bash$> git add .			(. all files)
+= Whenever we perform commit, for all files present in staging area,snapshots will be created by git. We can perform commit as follows 
+bash$> git commit -m 'comment'
+bash$> git commit -m '1st-ccomit-day1'
+
+=** We can check the status of commit by using the command 
+bash$> git status
+
+
+

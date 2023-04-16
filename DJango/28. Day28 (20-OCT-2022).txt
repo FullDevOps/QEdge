@@ -1,0 +1,443 @@
+=====================================================================
+***Start-Coding***
+(Programming on..)
+==>AUTHENTICATION APPLICATION ::-
+(Create UserAuthProject-project & MyApps1-application)
+Ex:-
+views.py (MyApps1 folder)
+----------------------------------
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
+# Create your views here.
+def home_page_view(request):
+    return render(request,'MyApps1/home.html')
+
+@login_required
+def java_exams_view(request):
+    return render(request,'MyApps1/javaexams.html');
+@login_required
+def python_exams_view(request):
+    return render(request,'MyApps1/pythonexams.html');
+@login_required
+def aptitude_exams_view(request):
+    return render(request,'MyApps1/aptitudeexams.html');
+
+def logout_view(request):
+    return render(request,'MyApps1/logout.html')
+	
+	
+Ex:-	
+urls.py (UserAuthProject conf-folder)
+-----------------------------------------
+from django.contrib import admin
+from django.urls import path,re_path
+from django.conf.urls import include
+from MyApps1 import views;
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('accounts/', include('django.contrib.auth.urls')),
+
+    path('java/', views.java_exams_view),
+    path('python/', views.python_exams_view),
+    path('aptitude/', views.aptitude_exams_view),
+    path('logout/', views.logout_view),
+
+    path('signup/',views.signup_view),
+
+    re_path('^.*$', views.home_page_view), #dont use re_path() for def/any-url
+]
+
+
+Ex:-	
+authstyles.css (static/css create-these-2-folder)
+----------------------------------------
+body
+{
+    background: lightyellow;
+    color:blue;
+}
+.jumbotron
+{
+    background: cyan;
+    color:red;
+}
+ul,li{
+    float:left;
+}
+
+(also register above folder in settings.py)
+Ex:-
+settings.py
+-------------------------
+STATIC_URL = '/static/'
+import os;
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+
+Ex:-	
+base.html (templates/MyApps1 folder)
+----------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango Authentication</title>
+        <link rel="stylesheet" href="{%static 'css/authstyles.css'%}">
+    </head>
+    <body>
+        <nav>
+            <div>
+                <div>
+                    <h1>
+                        <a href="/">SRI SAI EXAMINATION-CENTER</a>
+                    </h1> <hr />
+                </div>
+                <ul>
+                    <li> <a href="/java/">Java Exams</a> |
+                     <a href="/python/">Python Exams</a>  |
+                     <a href="/aptitude/">Aptitude Exams</a> </li>
+                </ul>
+                <ul>
+                    <li> <a href="/signup/">Signup</a>  |
+                     <a href="/accounts/login/">Login</a> |
+                     <a href="/accounts/logout/">Logout</a> </li>
+                </ul>
+            </div>
+        </nav>
+        <br /><br /><br />
+        <hr />
+        <br />
+        {%block body_block%}
+        {%endblock%}
+    </body>
+</html>
+
+
+Ex:-	
+home.html (templates/MyApps1 folder)
+----------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <div class="jumbotron">
+        <div>
+            <h2>***Welcome to SRI SAI Exams***</h2>
+            <h4>Rules & Regulations:</h4>
+            <ul>
+                <li>Rule-1:You should write only one exam per day</li>
+                <li>Rule-2:You should write exam from 9am to 6pm only</li>
+                <li>Rule-3:Use your Hall-Ticket No. for login-ID</li>
+                <li>Rule-4:User your Name & DOB as password for exams</li>
+                <li>Rule-5:Each exam is 90minutes to time</li>
+                <li>Rule-6:Each question appears only once(NO back option)</li>
+                <li>Rule-7:Each question has only 2minutes of time</li>
+                <li>Rule-8:Exam Result will be send to your mobile & emailid</li>
+                <li>Rule-9:Webcam is mandatory for all exams</li>
+            </ul>
+            <h4>***ALL THE BEST***</h4>
+        </div>
+    </div>
+{%endblock%}
+
+
+
+Ex:-	
+javaexams.html (templates/MyApps1 folder)
+----------------------------------------	
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <div class="jumbotron">
+        <div align='center'>
+            <h1>Welcome to Java Exams!!!</h1>
+            <hr />
+            <h3>Exam starts in 5 minutes...</h3>
+        </div>
+    </div>
+{%endblock%}
+
+
+Ex:-	
+pythonexams.html (templates/MyApps1 folder)
+---------------------------------------------						
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <div class="jumbotron">
+        <div align='center'>
+            <h1>Welcome to PYTHON Exams!!!</h1>
+            <hr />
+            <h3>Exam starts in 5 minutes...</h3>
+        </div>
+    </div>
+{%endblock%}
+
+
+			
+Ex:-	
+aptitudeexams.html (templates/MyApps1 folder)
+----------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <div class="jumbotron">
+        <div align='center'>
+            <h1>Welcome to Aptitude Exams!!!</h1>
+            <hr />
+            <h3>Exam starts in 5 minutes...</h3>
+        </div>
+    </div>
+{%endblock%}
+
+
+(***Very-Imp***)
+Ex:-	
+registration/login.html (templates/registration/MyApps1 folder)
+(create registration-folder under templates-folder)
+-------------------------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html' %}
+{%block body_block%}
+    <div align='center'>
+        <h3>Login to write your Exams..!!</h3>
+        <form method="post">
+            {{form.as_p}}
+            {%csrf_token%}
+            <button type="submit">Login</button>
+        </form>
+    </div>
+{%endblock%}
+
+
+Ex:-	
+MyApps1/logout.html (templates/MyApps1 folder)
+----------------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <div class="jumbotron">
+        <div>
+        <h3>Thanks for visiting SRI SAI Examination-Center..</h3>
+        <p>Have a nice day!!</p>
+        <h4>Login BAck Again:</h4>
+        <a href="/accounts/login/">Login</a>
+        </div>
+    </div>
+{%endblock%}
+
+
+Now,
+Ex:-
+settings.py (UserAuthProject conf-folder)
+---------------------------------------------
+LOGIN_REDIRECT_URL='/'
+LOGOUT_REDIRECT_URL='/logout'
+
+
+
+Now,(***imp***)
+=> CONFIGURE SIGNUP FORM:-
+Ex:-
+forms.py (MyApps1 main-folder)
+--------------------------------
+from django import forms;
+from django.contrib.auth.models import User
+class SignUpForm(forms.ModelForm):
+    class Meta:
+        model=User		#it is mysql-db model-table(for auth_app_db)
+        fields=['username', 'password','email','first_name','last_name'];
+
+Ex:-
+views.py (MyApps1 main-folder)
+--------------------------------
+from MyApps1.forms import SignUpForm
+from django.http import HttpResponseRedirect
+def signup_view(request):
+    formobj=SignUpForm()
+    if request.method=="POST":
+        formobj=SignUpForm(request.POST)
+        user=formobj.save()
+        user.set_password(user.password)
+        user.save()
+        return HttpResponseRedirect('/accounts/login')
+    return render(request, 'MyApps1/signup.html', {'formobj':formobj})
+
+
+Ex:-
+signup.html (templates/MyApps1 folder)
+----------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html' %}
+{%block body_block%}
+    <div align='center'>
+        <h3>Register Your Login!!</h3>
+        <form method="post">
+            {{formobj.as_p}}
+            {%csrf_token%}
+            <button type="submit">Register-Here</button>
+        </form>
+    </div>
+{%endblock%}
+
+
+
+Ex:-
+urls.py (UserAuthProject conf-folder) - add in last(already-done)
+-------------------------------------
+path('signup/',views.signup_view),
+
+
+Ex:- (already-done)
+Now,
+Password Hashers in settings.py (UserAuthProject conf-folder)
+--------------------------------------------------------------
+#password-hashers
+PASSWORD_HASHERS=[
+ 'django.contrib.auth.hashers.Argon2PasswordHasher',
+ 'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+ 'django.contrib.auth.hashers.BCryptPasswordHasher',
+ 'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+ 'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+]
+
+
+==>> Very Important Step::- (My-SQL-Database)
+mysql> create database authdb;
+Query OK, 1 row affected (0.36 sec)
+mysql> use authdb;
+Database changed
+mysql> show tables;
+Empty set (0.00 sec)
+
+Ex:-
+settings.py (UserAuthProject conf-folder)
+---------------------------------------------
+DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'PORT': '3302',		#3306 or 3308
+		'NAME': 'authdb',#makesure authdb is created and ready in mysql-db        
+		'USER': 'root',
+        'PASSWORD': 'root',
+    }
+}
+
+Ex:- (goto Terminal-tab) install mysqlclient
+cmd> pip install --only-binary :all: mysqlclient
+
+Now, Verify connection,
+cmd> py manage.py shell
+>>> from django.db import connection
+>>> mycursor = connection.cursor();
+>>> print(mycursor)
+>>> exit();
+
+Ex:- (Now perform makemigrations,sqlmigrate,migrate)
+cmd> py manage.py makemigrations
+No changes detected
+cmd> python manage.py sqlmigrate (Not-Required)
+
+cmd> python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+cmd>
+
+=> verify in mysql-db
+mysql> show tables;
+10 rows in set (0.01 sec)
++----------------------------+
+| Tables_in_authdb           |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
++----------------------------+
+10 rows in set (0.10 sec)
+
+mysql> select username, password,email,first_name,last_name from auth_user;
+Empty set (0.00 sec)
+
+
+Ex:- (Create superuser in terminal-tab)
+(back to Terminal-tab)
+cmd> py manage.py createsuperuser (uname:Sidhu,pwd:Sidhu)
+Username (leave blank to use 'office'): sai
+Email address: sai@gmail.com
+Password: sai
+Password (again): sai
+The password is too similar to the username.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+
+Ex:-
+Now,
+=> Restart the server & goto admin-page
+http://localhost:8000/admin/
+(verify superuser(record) under users-link)
+=> We can also verify it in mysql-db
+mysql> select * from auth_user;
+1 rows in set (0.08 sec)
+mysql> select username, password,email,first_name,last_name from auth_user;
+1 rows in set (0.08 sec)
+
+
+Ex:-
+=>> Finaly, Now acess below-url(home-page),
+		http://localhost:8000/
+(click signup & register your details) #uname:ram; password:ram; email; firstname;lastname & register
+(now in login-page, given your registered uname/pwd to login and to take exams(java,python,aptitude))
+(once we logout then we again require to login to take exams)
+(finally, verify all links with login & logout options)
+
+
+Ex:-
+=> Finally,verify all registered users mysql-db
+mysql> select * from auth_user;
+2 rows in set (0.08 sec)
+mysql> select username, password,email,first_name,last_name from auth_user;
+2 rows in set (0.08 sec)
+
+
+
+
++----+------------------------------------------------------------------------------------------------------------------+----------------------------+--------------+------------------------+------------+-----------+------------------------+----------+-----------+----------------------------+
+| id | password
+                                                  | last_login                 | is_superuser | username               | first_name | last_name | email                  | is_staff | is_active | date_joined                |
++----+------------------------------------------------------------------------------------------------------------------+----------------------------+--------------+------------------------+------------+-----------+------------------------+----------+-----------+----------------------------+
+|  1 | argon2$argon2id$v=19$m=102400,t=2,p=8$RkJwTENhM2oxMWo4V1dzWll4MjFNbA$0TFR/VYAVv/vtx4HS1dsY+f9inQjCchxZNEJVkdFco4 | 2023-03-30 10:47:44.593176 |            1 | Sidhu                  |            |           | jojibabu1043@gmail.com |        1 |         1 | 2023-03-30 10:47:20.385167 |
+|  2 | argon2$argon2id$v=19$m=102400,t=2,p=8$QWFyYW9rT3pKMmtEZkhraEdUV3J5Yg$oFUbcoi+80vf36mqK12wRT+T9k/oS/sNQLGSmA3LuKk | 2023-03-30 10:49:25.093586 |            0 | jojibabu1043@gmail.com | Jojibabu   | Gorantla  | jojibabu1043@gmail.com |        0 |         1 | 2023-03-30 10:48:58.398712 |
++----+------------------------------------------------------------------------------------------------------------------+----------------------------+--------------+------------------------+------------+-----------+------------------------+----------+-----------+----------------------------+
+2 rows in set (0.00 sec)
+
+mysql>

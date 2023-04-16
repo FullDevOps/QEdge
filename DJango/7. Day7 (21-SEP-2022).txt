@@ -1,0 +1,243 @@
+====================================================
+==> Working with Ui-Tech(HTML-CSS-Javascript)
+==> HTML Ui-Tech::-
+---------------------
+= HTML stands for Hyper-Text-Markup-Language
+Hyper ---> High/rich/royal (bold/italic/color/size/font...)
+Text ---> data(chars,imgs,audio,video,etc...)
+Markup ---> program with <tags> (tag decides webpage-data-format)
+Language ---> mode-of-comm.
+
+=** HTML is a standard to display any webpage on website(Browser-s/w)
+= HTML Programs are given with .html or .htm as extension
+Ex:-
+	Welcome.html
+	Demo1.htm
+	
+**NOTE:-
+= In html-program, we write everything in the form of <tags>	
+Ex:-
+	<html>...</html>
+	<head>...</head>
+	<title>...</title>
+	<body>...</body>
+	<style>...</style>	---> for CSS
+	<script>...</script> ----> for javascript
+(for every tag we have opening<tag> and closing</tag>)
+(opening-tag +data+ closing-tag ===> html-element)
+(inside open-tag & close-tag, we write data/info)	
+
+***= There some self-closing-tags (inside open-tag directly close-it)
+Ex:-
+	<hr />
+	<br />
+	<img src="myflag.jpg" />
+
+
+= HTML programs(.html,.htm) are run in browsers
+Ex:-
+		Chrome, Firefox, Safari etc...
+		
+		
+###Program (Welcome.html) ---> Use Notepad++ only
+(HTML Webpage to display Welcome msg using diff. headings)
+<!--
+	HTML Webpage to display "Welcome-Message" with different Headings 
+	(F:\SAISIR\HTML\Welcome.html)
+-->
+
+<html>
+	<head>
+		<title>***Weclome-Page***</title>
+		<style>
+			h1{
+				color:Blue;
+			}
+			h2{
+				color:Green;
+			}
+			h3{
+				color:Red;
+			}
+			h4{
+				color:Orange;
+			}
+			h5{
+				color:Pink;
+			}
+			h6{
+				color:violet;
+			}
+			h1,h3,h5{
+				background-color:yellow;
+			}
+			h2,h4,h6{
+				background-color:lightgreen;
+			}
+		</style>
+	</head>
+	<body>
+		<center>
+			<h1>Welcome to DJANGO HTML webpage</h1>
+			<hr color="brown" width="95%"/>
+			<h2>Welcome to DJANGO HTML webpage</h2>
+			<hr color="brown" width="85%"/>
+			<h3>Welcome to DJANGO HTML webpage</h3>
+			<hr color="brown" width="75%"/>
+			<h4>Welcome to DJANGO HTML webpage</h4>
+			<hr color="brown" width="65%"/>
+			<h5>Welcome to DJANGO HTML webpage</h5>
+			<hr color="brown" width="55%"/>
+			<h6>Welcome to DJANGO HTML webpage</h6>
+			<hr color="brown" width="45%"/>
+		</center>
+	</body>
+</html>
+
+		
+NOTE:-
+==Diagram== (basic-structure-of-html-page)
+= Every opening <tag> has closing-tag </tag>
+= <tags> are given in angle-brackets <> symbols
+= inside <> brackets give tagname Ex:- <html>
+= Usings <tags> we present or display data on webpage
+	
+=** Any changes done in html-program, save-it & refresh in browser-page
+(no-comiple, no-running only refresh/reload(F5))
+
+=** <h1> to <h6> provide diff.heading styles (big to small)
+=** <hr /> provides horizontal-rule(line), it is self-closing-tag
+=** <center> provides data in center of the line
+
+=*** <hr color="" width="" /> here color, width are html-attributes, they provide extra-func to html-tag
+
+
+=*** inside html-page, we can give css under <head> section, using <style>....</style> tags
+Ex:-
+	h1{
+		color:Blue;
+	}
+	h1,h3,h5{
+		background-color:lightyellow;
+	}
+
+=** CSS-properties are given with : and ended with ;(compulsory)
+=** html-attributes are given with  = and seperated with space
+
+NOTE:-
+= Inside HTML-page, we can write CSS & Javascript also
+i.e, HTML+CSS+Javascript
+=*** Every HTML-program is divided into 2-sections
+	a) <head> section
+	b) <body> section
+= under	<head> section, we write <title>, css <style>, javascript <script>
+= under <body> section, we write diff. html-tags to display data/info in browser-page
+
+=** html-attributes are given with =
+=** css-properties are given with : and ; is compulsory	
+
+===============================================
+===> FirstApp another view(/welcome2 url-view)
+Steps:-
+1) already done (create FirstApp & add our app-name in settings.py of Project-folder)
+
+2) FirstApp(views.py) ---> show() function
+Ex:-
+def show(request): 
+	ss = '''<!--
+	HTML Webpage to display 'Welcome-Message' with different Headings 
+	(F:\SAISIR\HTML\Welcome.html)
+-->
+
+<html>
+	<head>
+		<title>***Weclome-Page***</title>
+		<style>
+			h1{
+				color:Blue;
+			}
+			h2{
+				color:Green;
+			}
+			h3{
+				color:Red;
+			}
+			h4{
+				color:Orange;
+			}
+			h5{
+				color:Pink;
+			}
+			h6{
+				color:violet;
+			}
+			h1,h3,h5{
+				background-color:yellow;
+			}
+			h2,h4,h6{
+				background-color:lightgreen;
+			}
+		</style>
+	</head>
+	<body>
+		<center>
+			<h1>Welcome to DJANGO HTML webpage</h1>
+			<hr color='brown' width='95%'/>
+			<h2>Welcome to DJANGO HTML webpage</h2>
+			<hr color='brown' width='85%'/>
+			<h3>Welcome to DJANGO HTML webpage</h3>
+			<hr color='brown' width='75%'/>
+			<h4>Welcome to DJANGO HTML webpage</h4>
+			<hr color='brown' width='65%'/>
+			<h5>Welcome to DJANGO HTML webpage</h5>
+			<hr color='brown' width='55%'/>
+			<h6>Welcome to DJANGO HTML webpage</h6>
+			<hr color='brown' width='45%'/>
+		</center>
+	</body>
+</html>
+''';
+	return HttpResponse(ss); 
+    
+    
+3) create url(/welcome2) in urls.py of FirstProject-conf-folder using path() function
+Ex:-
+	  path('welcome2/', views.show),
+	(from FirstApp import views)
+	
+4) Restart(optional) the server and make url-request
+(it is live-server,chnages are auto-reloaded)
+Ex:-
+	(http://localhost:8000/welcome2)
+
+
+
+===============================================
+NOTE:-
+***Summary of Sequence of Activities related to Django Project:-
+(DJango-Project Activities)::- (small-summary)
+1) 👇️ Creation of Django project
+cmd> django-admin startproject FirstProject 
+
+2) 👇️ Creation of Application in that project 
+cmd> py manage.py startapp FirstApp 
+
+3)
+Adding our-application(FirstApp) to the Project(FirstProject) 
+(using settings.py)
+4)
+Define view function inside "views.py" (for client request & its response)
+5)
+Define url-pattern for our view inside "urls.py"
+6)
+Start Server
+cmd> py manage.py runserver 
+7)
+open Browser & Send the request with given url-pattern
+(http://localhost:8000/welcome)
+(http://localhost:8000/welcome2)
+8)
+verify output of program in Browser-page itself
+
+
+

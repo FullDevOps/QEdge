@@ -1,0 +1,786 @@
+***Other-Examples***
+--------------------
+==> Another-Example with Django-Templates(.html files)::- 
+(/FirstApp/templates)
+Step1:-
+-----
+1) Create new-project(SecondProject) & new-app(FirstApp)
+(Already done, simply re-use them)
+(also register FirstApp with INSTALLED_APPS=[] in settings.py, already-done)
+
+2) create templates-folder under main-project-folder(SecondProject) & also sub-folder(FirstApp) for .html files
+(Already-done, simply re-use them) 
+(also register template-folder with TEMPLATES=[] in settings.py, already-done)
+
+3) Create hello.html file(/FirstApp/templates folder)
+Ex:-
+Ex:-(hello.html)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>First Template Hello Page</title>
+    <STYLE>
+        body{
+            background-color: lightyellow;
+        }
+         h1,h2,h3{
+            text-align: center;
+            border: 2px Solid Brown;
+        }
+         h1{
+            color:blue;
+            background-color: yellow;
+        }
+        h2{
+            color:green;
+            background-color: lightpink;
+        }
+        h3{
+            color:red;
+            background-color: cyan;
+        }
+        #hr1{
+            width:95%;
+            border-color:Brown;
+        }
+        #hr2{
+            width:85%;
+            border-color: blue;
+        }
+        #hr3{
+            width:75%;
+            border-color: red;
+        }
+    </STYLE>
+</head>
+<body>
+    <h1>Hello User!! Welcome to DJANGO Templates..!!</h1>
+    <hr id="hr1" />
+    <h2>Good Morning User..!!</h2>
+    <hr id="hr2" />
+    <h3>Have a great DAY..!!</h3>
+    <hr id="hr3" />
+</body>
+</html>
+
+
+
+
+
+step4:-
+4)
+= For this template, create our view (def hello() in views.py)
+Ex:-
+from django.shortcuts import render
+...
+...
+def hello(request):
+	return render(request,'FirstApp/hello.html')
+
+5)
+= configure url-pattern in urls.py(proj-conf-folder)
+Ex:-
+urlpatterns = [
+	.....
+    path('hello/', views.hello),
+]
+
+
+6) Start/RUN the server & request below url-address in browser
+(http://localhost:8000/hello/)
+
+
+
+
+
+##Program
+==> Another-Example (Student-details with lists)
+=> HTML Lists::-
+= HTML-list means presentation of data in list-format
+Ex::-
+	Prog-Langs	(Unordered-list in HTML)
+		* C-Lang
+		* C++ Lang
+		* Java-Lang
+		* .Net-Lang
+		* Python-Lang
+Ex:-
+	Databases	(Ordered-list in HTML)
+		1 MySQL
+		2 Oracle
+		3 SQLite3
+		4 SQL-Server
+		5 DB2		
+Ex:- Hotel-menu-card
+	List of Recharge-options
+	
+= In html, basically lists are of 2-types,
+	a) Unordered List (<ul>....</ul>)
+	b) Ordered List (<ol>.....</ol>)
+Ex:-
+	<ul type="disc/circle/square">
+		<p>Programming-Langs</p> 
+		<li>C-lang</li>		#li means list-item
+		<li>C++ lang</li>
+		.....
+	</ul>
+
+Ex:-
+	<ol type="1/A/a/I/i" start="5">
+		<p>Databases</p> 
+		<li>MySQL</li>		#li means list-item
+		<li>Oracle</li>
+		.....
+	</ol>
+
+NOTE:-
+= <ul>,<ol>,<p>->paragraph-tag, all these tags starts in new-line & occupies 100%width of page
+(Block-elements ==> 100%width + new-line start)
+=** All headings are also HTML-Block-elements
+
+ 
+==>> Steps for Programming::-(using HTML-Lists)
+Steps:-
+-------
+1) Create new-project(SecondProject)
+(Already done, simply re-use them)
+& also new-app(SecondApp)
+(open-Terminal & give this cmd)
+cmd\SecondProject> py manage.py startapp SecondApp
+(register "SecondApp" with INSTALLED_APPS=[ 'SecondApp.apps.SecondappConfig',] in settings.py)
+
+
+2) create NEW-template-folder("temps") under main-project-folder(SecondProject) & also sub-folder(SecondApp) for .html files
+***(also register NEW-template-folder(temps) with TEMPLATES=[] in settings.py)
+Ex:-
+	'DIRS': [BASE_DIR/'templates', BASE_DIR/'temps']
+
+
+3) Create "students1.html" file(temps/SecondApp folder)
+Ex:- (Students1.html)
+---------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Students-Lists</title>
+    <style>
+        body{
+            background-color: lightyellow;
+        }
+        h1{
+            color:white;
+            border:2px Dotted Red;
+            background-color: greenyellow;
+            text-align: center;
+            border-radius: 15px;
+        }
+        ul,ol{
+            border:2px Solid Blue;
+            padding-bottom: 10px;   //inner-margin
+            margin:0px;
+            width:30%;
+            background-color: white;
+        }
+        p{
+            background-color: yellow;
+            width: 80%;
+            border:2px Solid Red;
+            text-align: center;
+            font-size: 24px;
+            color:Blue;
+        }
+        li{
+            background-color: cyan;
+            width:80%;
+            color:darkred;
+            border:2px dashed orange;
+            text-align: center;
+            margin:5px;
+            font-size: 15px;
+            padding:5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>***Students-Lists Template***</h1>
+    <hr />
+    <ul type="disc">
+        <p>Students-Data1</p>
+        <li>RollNo : 1001</li>
+        <li>Name : Sai</li>
+        <li>Course : CSE</li>
+        <li>Marks : 562</li>
+        <li>AVG : 75.68%</li>
+        <li>Grade : Distinction</li>
+    </ul>
+    <hr />
+    <ol type="a" start="5">
+        <p>Students-Data2</p>
+        <li>RollNo : 1002</li>
+        <li>Name : Ram</li>
+        <li>Course : ECE</li>
+        <li>Marks : 582</li>
+        <li>AVG : 78.68%</li>
+        <li>Grade : Distinction</li>
+    </ol>
+</body>
+</html>
+
+
+4)
+= For this template, create our own-view 
+(def students1() in views.py(SecondApp app-main-folder)
+Ex:- (views.py ---> SecondApp folder)
+---------------------------------------
+from django.shortcuts import render
+
+# Create your views here.
+def students1(request):
+    return render(request,'SecondApp/students1.html')
+
+5)
+= configure url-pattern in urls.py(proj-conf-folder)
+Ex:-
+from SecondApp import views as v1;
+path('students1/',v1.students1),
+
+
+6) Start/RUN server & request below-url-address in browser
+(http://localhost:8000/students1/)
+
+
+NOTE:-
+1) HTML mainly concentrates on "Presentation-of-data"
+(Headings/paragraphs/Lists/Tables/Images/Links etc)
+2) CSS mainly concentrates on "Stylish-of-html-data" (attractive)
+(colors/borders/background/alignments/margin/padding etc)
+
+
+
+
+==> Another-HTML-Example (Student-details with tables)
+==> HTML-tables:-
+= It means presentation of data in the form rows & cols i.e, table-format
+(Headings/Data/Footer)
+Ex:-(Tables related tags)
+(every table is divided into 3-section: <thead>,<tbody>,<tfoot>)
+Syntax:-
+	<table border="2" width="80%" cellspacing="2" cellpadding="3" ....>
+		<caption>Student-Details</caption>
+		<thead>
+			...write-table-headings...
+			<tr>
+				<th>RollNo</th>
+				<th>Name</th>
+				<th>Sub1</th>
+				<th>Sub2</th>
+				<th>Sub3</th>
+				<th>Sub4</th>
+				<th>Sub5</th>
+				<th>Total</th>
+				<th>AVG</th>
+				<th>Grade</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>1001</td>
+				<td>Sai</td>
+				<td>60</td>
+				<td>70</td>
+				<td>80</td>
+				<td>90</td>
+				<td>100</td>
+				<td>400</td>
+				<td>80.0%</td>
+				<td>Distinction</td>
+			</tr>
+			..2nd-row..
+			..3rd-row..
+		</tbody>
+		<tfoot>
+			<tr>
+				<td>*****End of Records*****</td>
+			</tr>
+		</tfoot>
+	</table>
+
+NOTE:-
+(Table-related-tags)
+-------------------------
+= table is block-element(100%width+new-line-start)
+<caption> ---> table-description at top
+<thead> ----> table-heading
+<tbody> ----> table-body
+<tfoot> ----> table-footer
+<tr> ---> table-rows
+<th> ---> table-heading-data(Bold)
+<td> ---> table-regular-data(w.o Bold)
+
+
+
+(using HTML-tables)
+==>> Steps for Programming::-
+1) Create new-project(SecondProject)
+(Already done, simply re-use them)
+& also new-app(SecondApp)
+(Already done, simply re-use them)
+(also register in settings.py, already-done)
+(re-use it)
+
+
+2) create template-folder(temps) under main-project-folder(SecondProject) & also sub-folder(SecondApp) for .html files
+(also register template-folder(temps) with TEMPLATES=[] in settings.py)
+Ex:-
+	'DIRS': [BASE_DIR/'templates',BASE_DIR/'temps'],
+(already-done, re-use them)
+
+
+3) Create students2.html file(temps/SecondApp folder)
+Ex:-
+students2.html (SecondApp folder)
+---------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Students Table-Data</title>
+    <style>
+        body{
+            background-color: lightyellow;
+        }
+        h1{
+            color:white;
+            border:2px Dotted Red;
+            background-color: greenyellow;
+            text-align: center;
+            border-radius: 15px;
+        }
+        table{
+            border:5px Solid Blue;
+            margin:auto;
+            background-color: white;
+            text-align: center;
+        }
+        caption{
+            border-left:5px Solid Blue;
+            border-right:5px Solid Blue;
+            border-top:5px Solid Blue;
+            /*border-bottom:5px Solid Blue;*/
+            background-color: yellow;
+            font-size: 25px;
+            color:red;
+        }
+        thead,tfoot{
+            background-color: lightpink;
+            color:darkgreen;
+        }
+        tfoot {
+            font-size: 21px;
+        }
+        tbody{
+            color:red;
+            background-color: lightskyblue;
+        }
+    </style>
+</head>
+<body>
+    <h1>***Students-Tables Template***</h1>
+    <hr />
+
+    <table border="2" width="80%">
+		<caption>Student-Details</caption>
+        <thead>
+            <tr>
+				<th>RollNo</th>
+				<th>Name</th>
+				<th>Sub1</th>
+				<th>Sub2</th>
+				<th>Sub3</th>
+				<th>Sub4</th>
+				<th>Sub5</th>
+				<th>Total</th>
+				<th>AVG</th>
+				<th>Grade</th>
+			</tr>
+		</thead>
+        <tbody>
+            <tr>
+				<td>1001</td>
+				<td>Sai</td>
+				<td>60</td>
+				<td>70</td>
+				<td>80</td>
+				<td>90</td>
+				<td>100</td>
+				<td>400</td>
+				<td>80.0%</td>
+				<td>Distinction</td>
+			</tr>
+            <tr>
+				<td>1002</td>
+				<td>Ram</td>
+				<td>65</td>
+				<td>75</td>
+				<td>85</td>
+				<td>95</td>
+				<td>55</td>
+				<td>375</td>
+				<td>75.0%</td>
+				<td>Distinction</td>
+			</tr>
+            <tr>
+				<td>1003</td>
+				<td>Ali</td>
+				<td>66</td>
+				<td>76</td>
+				<td>86</td>
+				<td>96</td>
+				<td>56</td>
+				<td>380</td>
+				<td>76.0%</td>
+				<td>Distinction</td>
+			</tr>
+            <tfoot>
+                <tr>
+                    <td colspan="10">*****End of Records*****</td>
+                </tr>
+            </tfoot>
+		</tbody>
+
+	</table>
+
+</body>
+</html>
+
+
+
+
+4)
+= For this template, create our-own-view 
+(def students2() in views.py(SecondApp)
+Ex:- (views.py ---> SecondApp app-main-folder)
+----------------------------------------
+
+def students2(request):
+    return render(request,'SecondApp/students2.html');
+	
+	
+5)
+= configure url-pattern in urls.py(proj-conf-folder)
+Ex:-
+from SecondApp import views as v1;
+path('students2/',v1.students2),
+
+
+6) RUN/Start server & request url-address in browser
+(http://localhost:8000/students2)
+
+
+NOTE:-
+1)  html-comments
+<!--
+....
+-->
+2) CSS-comments
+/*
+....
+*/
+(comments are not-executed & not-displayed on webpage)
+
+ 
+ 
+
+##Programs (Assignment)
+= Create a new templates-project (ThirdProject with FirstApp) & below Employee-data
+==Diagram==
+(empno,ename,job,sal,comm,mgr,doj,deptno) 8-cols & 3-records
+urls ('employees1/','employees2')
+views (def employees1(), def employees2())
+templates (FirstApp -----> employees1.html,employees2.html)
+Hint:-
+	Employees1 ---> (List-data)
+	Employees2 ---> (Table-data)
+
+
+
+===================================second class==================================================================================
+
+==> DJANGO New Feature::-
+----------------------------------------------------------------
+***new-feature in django***
+==>Template Tags{{var-name}} in Django-Framework::-
+(using python-code(views.py) directly in .html tags/templates)
+
+= From Python views.py(FirstApp) file we can inject dynamic-content(py-code-data) to the template-file(wishes.html of templates/FirstApp folder) by using Template-tags{{...}}
+
+=** Template-Tags also known as Template-Variables in Django-Application
+=** These Template-tag syntax it is not python-syntax and not html-syntax but are just special-syntax as follows
+Sp-Syntax::-
+	{{variable-name-from-views.py-file}}
+	
+= **Template-Tag is used for inserting Text-Data(for display)
+Ex:- (server date&time)
+	{{server_datetime}}
+(server_datetime is a variable in views.py)
+
+**Use this template-tag({{}}) inside template-file(Ex:- wishes.html file of templates/FirstApp) and we have to provide "server_datetime" variable-value from python views.py(FirstApp) file
+==Diagram==
+
+NOTE:-
+==** in this way, we can insert/share dynamic-content content from views.py to html-content(wishes.html) which is send as repsonse to client
+					
+
+
+
+##Program
+##Program with Template-Tag{{}} & its data(variable) from views.py (FirstApp)					
+==>Application to send Date and Time of server from views.py to Template File(datetime.html)::-
+--------------------------------------------------------------
+(Use SecondProject & FirsttApp only)
+step1:-
+(create template-html-file)
+Ex:-
+==>datetime.html (under templates/FirstApp template-folder)
+Ex:-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Date & Time Page</title>
+    <style>
+        h1{
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>
+        Hello from Server Current Date and Time: <br />
+        {{server_datetime}} <br /><br />
+        {{server_datetime2}}
+    </h1>
+    <hr />
+</body>
+</html>
+
+
+step2:-
+==>views.py:(FirstApp app-main-folder)
+---------------------------
+from django.shortcuts import render
+......
+......
+#{{templ-tag-vars}}
+import datetime;
+import time;
+def datetimefunction(request):
+	date1 = datetime.datetime.now();
+	print(date1)
+	date2 = time.ctime();
+	dict1={"server_datetime":date1,"server_datetime2":date2}
+	return render(request,'FirstApp/datetime.html',context=dict1)
+	
+
+**Note: The values to the template-variables should be passed from the views.py in the form of dictionary(dict1) as argument using "context=<dict>",which is input-parameter in render() function
+
+step3:-
+=*** make url-pattern in urls.py(proj-conf-folder)
+Ex:-
+	from FirstApp import views
+	path('datetime/', views.datetimefunction),
+
+
+step4:-
+=*** Re-Start the server & request below url in browser-address-bar
+http://localhost:8000/datetime/
+
+
+
+----------------------------------------------------------------------
+##Another-Program(template-tags {{}})
+==>Application to display date&time and student-information also::-
+(Use SecondProject & FirstApp only)
+
+step1:-
+**views.py (FirstApp app-folder of SecondProject)
+--------------------------------------------
+from django.shortcuts import render
+
+#student-data & date-time using {{templ-tags}}
+import datetime
+import time
+def student_datetime(request):
+	date1=datetime.datetime.now();
+	date2=time.ctime();
+	rollno = 1001;
+	sname='sai';
+	marks=95;
+	dict1 = {'server_datetime':date1,'server_datetime2':date2,'rollno':rollno,'sname':sname,'marks':marks};
+	return render(request,'FirstApp/studentdatetime.html',dict1);
+
+NOTE:-
+= in render(), we can send data from views.py as follows,
+	a) context=dict1
+	b) dict1
+	(last-input-parameter to render())
+
+	
+step2:-	
+***templates/FirstApp/studentdatetime.html***
+--------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student-DateTime</title>
+    <style>
+        body{
+            background-color:lightyellow;
+            color:blue;
+        }
+        h1{
+            border:5px solid lightgreen;
+            background-color: yellow;
+            text-align: center;
+        }
+        h2{
+            border:3px dotted lightpink;
+            background-color: cyan;
+            text-align: center;
+        }
+        h3{
+            border:3px dashed orange;
+            border-radius: 5px;
+            background-color: papayawhip;
+            text-align: center;
+            width:20%;
+        }
+        ol{
+            border:2px dotted orchid;
+            border-radius: 5px;
+            background-color: white;
+            width:20%;
+            padding-top:15px;
+            padding-bottom:15px;
+        }
+        li{
+            background-color: yellow;
+            width:75%;
+            margin:5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Hello from Student Template File....</h1>
+    <hr />
+    <h2>Server Date and Time is: {{server_datetime}}</h2>
+    <h2>Server Date and Time is: {{server_datetime2}}</h2>
+    <hr />
+    <h3>Student-Details</h3>
+    <ol type="i">
+        <li>Rollno : {{rollno}}</li>
+        <li>Name : {{sname}}</li>
+        <li>Marks : {{marks}}</li>
+    </ol>
+    <hr />
+</body>
+</html>
+
+
+
+step3:-
+= make url-pattern in urls.py(project-conf-folder)
+Ex:-
+	path('studdatetime/', views.student_datetime),
+
+
+step4:-
+=*** Re-Start the server & request below url in browser-address-bar
+http://localhost:8000/studdatetime/
+
+
+
+
+
+
+===================================================================
+(***Another-Program with {{template-tag-vars}}***)
+==> Application to wish End User based on Time of the Day::-
+(use SecondProject & FirstApp)
+
+step1:-
+==>wishes2.html (templates/FirstApp folder)
+------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Day Time Wishes</title>
+    <style>
+        #h11{
+            color:blue;
+        }
+        #h22{
+            color:green;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="h11">{{msg1}}</h1>
+    <hr />
+    <h2 id="h22">Current Server Date and Time ::: {{date1}}</h2>
+</body>
+</html>
+
+
+step2:-
+==>views.py (FirstApp app-main-folder)
+----------------------
+#server date&time with dynamic-wishes
+import datetime
+def wishes2(request):
+    date1=datetime.datetime.now()
+    msg1='Hello User/Client...GOOD';
+    hr=int(date1.strftime('%H'));
+    if hr<12:
+        msg1+=' Morning!!'
+    elif hr<16:
+        msg1+=' Afternoon!!'
+    elif hr<20:
+        msg1+=' Evening!!'
+    else:
+        msg1='Hello User/Client...Very Good Night!!'
+    dict1={'date1':date1,'msg1':msg1}
+    return render(request,'FirstApp/wishes2.html',context=dict1);
+
+
+step3:-
+=*** make url-address in urls.py(project-conf-folder SecondProject)
+Ex:-
+	path('wishes2/', views.wishes2),
+
+
+step4:-
+=*** Re-Start the server & request below url in browser-address-bar
+http://localhost:8000/wishes2/
+
+
+
+
+=> Finally, NOTE::-
+=> IN Templates Based Applications in Django::-
+1) Application To Display Hello World
+2) Application to display date and time
+(observe 3 ways of providing context dictionary)
+	a) context=dict1
+	b) dict1
+	c) {"key":value,....}
+3) Applications to display date,time and student information
+4) Application to display wish message based on time like Good Morning,Good Afternoon, Good Evening,Good Night etc...
+
+
+
+

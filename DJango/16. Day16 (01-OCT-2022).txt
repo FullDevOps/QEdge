@@ -1,0 +1,600 @@
+---------------------------------------------------
+##Another-Example of Static-Files::-
+##Working with .css files in DJango-App
+==>How to include CSS Files in HTML-program::-
+= Generally, we write css directly in html-program under <head> section using <style> element
+(Internal-css -----> Inline-css/Internal-css)
+Ex:-
+<h1 style="color:blue;">....</h1>
+(or)
+<head>
+	<style>
+		h1{
+		}
+		h2{
+		}
+	</style>
+</head>
+=*** We can also write css in external-file (mystyles.css) & use or <link> that file in html-program(template) under <head> section
+Ex:-
+<head>
+	<link href="mystyles.css" rel="stylesheet" />
+</head>
+
+==> STEPS::- (Re-use ThirdProject & FirstApp)
+1) Create HTML Program
+wishes4.html  (templates/FirstApp folder)
+--------------------------------------------
+<!DOCTYPE html>
+{% load static %}   <!-- folder name-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Static Files in DJango App</title>
+    <link href="{%static "css/mystyles.css"%}" rel="stylesheet" />
+</head>
+<body>
+    <h1 id=h11>{{msg1}}</h1>
+    <hr />
+    <h2 id=h22>Current Server Date & Time :: {{date1}}</h2>
+    <hr />
+    <h3>At this time your image is:</h3>
+    <img src="{%static 'images/image1.jpg'%}" alt="Image1" id="img1" />
+</body>
+</html>
+
+
+
+2) Create a folder 'css' inside static-folder and place our "mystyles.css" file in that 'css' folder
+==>"mystyles.css"
+-----------------------
+#h11{
+    color:blue;
+    background: yellow;
+    border: 2px Solid Brown;
+    text-align:center;
+    width:80%;
+    margin:auto;
+}
+#h22{
+    color:green;
+    background: lightpink;
+    border: 1px Solid red;
+    text-align:center;
+    width:70%;
+    margin:auto;
+}
+#img1{
+    border:10px Groove red;
+    width:300px;
+    height:200px;
+}
+
+
+3) In the template (wishes4.html) html-file we have to include this css file. It is done by using <link> tag under <head> tag
+Ex:-
+    <link rel="stylesheet" href="{%static "css/mystyles.css"%}" />
+
+	
+4) views.py (FirstApp app-0older)
+--------------------------------
+from django.shortcuts import render
+import datetime
+def wishes4(request):
+    date1=datetime.datetime.now()
+    msg1='Hello User/Client...GOOD';
+    dict1={'date1':date1,'msg1':msg1}
+    return render(request,'FirstApp/wishes4.html',context=dict1);
+
+
+
+5)
+=*** make url-pattern in urls.py(project-folder-level)
+Ex:-
+	path('wishes4/', views.wishes4),
+
+6)
+=*** Re-Start the server & request below same-url in browser-address-bar
+http://localhost:8000/wishes4/
+
+
+
+
+
+-------------------------------------------------------------------	(**********************************)
+==>SRI SAI NEWS Website::-
+Step1:-
+= create a project(NewsProject) and NewsApp(web-app)
+(templates folder also created automatically)
+(also create "static" folder and keep it ready... under NewsProject main-folder)
+= Register/Add "NewsApp" entry in settings.py
+(done-automatically)
+Ex:-
+INSTALLED_APPS = [
+	......
+    'NewsApp.apps.NewsappConfig',	#new-method done automatically
+	'NewsApp'		#old-style
+]
+= under templates-folder create our NewsApp-folder for html-files, (Add/register this template-directory to settings.py)
+Ex:-(done-auto.)
+TEMPLATES = [
+    {
+        .....
+        'DIRS': [BASE_DIR/'templates',],
+		.....
+	}
+};
+(BASE_DIR = Path(__file__).resolve().parent.parent; it is a variable which is automatically created while creating the project, it has project base-directory-path)
+=*** also create & add/register "static" directory in settings.py-file
+Ex:-
+STATIC_URL = 'static/'
+import os;
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+step2:- (Home-Page for News-application)
+==>index.html  
+(goes to templates/NewsApp folder of NewsProject)
+---------------------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SRI SAI News Website</title>
+    <link rel="stylesheet" href="{%static "css/newsstyles.css"%}">
+</head>
+<body>
+    <h1>Welcome to SRI SAI NEWS Website...</h1>
+    <hr />
+    <ul type="disc">
+        <span>***Categories***</span><br/><br />
+        <li><a href="/india/">India News</a></li>
+        <li><a href="/sports/">Sports News</a></li>
+        <li><a href="/tech/">Technology News</a></li>
+    </ul>
+</body>
+</html>
+
+==** now create a url-pattern for this index.html(home-page) in urls.py file
+Ex:-
+from django.urls import path		#new-one
+from NewsApp import views
+from django.conf.urls import url	#old-one for default/any-request
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('index/', views.index),
+	....
+]
+
+==>> views.py (NewsApp-app-folder)
+--------------------------
+from django.shortcuts import render
+# Create your views here.
+def index(request):
+        return render(request,'NewsApp/index.html')
+
+
+==> newsstyles.css (static/css)
+---------------------------------
+body{
+    background-color: lightyellow;
+}
+h1{
+    color:blue;
+    background-color: lightyellow;
+    text-align: center;
+    border:2px Solid Red;
+}
+img{
+    width:200px;
+    height:150px;
+}
+span{
+    background-color: yellow;
+    border: 1px Solid red;
+    padding:2px;
+    color:darkred;
+}
+
+NOTE:-
+= till here run-server & request home-page url(for verification)
+http://localhost:8000/index
+
+
+==> HTML-basics::-
+=** <span> is html-tag, used as regular text in big <p> paragraphs
+<span>.....</span> (spanning-text)
+(use is to apply separate-css for that particular spanning-text>
+<span id="sp1">....</span>   #sp1{.....}
+<span class="spc1">....</span> .spc1{....}
+
+
+
+step3:- 
+(for clicking & displaying diff-links india/, sports/, tech/)
+(it is a common file for different above-urls but changes in content is different Ex:- {{mainmsg/submsg1/submsg2/submsg3}})
+(it is used in views.py in render() with different context="" para)
+Ex:- (common-html-file)
+==>news.html
+-----------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{mainmsg}}</title>
+    <link rel="stylesheet" href="{%static "css/newsstyles.css"%}" />
+</head>
+<body>
+    <h1>{{mainmsg}}</h1>
+    <hr />
+    <ul>
+        <li><h2>{{submsg1}}</h2></li>
+        <li><h2>{{submsg2}}</h2></li>
+        <li><h2>{{submsg3}}</h2></li>
+    </ul>
+    <img src="{%static photo %}" alt="" />
+
+</body>
+</html>
+
+
+=** add some images to static/images folder
+Ex:- image1.jpg......image5.jpg
+
+
+Step4:-
+(for diff-links urls, we configure diff-views with diff-view-functions, context-dict-vars (mainmsg/submsg1/submsg2/submsg3))
+==> views.py
+----------------
+from django.shortcuts import render
+
+# Create your views here.
+def index(request):
+        return render(request,'NewsApp/index.html');
+
+def indianews(request):
+    dict1 = {'mainmsg': 'India News Page',
+             'submsg1': '100+ crores vaccines successfully done!!!',
+             'submsg2': 'India is super-power in the world',
+             'submsg3': 'Agni-5 long-range missile(20,000 kms) successfully tested!!!',
+             'photo': 'images/image1.jpg'};
+    return render(request, 'NewsApp/news.html', context=dict1);
+
+
+def sportsnews(request):
+    dict1 = {'mainmsg': 'Sports News Page',
+             'submsg1': 'India won Cricket World Cup 2023',
+             'submsg2': 'World Olympic India Gold Count 500(Tops-List)',
+             'submsg3': 'India to host next Olympics for 5-times',
+             'photo': 'images/image2.jpg'};
+    return render(request, 'NewsApp/news.html', context=dict1);
+
+
+def technews(request):
+    dict1 = {'mainmsg': 'Technology News Page',
+             'submsg1': 'Apple to release Apple-14 in 4-models(mini,basic,pro,pro-max',
+             'submsg2': 'India starts Semi-conductor chips to World Smartphones',
+             'submsg3': 'Tech-jobs more in India than elsewhere in the world',
+             'photo': 'images/image3.jpg'};
+    return render(request, 'NewsApp/news.html', context=dict1);
+		
+Step4:-
+(make all your url-patterns in urls.py from homepage to different links)
+==>urls.py
+----------
+from django.contrib import admin
+from django.urls import path,re_path
+from NewsApp import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('index/', views.index),
+
+    path('india/', views.indianews),
+    path('sports/', views.sportsnews),
+    path('tech/', views.technews),
+
+    re_path('^.*$',views.index),
+]
+(also configure re_path() for default/any/no/missing urls)
+
+step5:-
+= Finally Start server and make request to
+(http://localhost:8000/) & followed by India/Sports/Technology news links
+
+
+
+
+(threory-topic)
+===>HTML tags::-
+1) <a> anchor-tag::-
+Syntax:-
+	<a href="path"> Text/Image/Tag </a>
+
+= It is used to make hyperlinks in webpage
+= Hyperlinks means link between one-page to another-page (or) one-page to another-image (or) one-page to another-file
+= On given Text/Image/Tag, we have perform click-action & links gets forwarded to respective path in href=""
+= href="" means hyperlink-reference
+
+**(dj-html-code)***
+= <a href="/india/" target="null">India News</a>
+= <a href="india/" target="null">India News</a>
+(here we can take target="blank" html-attribute to <a> tag)
+(when link is clicked, it opens linked-page/image/file in new-tab)
+(target="new")
+
+
+
+
+
+
+
+==================== second class =============================================
+
+================================================================
+##Another Program for <a> Hyperlinks & downloadable static files, image-files
+(Re-use ThirdProject & FirstApp)
+(Re-use static/images or static/other folders & register this folder in settings.py -->already done)
+(Re-use templates/FirstApp folder for .html files & register this folder in settings.py -->already done)
+
+Step1:-
+create .html-file(templates/FirstApp folder)
+Ex:-
+hyperlinks.html
+--------------------
+<!DOCTYPE html>
+{% load static %}   <!-- folder name-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HyperLinks DJango-App</title>
+    <style>
+        body{
+            background-color: lightyellow;
+        }
+        h1{
+            background-color: yellow;
+            text-align: center;
+            color:blue;
+            border:2px Solid Brown;
+        }
+        h4{
+            background-color: lightpink;
+            text-align: center;
+            color:red;
+            width:75%;
+            margin:auto;
+            border:1px Solid Red;
+        }
+        #div1{
+            border: 5px Solid Red;
+            height:150px;
+        }
+        #div2{
+            border:2px Solid green;
+            height:99%;
+        }
+        .indiv{
+            border:1px Solid Maroon;
+            float:left;
+            width:24.5%;
+            height:135px;
+            margin:1px;
+            margin-top: 5px;
+        }
+        img{
+            border:1px dotted blue;
+            width:90%;
+            height:126px;
+            margin:3px;
+            margin-left:8px;
+        }
+        img:hover{
+            border:4px Solid Blue;
+            width:95%;
+            height:130px;
+        }
+        p{
+            background-color: yellow;
+            border:2px Solid red;
+            color:red;
+            display: inline;
+            padding: 3px;
+        }
+        ol{
+            border: 2px Solid blue;
+            width:150px;
+            padding-top: 5px;
+            padding-bottom: 5px;
+            background-color: lightgray;
+        }
+    </style>
+</head>
+<body>
+    <h1 id=h11>{{msg1}}</h1>
+    <h4 id=h22>Current Server Date & Time :: {{date1}}</h4>
+    <hr />
+    <div id="div1">
+        <div id="div2">
+            <div class="indiv">
+                <a href="{%static 'images/image1.jpg'%}" target="blank">
+                    <img src="{%static 'images/image1.jpg'%}" alt="image1.jpg" />
+                </a>
+            </div>
+            <div class="indiv">
+                <a href="{%static 'images/image2.jpg'%}" target="_parent">
+                    <img src="{%static 'images/image2.jpg'%}" alt="image2.jpg" />
+                </a>
+            </div>
+            <div class="indiv">
+                <a href="{%static 'images/image3.jpg'%}" target="_self">
+                    <img src="{%static 'images/image3.jpg'%}" alt="image3.jpg" />
+                </a>
+            </div>
+            <div class="indiv">
+                <a href="{%static 'images/image4.jpg'%}" target="new">
+                    <img src="{%static 'images/image4.jpg'%}" alt="image4.jpg" />
+                </a>
+            </div>
+        </div>
+    </div>
+    <hr />
+    <p>Downloadable Files</p>
+    <ol>
+        <li><a href="{% static "other/python-3.10.7-amd64.exe" %}">Python Software</a></li>
+        <li><a href="{% static "other/npp.8.4.6.Installer.x64.exe" %}">Notepad++</a></li>
+    </ol>
+    <hr />
+    <audio controls>
+        <source src="{% static 'other/music.mp3' %}" type="audio/mp3">
+        Your browser does not support the audio tag.
+    </audio>
+    <hr />
+    <video width="320" height="240" controls>
+        <source src="{% static 'other/lights.mp4' %}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    <hr />
+    <video width="320" height="240" controls>
+        <source src="https://youtu.be/qkbSLVr6WtQ" type="video">
+        Your browser does not support the video tag.
+    </video>
+    <hr />
+</body>
+</html>
+
+
+
+Step2:-
+views.py (FirstApp app-folder)
+----------------------
+from django.shortcuts import render
+import datetime
+def hyperlinks(request):
+    date1 = datetime.datetime.now()
+    msg1 = '***DJango-Hyperlinks***';
+    dict1 = {'date1': date1, 'msg1': msg1}
+    return render(request, 'FirstApp/hyperlinks.html', context=dict1);
+
+
+Step3:-
+make url-pattern in urls.py(ThirdProject conf-folder)
+Ex:-(urls.py)
+from FirstApp import views
+	#hyperlinks
+    path('hyperlinks/', views.hyperlinks),
+
+
+Step4:-
+= Run/Start the server & make below URL-request,
+http://localhost:8000/hyperlinks
+
+
+NOTE:-
+==>Extra HTML-tags:-
+------------------------
+<audio controls>
+	<source src="{% static 'other/music.mp3' %}" type="audio/mp3">
+	Your browser does not support the audio tag.
+</audio>
+<hr />
+<video width="320" height="240" controls>
+	<source src="{% static 'other/lights.mp4' %}" type="video/mp4">
+	Your browser does not support the video tag.
+</video>
+
+=*** used for playing audio/video files in html-page
+
+
+=============================================================
+==>> ==NEW_CHAPTER==
+***Working with Models And Databases***
+----------------------------------------------------
+=>> DJango Models or Django Database Connectivity::-
+
+==> Working with Models and Databases:
+= In dynamic web-apps, we should provide data(info..) dynamically from time-to-time, location-to-location, user-to-user
+Ex:-
+	time-to-time (Google-News)
+	location-to-location(Google-Maps)
+	user-to-user(Gmail,Facebook)
+= For such dynamic web-apps, we should have Database tables with updated-data
+= Such data should be used in our Django-Apps
+
+=> Imp-Tech-Points??
+= As the part of DJ web application development, compulsory we required to interact with database to store our data and to retrieve our stored data
+=	Django provides a big in-built support for database operations. Django provides one default-inbuilt database sqlite3.
+(it is generated auto. when we run DJ-server for 1st-time)
+= For small to medium applications this database is more enough. 
+= Django can provide support for other databases also like oracle, mysql, postgre-sql, DB2, ingress etc
+
+
+***
+==> Database Configuration in Django-Project::-
+=	Django by default provides sqlite3 database. If we want to use this database, we are not required to do any configurations.
+=	The default sqlite3 configurations in settings.py file are declared as follows,
+Ex:-
+settings.py: (Project-conf-Folder)
+-------------
+(old-conf-manually)
+DATABASES = {
+ 'default': {
+ 'ENGINE': 'django.db.backends.sqlite3',
+ 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
+  }
+
+(new-conf) ---> auto-done
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+(BASE_DIR = Path(__file__).resolve().parent.parent, variable is defined at begining of file)
+
+***NOTE:-
+= If we don't want to use  default-sqlite3 database then we have to configure our own database with the following parameters as follows,
+1) ENGINE: Name of Database engine/driver/module
+2) NAME: Database Name
+3) USER: Database Login user name
+4) PASSWORD: Database Login password
+5) HOST: The Machine on which database server is running
+6) PORT: The port number on which database server is running
+
+=** Note: Most of the times HOST and PORT are optional.
+
+
+==> Check/Verify Django Database Connection in PyCharm-IDE::-
+= We can check whether django database configurations are properly configured or not by using the following commands from the shell/terminal-tab/command-prompt as follows,
+(Create a new-DJango-Project 
+	i.e, DBModelProject and  new-app
+	DBModelApp in PyCharm-IDE)
+
+(Now, use below commands in proj-main-folder)
+Ex:-
+cmd\DBModelProject> py manage.py shell
+(or)
+cmd\PycharmProjects\DBModelProject>python manage.py shell
+
+(it opens Python-Interactive-Mode in Pycharm-terminal)
+(next-cmds)
+>>> from django.db import connection;
+>>> mycursor= connection.cursor();
+>>> print(mycursor); 	
+#prints DB-conn-cursor object-reference
+(if we are not getting any error means our database configurations are proper)
+
+
+
+
+
+
+
+

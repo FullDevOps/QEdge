@@ -1,0 +1,1053 @@
+----------------------------------------------------------------
+(Advanced Template views)
+2) ==> DetailView for CBV::-
+= We can use ListView to list of all records present from the database table
+= But to get details of a particular record, we should go for "DetailView"
+
+
+
+##Program to work with DetailView in CBV
+(Re-use CBVProject-project & MyApps1-app)
+Ex:-
+==> models.py  (MyApps1-app main-folder)
+---------------------------------------------
+#DetailView
+from django.db import models
+class Company(models.Model):
+    name=models.CharField(max_length=128)
+    location=models.CharField(max_length=64)
+    ceo=models.CharField(max_length=64)
+
+
+
+Ex:-
+=> admin.py  (MyApps1-app main-folder)
+---------------------------------------------
+#DetailView
+from django.contrib import admin
+from MyApps1.models import Company
+#Register your models here.
+class CompanyAdmin(admin.ModelAdmin):
+    list_display=['name', 'location','ceo'];
+
+admin.site.register(Company,CompanyAdmin)
+
+
+
+NOTE:-
+=> Follow all DB-steps related to models.py(model-class) & MySQL DB-activities
+1) configure DATABESES={...} in settings.py
+Ex:-
+settings.py:(CBVProject)
+-------------------------------
+DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'PORT': '3302',		#3306 or 3308
+        'NAME': 'companydb',	#'bookdb',(Replace)
+        'USER': 'root',
+        'PASSWORD': 'root',
+    }
+}
+
+Ex:-
+(also create "companydb" mysql-db and keep it ready...)
+mysql> show databases;
+mysql> create database companydb;
+mysql> show databases;
+mysql> use companydb;
+mysql> show tables
+
+
+#already-done (reuse-it)
+2) install mysqlclient in terminal-tab
+cmd> pip install --only-binary :all: mysqlclient
+Collecting mysqlclient
+  Using cached mysqlclient-2.1.0-cp39-cp39-win_amd64.whl (180 kB)
+Installing collected packages: mysqlclient
+Successfully installed mysqlclient-2.1.0
+
+3) verify mysql-db-connection
+cmd> py manage.py shell
+>>> from django.db import connection
+>>> mycursor = connection.cursor();
+>>> print(mycursor);
+<django.db.backends.utils.CursorDebugWrapper object at 0x000002115A02CD90>
+>>> exit()
+
+4) make-migrations
+cmd> py manage.py makemigrations
+Migrations for 'MyApps1':
+  MyApps1\migrations\0002_company.py
+    - Create model Company
+
+5) sql-migrate
+cmd> py manage.py sqlmigrate MyApps1 0002
+--
+-- Create model Company
+--
+CREATE TABLE `MyApps1_company` (`id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY, `name` varchar(128) NOT N
+ULL, `location` varchar(64) NOT NULL, `ceo` varchar(64) NOT NULL);
+
+
+6) run migrate
+cmd> py manage.py migrate
+Operations to perform:
+  Apply all migrations: MyApps1, admin, auth, contenttypes, sessions
+Running migrations:
+  Applying MyApps1.0001_initial... OK
+  Applying MyApps1.0002_company... OK
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+
+
+=** Also verify in mysql-db,
+mysql> show tables;
++----------------------------+
+| Tables_in_companydb        |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
+| myapps1_book               |
+| myapps1_company            |
++----------------------------+
+12 rows in set (0.07 sec)
+
+(already-done, re-use it...)
+6) create superuser
+cmd> py manage.py createsuperuser
+(uname:sai, pwd:sai)
+Username (leave blank to use 'office'): sai
+Email address: sai@gmail.com
+Password: sai
+Password (again): sai
+The password is too similar to the username.
+This password is too short. It must contain at least 8 characters.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+7) Run server & login to below-admin-url,
+http://localhost:8000/admin/
+(select Companys-link(model/table) under MyApps1 & perform add/update/del operations as per your requirement...)
+=add-3-records==
+(TCS, Infosys, Tech-Mahindra)
+
+8) also verify records in mysql-db
+mysql> select * from myapps1_company;
++----+---------------+-----------+-----------------+
+| id | name          | location  | ceo             |
++----+---------------+-----------+-----------------+
+|  1 | TCS           | India     | Ratan Tata      |
+|  2 | Infosys       | Hyderabad | Narayana Murthy |
+|  3 | Tech Mahindra | Delhi     | Anand Mahindra  |
++----+---------------+-----------+-----------------+
+3 rows in set (0.00 sec)
+
+
+Ex:-
+=> views.py  (MyApps1-app main-folder)
+--------------------------------------------- 
+#DetailView
+from django.shortcuts import render
+from MyApps1.models import Company
+from django.views.generic import DetailView, ListView
+# Create your views here.
+class CompanyListView(ListView):
+	model=Company		#companylist = Company.objects.all();
+	#default template_name is company_list.html
+	#defult context_object_name is company_list var
+
+class CompanyDetailView(DetailView):
+	model=Company
+	#default template_name is company_detail.html
+	#defult context_object_name is "company"o r given-object for company_list, which is in usage for company_list.html
+
+
+Ex:-
+=> base.html  (templates/MyApps1 folder)
+--------------------------------------------- 
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DetailView Base-Page</title>
+    </head>
+    <body>
+        <div>
+            {%block body_block%}
+            {%endblock %}
+        </div>
+    </body>
+</html>
+
+
+
+Ex:-
+=> company_list.html  (templates/MyApps1 folder)
+----------------------------------------------------- 
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+<h1>List of All-Companies</h1><hr>
+<ol>
+    {%for company in company_list%}
+        <h2>
+            <li>
+                <a href="/{{company.id}}">{{company.name|upper}}</a>
+            </li>
+        </h2>
+    {%endfor%}
+</ol>
+{%endblock %}
+ 
+ 
+Ex:-
+=> company_detail.html  (templates/MyApps1 folder)
+------------------------------------------------------ 
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Your Selected Company-Details/Information</h1>
+    <hr />
+    <ul>
+        <h3><li>Company Name: {{company.name|upper}}</li></h3>
+        <h3><li>Company Location: {{company.location|title}}</li></h3>
+        <h3><li>Company CEO: {{company.ceo|title}}</li></h3>
+    </ul>
+{%endblock%}
+
+
+
+Ex:-(***)
+=> urls.py (CBVProject conf-folder)
+-------------------------------------------
+#DetailView
+path('companies/',views.CompanyListView.as_view()),
+path('<pk>/',views.CompanyDetailView.as_view()),
+
+
+***imp-point***
+#<pk> is identification for id field of your table,(primary-key=>unique+notnull)
+#slug can also be used(tech also called as slug-url-pattern)
+(slug means generating url-pattern dynamically based on client-request Ex:- click/submit/button)
+=**hence for TCS-link-click(company_list.html) it is <1>pk
+(for Infosys it is <2>pk)
+(for Tech-Mahindra it is <3>pk)
+
+
+NOTE:-
+= Finally, Run server & request below url
+http://localhost:8000/companies/
+
+
+
+
+***NOW-Extra-Information***
+==> Adding Extra Employee Information also to Company DetailView::-
+Ex:-
+=> models.py (MyApps1 main-folder)
+-------------------------------------------
+#DetailView Extra Employee-Info
+from django.db import models
+# Create your models here.
+class Company(models.Model):   #parent-table
+    name=models.CharField(max_length=128)
+    location=models.CharField(max_length=64)
+    ceo=models.CharField(max_length=64)
+    def __str__(self):
+        return self.name;
+
+#extra-table
+class Employee(models.Model):   #employee-table
+    eno=models.IntegerField()
+    name=models.CharField(max_length=128)
+    salary=models.FloatField()
+    company=models.ForeignKey(Company,related_name='employees',on_delete=models.CASCADE)
+
+
+Ex:-
+=> admin.py (MyApps1 main-folder)
+-------------------------------------------
+from MyApps1.models import Employee
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display=['eno','name','salary','company'];
+
+admin.site.register(Employee,EmployeeAdmin)
+
+
+
+NOTE:-
+= Perform DB-Operations in Terminal,
+1) make-migrations
+cmd> py manage.py makemigrations
+RuntimeWarning: Model 'MyApps1.company' was already registered. Reloading models is not advised as it can lea
+d to inconsistencies, most notably with related models.
+  new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
+Migrations for 'MyApps1':
+  MyApps1\migrations\0003_employee.py
+    - Create model Employee
+
+
+2) sql-migrate
+cmd> py manage.py sqlmigrate MyApps1 0003
+RuntimeWarning: Model 'MyApps1.company' was already registered. Reloading models is not advised as it can lea
+d to inconsistencies, most notably with related models.
+  new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
+--
+-- Create model Employee
+--
+CREATE TABLE `MyApps1_employee` (`id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY, `eno` integer NOT NULL, 
+`name` varchar(128) NOT NULL, `salary` double precision NOT NULL, `company_id` bigint NOT NULL);
+ALTER TABLE `MyApps1_employee` ADD CONSTRAINT `MyApps1_employee_company_id_d9ec981f_fk_MyApps1_company_id`
+ FOREIGN KEY (`company_id`) REFERENCES `MyApps1_company` (`id`);
+
+
+3) run migrate
+cmd> py manage.py migrate
+RuntimeWarning: Model 'MyApps1.company' was already registered. Reloading models is not advised as it can lea
+d to inconsistencies, most notably with related models.
+  new_class._meta.apps.register_model(new_class._meta.app_label, new_class)
+Operations to perform:
+  Apply all migrations: MyApps1, admin, auth, contenttypes, sessions
+Running migrations:
+  Applying MyApps1.0003_employee... OK
+
+
+=** Also verify in mysql-db,
+mysql> show tables;
++----------------------------+
+| Tables_in_companydb        |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
+| myapps1_book               |
+| myapps1_company            |
+| myapps1_employee           |
++----------------------------+
+13 rows in set (0.00 sec)
+
+
+(already-done, re-use it...)
+4) create superuser
+cmd> py manage.py createsuperuser
+Username (leave blank to use 'office'): sai
+Email address: sai@gmail.com
+Password: sai
+Password (again): sai
+The password is too similar to the username.
+This password is too short. It must contain at least 8 characters.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+5) Run server & login to below-admin-url,
+http://localhost:8000/admin/
+(select Employees-link(model/table) under MyApps1 & perform add/update/del operations as per your requirement...)
+(add-6-records)
+
+6) also verify records in mysql-db
+mysql> select * from myapps1_employee;
++----+------+---------+--------+------------+
+| id | eno  | name    | salary | company_id |
++----+------+---------+--------+------------+
+|  1 | 1001 | Sai     | 125000 |          1 |	(TCS)
+|  2 | 1002 | Ram     | 113000 |          2 |	(Infosys)
+|  3 | 1003 | Ali     |  90000 |          3 |	(Tech Mahindra)
+|  4 | 1004 | SaiBaba |  98000 |          1 |
+|  5 | 1005 | RamLala | 104000 |          2 |
+|  6 | 1006 | AliSyed |  89000 |          3 |
++----+------+---------+--------+------------+
+6 rows in set (0.00 sec)
+
+
+***Now back to template-program***
+Ex:-
+=> company_detail.html (templates/MyApps1 folder)
+--------------------------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Your Selected Company-Details/Information</h1>
+    <hr />
+    <ul>
+        <h3><li>Company Name: {{company.name|upper}}</li></h3>
+        <h3><li>Company Location: {{company.location|title}}</li></h3>
+        <h3><li>Company CEO: {{company.ceo|title}}</li></h3>
+
+        <h3>****Employee Information in {{ company.name | upper }}</h3>
+        {% if company.employees.all %}
+            {%for emp in company.employees.all%}
+                <ul>
+                    <li>Employee Number : {{emp.eno}}</li>
+                    <li>Employee Name : {{emp.name}}</li>
+                    <li>Employee Salary : {{emp.salary}}</li>
+                    <hr />
+                </ul>
+            {%endfor%}
+        {% else %}
+                <p style="color:red;background-color: yellow;">No-Emp-Records in given Company : {{ company.name }}</p>
+        {% endif %}
+    </ul>
+{%endblock%}
+
+
+
+NOTE:-
+= Finally restart the server & request below URL,
+http://localhost:8000/companies/
+
+
+
+
+
+
+===========================================(2nd-session)===============================================
+==============================================================
+***Start-Here****
+==> Django CRUD Operations::- (using CBV's)
+1) C → Create a Record (Insert Query)
+2) R → Retrieve a Record (Select Query)
+3) U → Update a Record (Update Query)
+4) D→ Delete a Record (Delete Query)
+= For any web application, it is very common requirement to perform CRUD operations by end-user or admin-user
+
+==> Example::-
+(Online-Ticket-Booking Application)
+1) Add New-Movie Information (Create)
+2) Display or Show-Movie Information (Retrieve)
+3) Modify with New Show-timings for existing Movie (Update)
+4) Remove Old Movie Information (Delete)
+
+
+==> Programming Lib-modules::-(CBVs)
+= By using the following Class-Based Views we can perform CRUD operations very easily...
+Ex:- (Company-Data)
+CreateView → Create Operation (Insert Data)
+ListView, DetailView → Retrieve Operation
+UpdateView → Update Operation
+DeleteView → Delete Operation
+==Diagram==
+
+
+***Start-Coding***
+-----------------------
+(Create New-Project(CRUDCBVProject) & MyApps1(application))
+(Also create mysql-db compdb & keep it ready)
+
+Ex:-(create-mysel-DBase)
+mysql> create database compdb;
+Query OK, 1 row affected (0.30 sec)
+
+mysql> use compdb;
+Database changed
+mysql> show tables;
+Empty set (0.06 sec)
+
+Ex:-
+==> models.py  (MyApps1-app main-folder)
+---------------------------------------------
+#CRUD
+from django.db import models
+class Company(models.Model):
+    name=models.CharField(max_length=128)
+    location=models.CharField(max_length=64)
+    ceo=models.CharField(max_length=64)
+
+Ex:-
+=> admin.py  (MyApps1-app main-folder)
+---------------------------------------------
+#CRUD
+from django.contrib import admin
+from MyApps1.models import Company
+#Register your models here.
+class CompanyAdmin(admin.ModelAdmin):
+	list_display=['name', 'location','ceo'];
+
+admin.site.register(Company,CompanyAdmin)
+
+
+NOTE:-(Perform DB-operations)
+=> Follow all steps related to models.py(model-class) & MySQL DB-activities
+1) configure DATABESES={...} in settings.py
+Ex:-
+settings.py:(CBVProject)
+-------------------------------
+DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'PORT': '3302',		#3306 or 3308
+        'NAME': 'compdb',
+        'USER': 'root',
+        'PASSWORD': 'root',
+    }
+}
+(also create "compdb" mysql-db and keep it ready...)
+mysql> show databases;
+mysql> create database compdb;
+mysql> show databases;
+mysql> use compdb;
+mysql> show tables
+
+
+2) install mysqlclient in terminal-tab
+cmd> pip install --only-binary :all: mysqlclient
+Collecting mysqlclient
+  Using cached mysqlclient-2.1.0-cp39-cp39-win_amd64.whl (180 kB)
+Installing collected packages: mysqlclient
+Successfully installed mysqlclient-2.1.0
+
+3) verify mysql-db-connection
+cmd> py manage.py shell
+>>> from django.db import connection
+>>> mycursor = connection.cursor();
+>>> print(mycursor);
+<django.db.backends.utils.CursorDebugWrapper object at 0x000002115A02CD90>
+>>> exit()
+
+4) make-migrations
+cmd> py manage.py makemigrations
+Migrations for 'MyApps1':
+  MyApps1\migrations\0001_initial.py
+    - Create model Company
+
+
+5) sql-migrate
+cmd> py manage.py sqlmigrate MyApps1 0001
+--
+-- Create model Company
+--
+CREATE TABLE `MyApps1_company` (`id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY, `name` varchar(128) NOT N
+ULL, `location` varchar(64) NOT NULL, `ceo` varchar(64) NOT NULL);
+
+
+6) run migrate
+cmd> py manage.py migrate
+Operations to perform:
+  Apply all migrations: MyApps1, admin, auth, contenttypes, sessions
+Running migrations:
+  Applying MyApps1.0001_initial... OK
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+
+(Now)
+=** Also verify in mysql-db,
+mysql> show tables;
++----------------------------+
+| Tables_in_compdb           |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
+| myapps1_company            |
++----------------------------+
+11 rows in set (0.07 sec)
+
+
+6) create superuser
+cmd> py manage.py createsuperuser
+(uname:sai, pwd:sai)
+Username (leave blank to use 'office'): sai
+Email address: sai@gmail.com
+Password: sai
+Password (again): sai
+The password is too similar to the username.
+This password is too short. It must contain at least 8 characters.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+7) Run server & login to below-admin-url,
+http://localhost:8000/admin/
+(select Companys-link(model/table) under MyApps1 & perform add/update/del operations as per your requirement...)
+(Add-3-records)
+Tech Mahindra	Delhi		Anand Mahindra
+Infosys			Hyderabad	Narayana Murthy
+TCS				India		Ratan Tata
+
+8) also verify records in mysql-db
+mysql> select * from myapps1_company;
++----+---------------+-----------+-----------------+
+| id | name          | location  | ceo             |
++----+---------------+-----------+-----------------+
+|  1 | TCS           | India     | Ratan Tata      |
+|  2 | Infosys       | Hyderabad | Narayana Murthy |
+|  3 | Tech Mahindra | Delhi     | Anand Mahindra  |
++----+---------------+-----------+-----------------+
+3 rows in set (0.00 sec)
+
+
+
+(Now,)
+==> CreateView Class::- (insert-data)
+-----------------------------------------
+= We can use this CreateView-class from (from django.views.generic import CreateView) to insert data into our models,
+Ex:-
+=> views.py  (MyApps1 main-folder)
+-------------------------------------------
+from MyApps1.models import Company
+from django.views.generic import CreateView
+class CompanyCreateView(CreateView):
+	model=Company
+
+
+Ex:-
+=> urls.py  (CBVProject conf-folder)
+-------------------------------------------
+
+from MyApps1 import views
+
+urlpatterns = [
+	#CRUD-urls
+    path('create/', views.CompanyCreateView.as_view(), name='create'),
+    path('companies/',views.CompanyListView.as_view()),
+    path('detail/<int:pk>',views.CompanyDetailView.as_view(),name='detail'),
+    #(or)
+    path('detail/<pk>',views.CompanyDetailView.as_view(),name='detail'),
+]
+
+=*** Copy CompanyListView, CompanyDetailView code from previous project & use it in views.py
+Ex:-
+#DetailView
+from django.shortcuts import render
+from MyApps1.models import Company
+from django.views.generic import DetailView, ListView
+# Create your views here.
+class CompanyListView(ListView):
+	model=Company		#companylist = Company.objects.all();
+	#default template_name is company_list.html
+	#defult context_object_name is company_list var
+
+class CompanyDetailView(DetailView):
+	model=Company
+	#default template_name is company_detail.html
+	#defult context_object_name is "company"o r given-object for company_list, which is in usage for company_list.html
+
+
+NOTE:-
+=> If we run-server & send Request to http://localhost:8000/create/
+(we get below error...)
+Exception Type:	ImproperlyConfigured
+Exception Value: Using ModelFormMixin (base class of CompanyCreateView) without the 'fields' attribute is prohibited.
+
+**= We can solve this problem by defining fields attribute in CreateView class
+
+Ex:- (views.py) (MyApps1 main-folder) -> add fields=() var
+-------------------------------------------
+from MyApps1.models import Company
+from django.views.generic import CreateView
+class CompanyCreateView(CreateView):
+	model=Company
+	fields = ('name', 'location','ceo')
+
+Now,
+=> If we re-send same-url-Request to http://localhost:8000/create/
+(we get below error...)
+Exception Type:	TemplateDoesNotExist
+Exception Value: MyApps1/company_form.html
+= By default CreateView-class will always search for template file named with "modelclassname_form.html"
+Ex:- "company_form.html"
+
+(now, create that file...)
+Ex:-
+=> company_form.html (templates/MyApps1 folder)
+-------------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Company Create(Insert) Form</h1>
+    <hr />
+    <form method="post">
+        {{form.as_p}}
+        {%csrf_token%}
+        <input type="submit" value="Insert-Record" />
+    </form>
+{%endblock %}
+
+Ex:-
+=> base.html (templates/MyApps1 folder)
+-------------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Base-HTML-Page</title>
+</head>
+<body>
+    {%block body_block%}
+    {% endblock %}
+</body>
+</html>
+
+
+NOTE:-(****)
+= Without forms.py, we get auto-form inin company_form.html, it is because of inbuilt feature of CreateView-class
+(simply specify fields in views.py ---> CompanyCreateView)
+
+Now,
+(re-run server & fill form & submit)
+=> If we fill form and submit then we get below error...,
+Exception Type:	ImproperlyConfigured
+Exception Value: No URL to redirect to. Either provide a url or define a get_absolute_url method on the Model.
+(after inserting the record)
+[record is inserted but redirection url error)
+
+
+==> How to define get_absolute_url() in Model class::-
+(for re-direction after insert in create-view)
+Ex:-
+models.py (MyApps1 main-folder)
+---------------------------------------
+from django.db import models
+#from django.core.urlresolvers import reverse #old-lib
+from django.urls import reverse; #new-lib
+class Company(models.Model):
+    name=models.CharField(max_length=128)
+    location=models.CharField(max_length=64)
+    ceo=models.CharField(max_length=64)
+    def __str__(self):
+        return self.name;
+    def get_absolute_url(self):
+        return reverse('detail', kwargs={'pk': self.pk})
+
+=** get_absolute_url() in model class helps us to redirect to given path-name(url/detail in path()) after inserting the record(Create-view)
+
+
+***IMP***
+(for redirect from create-view to detail-view)
+(use from prev-proj CBVProject)
+Ex:-
+=> views.py  (MyApps1-app main-folder)
+--------------------------------------------- 
+#DetailView
+from django.shortcuts import render
+from MyApps1.models import Company
+from django.views.generic import ListView
+from django.views.generic import DetailView
+# Create your views here.
+class CompanyListView(ListView):
+	model=Company
+	#default template_name is company_list.html
+	#defult context_object_name is company_list var
+
+class CompanyDetailView(DetailView):
+	model=Company
+	#default template_name is company_detail.html
+	#defult context_object_name is company or given-object for company_list in usage in company_list.html
+
+
+
+Ex:-
+=> company_list.html  (templates/MyApps1 folder)
+----------------------------------------------------- 
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+<h1>List of All-Companies</h1><hr>
+<ol>
+    {%for company in company_list%}
+        <h2>
+            <li>
+                <a href="/detail/{{company.id}}">{{company.name|upper}}</a>
+            </li>
+        </h2>
+    {%endfor%}
+</ol>
+{%endblock %}
+
+
+Ex:-
+=> company_detail.html  (templates/MyApps1 folder)
+------------------------------------------------------ 
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Your Selected Company-Information</h1>
+    <hr />
+    <ul>
+        <h3><li>Company Name: {{company.name|upper}}</li></h3>
+        <h3><li>Company Location: {{company.location|title}}</li></h3>
+        <h3><li>Company CEO: {{company.ceo|title}}</li></h3>
+    </ul>
+{%endblock%}
+
+
+Ex:-
+=> urls.py (CRUDCBVProject conf-folder)
+-------------------------------------------
+(already-done just put comment for last-one)
+#DetailView
+path('create/', views.CompanyCreateView.as_view(), name='create'),
+
+path('companies/',views.CompanyListView.as_view()),
+path('detail/<pk>',views.CompanyDetailView.as_view(),name='detail'),
+#path('detail/<int:pk>',views.CompanyDetailView.as_view(),name='detail'),
+
+
+
+**Finally-Now,
+=> Fill the form and submit the data...
+=** (Data is submitted to mysql-db & also re-directs to detail-view page with id as primary-key)
+http://localhost:8000/detail/<pk> (Current "id")
+
+=> Verify data in mysql-db:-
+mysql> select * from myapps1_company;
+
+
+
+
+--------------------------------------------------------------
+****Start-Here****
+-----------------------------------------------------
+===> UpdateView-class:-
+(from django.views.generic import UpdateView)
+= We can use UpdateView to update existing record in DB-table(MySQL)
+
+**Coding**
+Ex:-
+=> views.py (MyApps1 main-folder)
+-------------------------------------
+#UpdateView(update-record)
+from django.views.generic import UpdateView
+class CompanyUpdateView(UpdateView):
+	model=Company
+	fields=('name','ceo');  #auto it takes company_form.html with given-fields
+
+=*** re-uses insert/create form(company_form.html)
+
+Ex:-
+=> urls.py (MyApps1 main-folder) (add only last-one)
+-------------------------------------
+Ex:-
+(Define URL for this updateview using id(pk -> primary-key))
+	http://localhost:8000/update/5(pk)
+
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views;
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    #DetailView
+    path('companies/',views.CompanyListView.as_view()),
+    path('<pk>/',views.CompanyDetailView.as_view()), #for old-view
+
+    #this is for re-direction from create-view to detail-view using its name...
+    path('detail/<pk>',views.CompanyDetailView.as_view(),name='detail'),  #new-view
+    #path('detail/<int:pk>',views.CompanyDetailView.as_view(),name='detail'),  #old-style
+
+    path('create/', views.CompanyCreateView.as_view(), name='create'),
+    path('update/<pk>',views.CompanyUpdateView.as_view(),name='update'),
+]
+
+
+
+==> Add Update Button in Company-Details-Page:-
+Ex:-
+=> company_detail.html (templates/MyApps1 folder)
+(prev-file, reuse-it & modify)
+----------------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Your Selected Company-Information</h1>
+    <hr />
+    <ul>
+        <h3><li>Company Name: {{company.name|upper}}</li></h3>
+        <h3><li>Company Location: {{company.location|title}}</li></h3>
+        <h3><li>Company CEO: {{company.ceo|title}}</li></h3>
+    </ul>
+    <a href="/update/{{company.id}}">Update-Company-Data</a>
+{%endblock%}
+
+
+Ex:-
+(Finally RUN-server and view company-details)
+==> http://localhost:8000/companies/
+(select any company)
+(Click update-company-data link)
+= Automatically, we get Update-Form(from company_form.html) for given company-data(name,ceo)
+Ex:-
+company_form.html (templates/MyApps1 folder)
+(already used in CreateView(insert-rec), here it is re-used here)
+----------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Company Create(Insert) Form</h1>
+    <hr />
+    <form method="post">
+        {{form.as_p}}
+        {%csrf_token%}
+        <input type="submit" value="Insert-Record" />
+    </form>
+{%endblock %}
+
+
+Now,
+= make necessary changes(name/ceo) & click [Insert-Record] button
+= Data is updated & goes auto to prev-comp-detail-page(with new-data)
+
+=** verify data in mysql-db
+mysql> select * from myapps1_company;
+(Also in admin-interface)
+
+
+
+-------------------------------------------------------------------
+===> DeleteView-class:-
+(from django.views.generic import UpdateView)
+(We can use DeleteView-class to delete records)
+
+**Coding**
+Ex:-
+=> views.py (MyApps1 main-folder)
+-------------------------------------
+#DeleteView(delete-record)
+#from django.core.urlresolvers import reverse_lazy #old-lib
+from django.views.generic import DeleteView
+from django.urls import reverse_lazy
+class CompanyDeleteView(DeleteView):
+	model=Company
+	success_url=reverse_lazy('companies') #given name="" para. of path()
+
+NOTE:-
+= success_url is sp-var in DeleteView-class, which represents the target page which should be displayed after delete-operation
+(#given name="" para. used in path() of urls.py)
+= it is used only in views.py
+(get_absolute_url() is used in models.py)
+= reverse_lazy() function will wait until deleting the record & also performs re-direction to "companies-list-view"
+
+Now,
+Ex:-
+==> urls.py (MyApps1 main-folder)
+-------------------------------------
+(Add-in-last)
+path('delete/<pk>',views.CompanyDeleteView.as_view(),name='delete'),
+path('companies/',views.CompanyListView.as_view(),name='companies'),
+
+
+Now,
+==> Add Delete Button in Company-Details-Page:-
+Ex:-
+=> company_detail.html (templates/MyApps1 folder)
+(prev-file, reuse-it & modify)
+----------------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Your Selected Company-Information</h1>
+    <hr />
+    <ul>
+        <h3><li>Company Name: {{company.name|upper}}</li></h3>
+        <h3><li>Company Location: {{company.location|title}}</li></h3>
+        <h3><li>Company CEO: {{company.ceo|title}}</li></h3>
+    </ul>
+    <a href="/update/{{company.id}}">Update-Company-Data</a><br /><br />
+    <a href="/delete/{{company.id}}">Delete-Company-Data</a>
+{%endblock%}
+
+
+Ex:-
+(Finally RUN-server and view company-details)
+==> http://localhost:8000/companies/
+(select & any-company-name)
+(Click Delete-company-data)
+(it goes to http://localhost:8000/delete/13)
+
+*****& we get below error....
+Exception Type:	TemplateDoesNotExist
+Exception Value: MyApps1/company_confirm_delete.html
+
+NOTE:-
+= If we are trying to delete, then DeleteView will provide confirmation template
+= The default template name is model_confirm_delete.html
+Ex:- company_confirm_delete.html
+= We have to provide this template file...
+
+Ex:-
+=> company_confirm_delete.html (templates/MyApps1 folder)
+-----------------------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Delete ("{{company.name}}") company-data ???</h1><hr>
+    <form method="post">
+        {%csrf_token%}
+        Yes : <input type="submit" value="Delete-Company-Record" /> <br /> <br />
+        NO(stop) : <a href="/detail/{{company.id}}">Cancel-Delete</a>
+    </form>
+{%endblock %}
+
+NOTE:-
+= After deleting record, we get success page(CompanyListView)
+= Verify deleted record in CompanyListView(companies/)
+= also verify in mysql-db(table),
+mysql> select * from myapps1_company;
+
+
+
+
+

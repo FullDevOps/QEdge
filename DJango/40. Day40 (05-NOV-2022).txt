@@ -1,0 +1,182 @@
+***DJ-Project on live server***
+-----------------------------------
+NOW,
+===>>> Working with Static Files::-(on live-server)
+= By default in pythonanywhere deployment static files won't be considered. Hence while accessing our web application and django admin site look and feel will be changed(normal-look). For that we have perform some configurations in the web tab of dashboard.
+
+=>  Static files related to admin-site:-(admin)
+(Goto Web-tab/link)
+(Goto Static-files section)
+
+Static files: (make below changes)
+-------------------------------------------
+URL: /static/admin
+Path: /home/srikanthsaisir/.virtualenvs/myproj/lib/python3.9/site-
+packages/django/contrib/admin/static/admin
+(or)
+(/home/prem777chandu/.virtualenvs/myproj/lib/python3.10/site-
+packages/django/contrib/admin/static/admin)
+
+==>> Note: After performing any configuration changes, compulsory we should reload our application
+=> Now, reload our webpage from browser using internet-connection
+(srikanthsaisir.pythonanywhere.com)
+
+
+==>> Static files related to our application::-(FirstProject)
+= To reflect css files,js files and images used in our application we have to perform the following configuration under Static files:
+(use 2nd-row)
+-------------
+URL: /static
+Path: /home/srikanthsaisir/django-deployment-first-project/FirstProject/static
+(or)
+/home/prem777chandu/django-deployment-first-project/FirstProject/static
+
+
+**do coding for static-coding***
+---------------------------------
+=> goto bash,
+add required folders & files for static-content & save the changes
+$mkdir static
+$cd static
+$nano mystyles.css
+$nano .html files also
+{%load static%}
+<a href="{%static 'css/mystyles.css'%}" rel="stylesheet" />
+----------------------------------------------------------
+settings.py:-
+--------------
+STATIC_URL = 'static/'
+import os;
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+TEMPLATES = [
+    {
+		....
+        'DIRS': [BASE_DIR/'templates'],
+		....
+	},
+]
+----------------------------------------------------------
+Ex:-
+welcome.html (templates/FirstApp folder)
+-----------------------------------------
+<!DOCTYPE html>
+{%load static%}
+        <head>
+                <title>Django First App</title>
+                <link rel='stylesheet' href="{%static 'css/mystyles.css'%}" />
+        </head>
+        <body>
+                <center>
+                <h1>Hello Students, Welcome to Django First-Project First-App</h1>
+                <hr color="brown" width="90%" />
+                <h2>Have a nice day!!!</h2>
+                <h3>***ALL THE BEST***</h3>
+                <hr color="brown" width="70%" />
+                <h4>Take care and Bye..</h4>
+                <hr color="brown" width="50%" />
+                </center>
+        </body>
+</html>
+
+Ex:-
+views.py (firstApp main-folder)
+-----------------------------------------
+from django.shortcuts import render; 
+from django.http import HttpResponse;
+#Create your views here
+def display_css_view(request): 
+        return render(request,'FirstApp/welcome.html');
+
+Ex:-
+mystyles.css (static/css folder)
+-----------------------------------
+h1{
+        color:Green;
+        text-align:center;
+        background-color:yellow;
+}
+h2{
+        color:blue;
+        text-align:center;
+        background-color:lightpink;
+}
+h3{
+        color:red;
+        text-align:center;
+        background-color:lightcyan;
+}
+h4{
+        color:orange;
+        text-align:center;
+        background-color:lightblue;
+}
+
+Ex:-
+urls.py	(firstProject conf-folder)
+------------------------------------
+from FirstApp import views;
+
+urlpatterns = [
+	path('welcomecss/',views.display_css_view),
+]
+
+
+(Finally)
+=> Now, reload our webpage from browser using internet-connection & access below url
+(srikanthsaisir.pythonanywhere.com/welcomecss/)
+(prem777chandu/.pythonanywhere.com/welcomecss/)
+(or)
+tinyurl.com/y6k43ktp
+
+
+
+(Finally)
+===>> Note: 
+= It is highly recommended to disable DEBUG mode in production, because we should not display application level sensitive information to the end user
+(For this,in settings.py, we have to set DEBUG=False)
+$nano settings.py
+(make necessary-changes....)
+
+=*** Optionally, we can use Files-tab(link) to work with project files directly in GUI-mode instead of CUI-mode(bash-console)
+(nano command is not-required)
+Ex:- cd, cd .., nano etc...
+
+
+
+===>> Working with Live Project directly from Py-Charm IDE::-
+=Steps:-
+1) Open Py-Charm IDE
+2) Select any existing project (DemoProject)
+3) Goto VCS menu-link & select "Share Project on GitHub.com"
+4) Give Repo-name(DemoProject)
+5) give origin(Default)
+6) give desc(Anything)
+7) add-account (select generate-token)
+8) goes to website(github.com) login with your username & pwd
+(prem777chandu and Chanduprem@77)
+9) token string is generated (copy) and paste it in Py-Charm-IDE
+10) Perform commit option(Select all-files) & click "Add" button
+
+NOTE:-
+1)
+= Any changes done in proj-files from Py-Charm, simply perform commit & push option under Git(menu-option) i.e, VCS(menu-prev)
+
+2)
+= Any changes done in proj-files from github.com(from Files-link), simply perform update-proj option under Git(menu-option) i.e, VCS(menu-prev) & Merge-Incoming-Changes(OK)
+
+
+
+
+
+
+
+
+
+
+
+
+

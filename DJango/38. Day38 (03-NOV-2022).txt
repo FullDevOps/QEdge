@@ -1,0 +1,332 @@
+***coding-starts-here for GIT-BAsh***
+======================================
+=>Steps::-
+Office@SriSaiBaba-PC MINGW64 ~ (master)
+$ cd my_repo1/
+
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git init
+Initialized empty Git repository in C:/Users/Office/my_repo1/.git/
+
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git add test.py
+(make sure this file is in our my_repo1 folder)
+(if not there then create 1 new-file)
+
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git status
+-----------------------------------------------------------------------
+On branch master
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+        new file:   test.py
+
+----------------------------------------------------------------------
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git commit -m 'firstcommit'
+Author identity unknown
+
+*** Please tell me who you are.
+
+Run
+
+  git config --global user.email "you@example.com"
+  git config --global user.name "Your Name"
+
+to set your account's default identity.
+Omit --global to set the identity only in this repository.
+
+fatal: unable to auto-detect email address (got 'Office@SriSaiBaba-PC.(none)')
+----------------------------------------------------------------------
+(Now do this with internet-connection)
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git config --global user.email "srikanth.sai.sir@gmail.com"
+
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git config --global user.name "srikanth-sai-sir"
+
+(now commit again...)
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git commit -m 'firstcommit'
+[master (root-commit) ef0ad5a] firstcommit
+ 1 file changed, 3 insertions(+)
+ create mode 100644 test.py
+
+
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git status
+On branch master
+nothing to commit, working tree clean
+
+=> now modify test.py file
+[print("Welcome to django");]
+
+
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git status
+On branch master
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   test.py
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git add test.py
+
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git commit -m 'second'
+[master 0279d48] second
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git status
+On branch master
+nothing to commit, working tree clean
+
+
+==> Creating Repository from git cmd-line::-
+(create a new repository-file on the git-bash command line)
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ echo "#django-deployment-first-application" >> README.md
+(also take readme.txt)
+
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git init
+Reinitialized existing Git repository in C:/Users/Office/my_repo1/.git/
+
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git add README.md
+warning: LF will be replaced by CRLF in README.md.
+The file will have its original line endings in your working directory
+
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git commit -m "firstcommit"
+[master 5cb1bdc] firstcommit
+ 1 file changed, 1 insertion(+)
+ create mode 100644 README.md
+
+***(Now this is important step)***
+(transfering data-files from git to github.com)
+------------------------------------------------
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git remote add origin https://github.com/srikanth-sai-sir/django-deployment-first-application.git
+(make sure django-deployment-first-application(repository/folder) is created in github.com under your uname(srikanth-sai-sir))
+
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ git push -u origin master
+(GitHub authentication-app opens, login with your registered username & password and grant access to all authorizations(permissions) asked by github.com website[Grant-Access])
+
+
+(*****)
+==>>Another-Example(with another-directory)::-
+(now change your directory to F-drive:\>)
+Office@SriSaiBaba-PC MINGW64 ~/my_repo1 (master)
+$ cd f:
+
+Office@SriSaiBaba-PC MINGW64 /f
+$ cd my_codebase/
+(create this folder & keep it ready...)
+
+(initialize git to this curent working directory...)
+Office@SriSaiBaba-PC MINGW64 /f/my_codebase
+$ git init
+Initialized empty Git repository in F:/my_codebase/.git/
+
+(add all(.) to git)
+Office@SriSaiBaba-PC MINGW64 /g/my_codebase (master)
+$ git add .
+
+Office@SriSaiBaba-PC MINGW64 /g/my_codebase (master)
+$ git status
+On branch master
+
+No commits yet
+
+nothing to commit (create/copy files and use "git add" to track)
+
+==> ***(now copy our django-project folder to our git initialized working directory F:\my_codebase\FirstProject)
+(copy whole proj-folder)
+
+Office@SriSaiBaba-PC MINGW64 /f/my_codebase (master)
+$ git add .
+
+Office@SriSaiBaba-PC MINGW64 /f/my_codebase (master)
+$ git status
+On branch master
+
+No commits yet
+
+Changes to be committed:
+  (use "git rm --cached <file>..." to unstage)
+        new file:   firstProject/App1/__init__.py
+        new file:   firstProject/App1/__pycache__/__init__.cpython-39.pyc
+        new file:   firstProject/App1/__pycache__/views.cpython-39.pyc
+        new file:   firstProject/App1/admin.py
+        new file:   firstProject/App1/apps.py
+        new file:   firstProject/App1/migrations/__init__.py
+        new file:   firstProject/App1/models.py
+        new file:   firstProject/App1/tests.py
+        new file:   firstProject/App1/views.py
+        new file:   firstProject/App2/__init__.py
+        new file:   firstProject/App2/__pycache__/__init__.cpython-39.pyc
+        new file:   firstProject/App2/__pycache__/views.cpython-39.pyc
+        new file:   firstProject/App2/admin.py
+        new file:   firstProject/App2/apps.py
+        new file:   firstProject/App2/migrations/__init__.py
+        new file:   firstProject/App2/models.py
+        new file:   firstProject/App2/tests.py
+        new file:   firstProject/App2/views.py
+        new file:   firstProject/db.sqlite3
+        new file:   firstProject/firstApp/__init__.py
+        new file:   firstProject/firstApp/__pycache__/__init__.cpython-39.pyc
+        new file:   firstProject/firstApp/__pycache__/admin.cpython-39.pyc
+        new file:   firstProject/firstApp/__pycache__/apps.cpython-39.pyc
+        new file:   firstProject/firstApp/__pycache__/models.cpython-39.pyc
+        new file:   firstProject/firstApp/__pycache__/views.cpython-39.pyc
+        new file:   firstProject/firstApp/admin.py
+        new file:   firstProject/firstApp/apps.py
+        new file:   firstProject/firstApp/migrations/__init__.py
+        new file:   firstProject/firstApp/migrations/__pycache__/__init__.cpython-39.pyc
+        new file:   firstProject/firstApp/models.py
+        new file:   firstProject/firstApp/tests.py
+        new file:   firstProject/firstApp/views.py
+        new file:   firstProject/firstProject/__init__.py
+        new file:   firstProject/firstProject/__pycache__/__init__.cpython-39.pyc
+        new file:   firstProject/firstProject/__pycache__/settings.cpython-39.pyc
+        new file:   firstProject/firstProject/__pycache__/urls.cpython-39.pyc
+        new file:   firstProject/firstProject/__pycache__/wsgi.cpython-39.pyc
+        new file:   firstProject/firstProject/asgi.py
+        new file:   firstProject/firstProject/settings.py
+        new file:   firstProject/firstProject/urls.py
+        new file:   firstProject/firstProject/wsgi.py
+        new file:   firstProject/manage.py
+        new file:   firstProject/multiViewsApp/__init__.py
+        new file:   firstProject/multiViewsApp/__pycache__/__init__.cpython-39.pyc
+        new file:   firstProject/multiViewsApp/__pycache__/views.cpython-39.pyc
+        new file:   firstProject/multiViewsApp/admin.py
+        new file:   firstProject/multiViewsApp/apps.py
+        new file:   firstProject/multiViewsApp/migrations/__init__.py
+        new file:   firstProject/multiViewsApp/models.py
+        new file:   firstProject/multiViewsApp/tests.py
+        new file:   firstProject/multiViewsApp/views.py
+
+
+Office@SriSaiBaba-PC MINGW64 /g/my_codebase (master)
+$ git commit -m 'firstcommit'
+[master (root-commit) 5a198c6] firstcommit
+ 51 files changed, 339 insertions(+)
+ create mode 100644 firstProject/App1/__init__.py
+ create mode 100644 firstProject/App1/__pycache__/__init__.cpython-39.pyc
+ create mode 100644 firstProject/App1/__pycache__/views.cpython-39.pyc
+ create mode 100644 firstProject/App1/admin.py
+ create mode 100644 firstProject/App1/apps.py
+ create mode 100644 firstProject/App1/migrations/__init__.py
+ create mode 100644 firstProject/App1/models.py
+ create mode 100644 firstProject/App1/tests.py
+ create mode 100644 firstProject/App1/views.py
+ create mode 100644 firstProject/App2/__init__.py
+ create mode 100644 firstProject/App2/__pycache__/__init__.cpython-39.pyc
+ create mode 100644 firstProject/App2/__pycache__/views.cpython-39.pyc
+ create mode 100644 firstProject/App2/admin.py
+ create mode 100644 firstProject/App2/apps.py
+ create mode 100644 firstProject/App2/migrations/__init__.py
+ create mode 100644 firstProject/App2/models.py
+ create mode 100644 firstProject/App2/tests.py
+ create mode 100644 firstProject/App2/views.py
+ create mode 100644 firstProject/db.sqlite3
+ create mode 100644 firstProject/firstApp/__init__.py
+ create mode 100644 firstProject/firstApp/__pycache__/__init__.cpython-39.pyc
+ create mode 100644 firstProject/firstApp/__pycache__/admin.cpython-39.pyc
+ create mode 100644 firstProject/firstApp/__pycache__/apps.cpython-39.pyc
+ create mode 100644 firstProject/firstApp/__pycache__/models.cpython-39.pyc
+ create mode 100644 firstProject/firstApp/__pycache__/views.cpython-39.pyc
+ create mode 100644 firstProject/firstApp/admin.py
+ create mode 100644 firstProject/firstApp/apps.py
+ create mode 100644 firstProject/firstApp/migrations/__init__.py
+ create mode 100644 firstProject/firstApp/migrations/__pycache__/__init__.cpython-39.pyc
+ create mode 100644 firstProject/firstApp/models.py
+ create mode 100644 firstProject/firstApp/tests.py
+ create mode 100644 firstProject/firstApp/views.py
+ create mode 100644 firstProject/firstProject/__init__.py
+ create mode 100644 firstProject/firstProject/__pycache__/__init__.cpython-39.pyc
+ create mode 100644 firstProject/firstProject/__pycache__/settings.cpython-39.pyc
+ create mode 100644 firstProject/firstProject/__pycache__/urls.cpython-39.pyc
+ create mode 100644 firstProject/firstProject/__pycache__/wsgi.cpython-39.pyc
+ create mode 100644 firstProject/firstProject/asgi.py
+ create mode 100644 firstProject/firstProject/settings.py
+ create mode 100644 firstProject/firstProject/urls.py
+ create mode 100644 firstProject/firstProject/wsgi.py
+ create mode 100644 firstProject/manage.py
+ create mode 100644 firstProject/multiViewsApp/__init__.py
+ create mode 100644 firstProject/multiViewsApp/__pycache__/__init__.cpython-39.pyc
+ create mode 100644 firstProject/multiViewsApp/__pycache__/views.cpython-39.pyc
+ create mode 100644 firstProject/multiViewsApp/admin.py
+ create mode 100644 firstProject/multiViewsApp/apps.py
+ create mode 100644 firstProject/multiViewsApp/migrations/__init__.py
+ create mode 100644 firstProject/multiViewsApp/models.py
+ create mode 100644 firstProject/multiViewsApp/tests.py
+ create mode 100644 firstProject/multiViewsApp/views.py
+
+
+**(now check git-status)
+Office@SriSaiBaba-PC MINGW64 /g/my_codebase (master)
+$ git status
+On branch master
+nothing to commit, working tree clean
+
+Office@SriSaiBaba-PC MINGW64 /F/my_codebase (master)
+$ git remote set-url origin https://github.com/prem777chandu/django-deployment-first-project.git
+(or)
+$ git remote add origin https://github.com/srikanth-sai-sir/django-deployment-first-project.git
+(repository is already created on github.com & it is ready)
+
+**[$ git pull origin master]** ---> not-req...
+
+NOTE:-
+=** Makesure to create a repository(name) on github.com and keep it ready
+(https://github.com/srikanth-sai-sir/django-deployment-first-project.git)
+(django-deployment-first-project.git) ---> repository-name
+
+**(now push)
+Office@SriSaiBaba-PC MINGW64 /f/my_codebase (master)
+$ git push -u origin master 
+
+Enumerating objects: 49, done.
+Counting objects: 100% (49/49), done.
+Delta compression using up to 4 threads
+Compressing objects: 100% (46/46), done.
+Writing objects: 100% (49/49), 10.25 KiB | 700.00 KiB/s, done.
+Total 49 (delta 13), reused 0 (delta 0), pack-reused 0
+remote: Resolving deltas: 100% (13/13), done.
+To https://github.com/srikanth-sai-sir/django-deployment-first-application.git
+ * [new branch]      master -> master
+branch 'master' set up to track 'origin/master'.
+
+NOTE:-
+= Finally verify your uploaded complete project-code(FirstProject/) under "github" repositories
+(srikanth-sai-sir/django-deployment-first-project)
+= click above link & verify your code...
+
+
+==***Finally,follow previous steps whenever we make changes to code in our project of our local-system
+$ git init
+$ git add .
+$ git status
+$ git commit -m 'firstcommit'(commit-name)
+$ git status
+$ git remote set-url origin https://github.com/prem777chandu/django-deployment-first-project.git
+(or)
+$ git remote add origin https://github.com/srikanth-sai-sir/django-deployment-first-project.git
+$ git push -u origin master
+(verify in github.com under repositories-section)
+
+(https://github.com/srikanth-sai-sir/django-deployment-first-project.git)
+
+
+

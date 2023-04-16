@@ -1,0 +1,418 @@
+--------------------------------------------------------
+****start-here****
+===>> Deployment on pythonanywhere.com:
+--------------------------------------------
+(Follow below Steps)
+= goto pricing and signup link/option
+= beginner account(free) & non-commercial
+email:srikanth.sai.sir@gmail.com (prem777chandu@gmail.com)
+username:srikanthsaisir (prem777chandu)	
+pwd:Saisir123@  (Chanduprem@77)
+(Account is created immediately...)
+(url: https://www.pythonanywhere.com/user/srikanthsaisir/)
+(https://www.pythonanywhere.com/user/prem777chandu/)
+
+
+
+***coding***
+---------------
+***Now do below steps***
+= Open the console and Create Virtual Environment:-
+Click-Consoles
+Select-Bash 
+Now,
+06:54 ~ $ mkvirtualenv --python=python3.9 myproj
+---------------------------------------------------
+created virtual environment CPython3.9.5.final.0-64 in 12870ms
+  creator CPython3Posix(dest=/home/srikanthsaisir/.virtualenvs/myproj, clear=False, no_vcs_ignore=False, global=False)
+  seeder FromAppData(download=False, pip=bundle, setuptools=bundle, wheel=bundle, via=copy, app_data_dir=/home/srikant
+hsaisir/.local/share/virtualenv)
+    added seed packages: pip==21.1.2, setuptools==57.0.0, wheel==0.36.2
+  activators BashActivator,CShellActivator,FishActivator,PowerShellActivator,PythonActivator,XonshActivator
+virtualenvwrapper.user_scripts creating /home/srikanthsaisir/.virtualenvs/myproj/bin/predeactivate
+virtualenvwrapper.user_scripts creating /home/srikanthsaisir/.virtualenvs/myproj/bin/postdeactivate
+virtualenvwrapper.user_scripts creating /home/srikanthsaisir/.virtualenvs/myproj/bin/preactivate
+virtualenvwrapper.user_scripts creating /home/srikanthsaisir/.virtualenvs/myproj/bin/postactivate
+virtualenvwrapper.user_scripts creating /home/srikanthsaisir/.virtualenvs/myproj/bin/get_env_details
+(myproj) 06:54 ~ $ 
+----------------------------------------------------------------
+(here "myproj" is the name of the virtual environment)
+(myproj) 06:54 ~ $ 
+(If we are seeing this means our virtual enviroment created and active)
+
+
+=> Now verify the packages installed for our virtual-environment,
+(Which package already installed in this virtual env)
+(myproj) 06:54 ~ $ pip list
+Package    Version
+---------- -------
+pip        21.1.2
+setuptools 57.0.0
+wheel      0.36.2
+
+(myproj) 06:58 ~ $ 
+
+
+==>> Now Install diango for our virtual-environment::-
+= It is highly recommended to install the same version which is available on our local machine.
+=>How to check our local machine django version:
+C:\Users\Office>py
+Python 3.9.6 (tags/v3.9.6:db3ff76, Jun 28 2021, 15:26:21) [MSC v.1929 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import django
+>>> django.__version__
+'3.2.7'
+>>>
+
+=> Now, we can install django in virtualenv as follows.
+(myproj) 06:58 ~ $ pip install -U django==3.2.7
+-----------------------------------------------------------
+Looking in links: /usr/share/pip-wheels
+Collecting django==3.2.7
+  Downloading Django-3.2.7-py3-none-any.whl (7.9 MB)
+     |████████████████████████████████| 7.9 MB 4.8 MB/s 
+Collecting pytz
+  Downloading pytz-2021.3-py2.py3-none-any.whl (503 kB)
+     |████████████████████████████████| 503 kB 13.8 MB/s 
+Collecting sqlparse>=0.2.2
+  Downloading sqlparse-0.4.2-py3-none-any.whl (42 kB)
+     |████████████████████████████████| 42 kB 162 kB/s 
+Collecting asgiref<4,>=3.3.2
+  Downloading asgiref-3.5.0-py3-none-any.whl (22 kB)
+Installing collected packages: sqlparse, pytz, asgiref, django
+Successfully installed asgiref-3.5.0 django-3.2.7 pytz-2021.3 sqlparse-0.4.2
+-----------------------------------------------------------
+(myproj) 07:05 ~ $ 
+***now online myproj-folder is initialized with python3.10 & Django4.1.1
+
+===>> How to check whether django installed properly:
+(myproj) 07:05 ~ $ pip list
+Package    Version
+---------- -------
+asgiref    3.5.0
+Django     3.2.7
+pip        21.1.2
+pytz       2021.3
+setuptools 57.0.0
+sqlparse   0.4.2
+wheel      0.36.2
+
+=> (verify django-admin also...)
+(myproj) 07:10 ~ $ 
+(myproj) 07:10 ~ $ which django-admin
+/home/srikanthsaisir/.virtualenvs/myproj/bin/django-admin
+(myproj) 07:10 ~ $ 
+
+
+=> Finally,
+===>> Copy Our Application(proj-folder) from github to Our Virtual Environment(myproj) (in pythonanywhere.com):
+https://github.com/srikanth-sai-sir/django-deployment-first-application
+(https://github.com/prem777chandu/django-deployment-first-project)
+
+= Now perform "clone or download"
+(copy url) https://github.com/srikanth-sai-sir/django-deployment-first-application
+(https://github.com/prem777chandu/django-deployment-first-project)
+
+=> come to bash::-
+(myproj) 07:10 ~ $ git clone https://github.com/srikanth-sai-sir/django-deployment-first-application
+-------------------------------------------------------------------------
+Cloning into 'django-deployment-first-application'...
+remote: Enumerating objects: 49, done.
+remote: Counting objects: 100% (49/49), done.
+remote: Compressing objects: 100% (33/33), done.
+remote: Total 49 (delta 13), reused 49 (delta 13), pack-reused 0
+Unpacking objects: 100% (49/49), 10.23 KiB | 8.00 KiB/s, done.
+-------------------------------------------------------------------------
+(myproj) 07:23 ~ $ 
+
+
+==> Now, verify your files in pythonanywhere(bash)::-
+(myproj) 07:23 ~ $ ls
+README.txt  django-deployment-first-project
+(myproj) 11:03 ~ $ 
+
+(now change-directory to your app-folder)
+(myproj) 11:03 ~ $ cd django-deployment-first-project/
+(myproj) 11:03 ~/django-deployment-first-project (master)$ 
+
+(verify files in our project-folder)
+(myproj) 11:03 ~/django-deployment-first-project (master)$ ls
+FirstProject
+
+(now change-directory to firstProject/)
+(myproj) 11:17 ~/django-deployment-first-project (master)$ cd FirstProject/
+(myproj) 11:17 ~/django-deployment-first-project/firstProject (master)$ 
+
+(perform makemigrations)
+(myproj) 11:17 ~/django-deployment-first-project/firstProject (master)$ python manage.py makemigrations
+No changes detected
+
+(run migrate command)
+(myproj) 11:20 ~/django-deployment-first-project/firstProject (master)$ python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+  
+  
+***(verify present-working-directory)***
+(myproj) 11:21 ~/django-deployment-first-project/firstProject (master)$ pwd
+/home/srikanthsaisir/django-deployment-first-project/firstProject
+
+NOTE:-
+=** This is the sourcecode path of our project in pythonanywhere.com copied/cloned from github.com
+
+
+***Another-Steps****
+===>> Configuration on the web tab::-
+(Click Menu-options)
+(Select Web-link)
+"Add a new web app"
+Click(Next)
+
+NOTE:-
+= If we want to develop a fresh application we have to select "Django."
+= But if we have application already then we have to select
+"Manual configuration" (including virtualenvs)
+= Select "Manual-Configuration" & Next(button)
+= Select Python Version (Python 3.10) & Next(button)
+
+
+****Now Enter below details**** (in Next_page)
+(Configuration for srikanthsaisir.pythonanywhere.com)
+(prem777chandu.pythonanywhere.com)
+--------------------------------------------------------
+=> Source code path:
+--------------
+/home/srikanthsaisir/django-deployment-first-project/firstProject
+(/home/prem777chandu/django-deployment-first-project/FirstProject)
+
+=> Virtualenv path:
+--------------------
+/home/srikanthsaisir/.virtualenvs/myproj
+(/home/prem777chandu/.virtualenvs/myproj)
+
+=> Click Reload srikanthsaisir.pythonanywhere.com button
+(prem777chandu.pythonanywhere.com) at begining/top
+
+NOTE:-
+= Access our website from anyhwere in world using browser with internet-connection
+(srikanthsaisir.pythonanywhere.com)
+(https://srikanthsaisir.pythonanywhere.com/)
+(prem777chandu.pythonanywhere.com)
+
+
+
+***Finally Server Perform***
+===>> WSGI Configuration::- (Web server gateway interface)
+WSGI configuration file:/var/www/srikanthsaisir_pythonanywhere_com_wsgi.py
+(/var/www/prem777chandu_pythonanywhere_com_wsgi.py)
+(under same web-tab and code section)
+(click & open the file)
+(make below changes for HELLO_WORLD (str-var, multi-line-str)
+
+***opens online editor***
+-----------------------------------------------------------------
+HELLO_WORLD = """<html>
+<head>
+    <title>PythonAnywhere hosted web application</title>
+    <style>
+        body{
+            background:lightyellow;
+        }
+        h1{
+            color:Blue;
+            background-color:Yellow;
+            text-align:center;
+            border:2px Solid Brown;
+        }
+        h2,h3,h4{
+            text-align:center;
+        }
+        h2{
+            color:green;
+            background:lightpink;
+        }
+        h3{
+            color:red;
+            background:lightcyan;
+        }
+        h4{
+            color:orange;
+            background:lightblue;
+        }
+    </style>
+</head>
+<body>
+<h1>Hello, World!</h1>
+<hr />
+<h2>Welcome to Sai sir(Python Django Trainer) DJango project</h2>
+<h3>Have a nice day!!!</h3>
+<h4>All the Best</h4>
+<hr />
+<!--
+<p>
+    This is the default welcome page for a
+    <a href="https://www.pythonanywhere.com/">PythonAnywhere</a>
+    hosted web application.
+</p>
+<p>
+    Find out more about how to configure your own web application
+    by visiting the <a href="https://www.pythonanywhere.com/web_app_setup/">web app setup</a> page
+</p>
+-->
+</body>
+</html>"""
+-------------------------------------------------------------------
+(click on SAVE button at top of editor)
+
+
+=> Now, goto web-tab reload our webpage from browser using internet-connection
+(srikanthsaisir.pythonanywhere.com)
+(https://srikanthsaisir.pythonanywhere.com/)
+(https://prem777chandu.pythonanywhere.com/)
+
+
+***(Updated-coding)***
+= again In the wsgi-configuration file just remove Hello World related things,
+(put comment/remove for html-code & its corresponding python-code)
+==================================================================
+#HELLO_WORLD = """<html>
+'''<head>
+    <title>PythonAnywhere hosted web application</title>
+    <style>
+        body{
+            background:lightyellow;
+        }
+        h1{
+            color:Blue;
+            background-color:Yellow;
+            text-align:center;
+            border:2px Solid Brown;
+        }
+        h2,h3,h4{
+            text-align:center;
+        }
+        h2{
+            color:green;
+            background:lightpink;
+        }
+        h3{
+            color:red;
+            background:lightcyan;
+        }
+        h4{
+            color:orange;
+            background:lightblue;
+        }
+    </style>
+</head>
+<body>
+<h1>Hello, World!</h1>
+<hr />
+<h2>Welcome to Sai sir(Python Django Trainer) Django Project</h2>
+<h3>Have a nice day!!!</h3>
+<h4>All the Best</h4>
+<hr />
+<!--
+<p>
+    This is the default welcome page for a
+    <a href="https://www.pythonanywhere.com/">PythonAnywhere</a>
+    hosted web application.
+</p>
+<p>
+    Find out more about how to configure your own web application
+    by visiting the <a href="https://www.pythonanywhere.com/web_app_setup/">web app setup</a> page
+</p>
+-->
+</body>
+</html>"""
+'''
+
+'''
+def application(environ, start_response):
+    if environ.get('PATH_INFO') == '/':
+        status = '200 OK'
+        content = HELLO_WORLD
+    else:
+        status = '404 NOT FOUND'
+        content = 'Page not found.'
+    response_headers = [('Content-Type', 'text/html'), ('Content-Length', str(len(content)))]
+    start_response(status, response_headers)
+    yield content.encode('utf8')
+'''
+==================================================================
+
+(Goto below section(# +++++++++++ CUSTOM WSGI +++++++++++) & make changes)
+# +++++++++++++++++++++++++++ DJANGO +++++++++++++++++++++++++++++
+# To use your own django app use code like this:
+import os
+import sys
+#
+## assuming your django settings file is at '/home/srikanthsaisir/mysite/mysite/settings.py'
+## and your manage.py is is at '/home/srikanthsaisir/mysite/manage.py'
+#path = '/home/srikanthsaisir/mysite'
+path = '/home/srikanthsaisir/django-deployment-first-project/FirstProject'
+if path not in sys.path:
+    sys.path.append(path)
+
+os.chdir(path)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE','FirstProject.settings')
+
+import django
+django.setup()
+#os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.settings'
+#
+## then:
+
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+==>>Now Add 'srikanthsaisir.pythonanywhere.com' to ALLOWED HOSTS:
+(from bash shell) -> goto Console & select bash-shell
+
+12:46 ~ $ ls
+README.txt  django-deployment-first-project
+12:46 ~ $ cd django-deployment-first-project/
+12:47 ~/django-deployment-first-project (master)$ ls
+firstProject
+12:47 ~/django-deployment-first-project (master)$ cd firstProject/
+12:47 ~/django-deployment-first-project/firstProject (master)$ ls
+App1  App2  db.sqlite3  firstApp  firstProject  manage.py  multiViewsApp
+12:47 ~/django-deployment-first-project/firstProject (master)$ cd firstProject/
+12:47 ~/django-deployment-first-project/firstProject/firstProject (master)$ ls
+__init__.py  __pycache__  asgi.py  settings.py  urls.py  wsgi.py
+12:47 ~/django-deployment-first-project/firstProject/firstProject (master)$ nano settings.py 
+(opens nano-editor for settings.py file)
+(move to the required position and add)
+ALLOWED_HOSTS = ['srikanthsaisir.pythonanywhere.com']
+(ALLOWED_HOSTS = ['prem777chandu.pythonanywhere.com']
+
+=> Finally, do this command,
+ctrl+o to save
+ctrl+x to close
+-------------------------------------------------------------
+NOTE:-
+= Got web-option in Menu & Click Reload button
+
+
+
+

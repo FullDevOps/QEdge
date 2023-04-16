@@ -1,0 +1,107 @@
+==> DJango Framework Architecture::-
+1) DJango Framework::-
+def:-
+	DJango is a Python Framework, using which we develop real-time computer Web-apps(websites)
+	
+(website means coll.of.webpages)
+(webpage is presentation of data in the form of text/images/audio/video etc...)
+Ex:-
+	www.news.google.com (website)
+		= India-news (webpages)
+		= World-news
+		= Sports-news
+		...etc
+		
+=> Framework??
+	= Framework means Pre-defined-Library + Runtime-Environment
+	(Pre-defined-Library => Python modules/pkgs/classes/funcs)
+	(Runtime-Environment => Django Live Development Server)
+	
+
+(**)
+===> Types of Web-applications::-
+= Web-applications are of 2-types,
+	a) Static web-app
+	b) Dynamic web-app
+	
+A) Static web-app::-
+= This web-app data or info is common or SAME wrt 3-things,
+	i) User
+	ii) Time
+	iii) Location
+	Ex:-
+		School-website
+		College-website
+		Hospital-website
+		etc...
+
+
+B) Dynamic web-app::-
+= This web-app data or info is different or changing wrt 3-things,
+	i) User
+	ii) Time
+	iii) Location
+	Ex:-
+		Gmail-website (user-user)
+		Google-news-website (time-time)
+		Google-maps-website (loc-loc)
+		etc...
+
+
+NOTE:-
+= Using Django Framework, we develop Dynamic-web-apps
+
+
+==>> Django-Architecture::-
+(MVT) -> (Model-View-Template)
+==Diagram==
+==** Framework allows us to develop web-apps simple & easy, quick or fast with less-coding & short-time-development
+= Django Framework uses MVT-approach or Architecture internally for coding-development
+= MVT Stands for,
+	M -> Model (Data-prog)
+	V -> View (Server-prog for accept-process-response to client)
+	T -> Template (html+css+javascript...etc)
+	
+=> This MVT-Model is as follows,
+==Diagram==
+
+
+NOTE:-
+= Model-View-Template are different Python(.py) Files
+Ex:-
+	views.py
+	models.py
+	templates\home.html
+	
+=** views.py is main-file to accept-process-response to clients
+(here in this file we use models & templates internally)
+=** models.py comm. with Dbase using ORM tech & gets dynamic-data
+(create-table,insert-rec/update-rec/del-rec all are auto-operations)
+=** templates folder proviews different html-data for different-views
+(/home ---> home.html)
+(/aboutus ---> aboutus.html)
+
+==** finally models+views+templates makes up ===> Django MVT Architecture
+
+=** Hence diff-developers can work on Models/Views/Templates separately & make Web-application development Quick or Fast
+(it is advantage from Django Framework)
+
+
+
+
+
+
+
+
+
+	
+	
+	
+	
+	
+	
+	
+
+
+
+

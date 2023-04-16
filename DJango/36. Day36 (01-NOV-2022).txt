@@ -1,0 +1,381 @@
+==>> Working_with_Django_Middleware::-
+-----------------------------------------
+=> What is Middleware???
+---------------------
+= Middleware is a framework of hooks into Django's request/response processing
+= It is a light , low level 'plugin' system for globally altering Django's input or output
+= If we want to perform any activity/work at the time of pre-processing of the request or post-processing of request then we should go for middleware-services
+
+==Diagram==											
+
+Client ------> Request ------> Middleware(pre) --------> modifiedrequest
+--->Server ------> Response ---->Middleware(post) --------> modifiedresponse
+
+
+NOTE:-
+= Django contains several inbuilt middlewares for every proj. which are configured inside "settings.py"
+Ex:-
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+= All these middlewares(small-progs) will be executed before and after processing of every request.
+
+=> Tech-points to remember??
+(Refer-notes)
+1) SecurityMiddleware provides security enhancements like SSL Redirects(like from http request to https request) etc
+2)SessionMiddleware enables session support in out app
+3)CommonMiddleware provides a common set of features like adding slash at the end of the URL
+4)CsrfViewMiddleware is responsible to verify whether POST request has csrf_token or not.
+5)AuthenticationMiddleware is responsible to add user attribute to the request object
+
+NOTE:-
+= If we comment this middleware(AuthenticationMiddleware) is settings.py then we cannot access user-attribute in our view function
+= If we are trying to access you will get error.
+Ex:-
+print(request.user)
+(other-example)
+def display_view(request):
+	print(request)
+	print(request.user)
+	print(request.path)
+	print(request.method)
+	print(request.path_info)
+-----------------------------------------------------
+AttributeError at/first/
+'WSGIRequest' object has no attribute 'user'
+------------------------------------------------------
+Note : Middleware are applicable for incoming request and for every outgoing response.
+
+
+
+==>> Middleware Structure::-
+----------------------------
+= Based on our requirement we can define our own customized middleware.
+= Every customized middleware is a python class and it is the child class of object, 
+= it contains 2 mandatory methods and 3 optional methods
+Ex:-
+class LoginMiddleware(object):
+----------------------------------------
+def __init__(self,get_response):
+	#one time configuration and initialization on start-up, get_response is a reference to previous middleware response
+	self.get_response = get_response
+(this method is executed only once before our 1st-request while initializing our app, it gives reference to previous middleware response)
+	
+def __call__(self ,request):
+------------------------------
+#This code will be executed before the view/any request (and other middleware) is called 
+response = self.get_response(request) #--> view is called...
+# It triggers next phase
+# This code will be executed after the view/any response (and other middleware ) is called return response # to finish middleware sequence.
+
+
+def process_view(self,request,view_args,view_kwargs):
+---------------------------------------------------------------------
+# Logic will be executed before a call to view
+# Gives access to the view itself and arguments 
+
+def process_exception(self,request,exception):
+-----------------------------------------------------------
+# Logic will be executed auto if an exception/error occurs in our view
+(here we can process our execption with proper templates(html))
+
+def process_template_response(self ,request, response):
+----------------------------------------------------------------------
+# Logic is executed after view is called.
+#It is reqiured to alter the response itself to perform additional logic on it like modifying context or template.
+
+=***1,2 compulsory
+=***3,4,5 is optional
+
+
+****Start-Coding****
+==>> Demo Application for Custom Middleware Execution Flow ::
+--------------------------------------------------------
+(Create new project "MiddlewareProject" & new-app "MyApps1")
+Ex:-
+middleware.py: (inside application folder(MyApps1))
+----------------------------------------------------
+(create this new-file here...)
+
+class ExecutionFlowMiddleware(object):
+    def __init__(self, get_response):
+        print("init() is executed only once..!!")
+        self.get_response = get_response
+    def __call__(self, request):
+        print('This line added at pre-processing of request')
+        response = self.get_response(request)
+        print('This line added at post-processing of request')
+        return response
+		
+		
+Ex:-***Imp-step***
+=> Now add your customized middleware to MIDDLEWARE=[] var in settings.py file....
+Ex:-				
+settings.py
+--------------
+MIDDLEWARE = [
+	...........
+	...........
+	'MyApps1.middleware.ExecutionFlowMiddleware'	#add-in-last
+]
+	
+
+Ex:-	
+views.py (MyApps1 folder)
+-----------------------------
+from django.http import HttpResponse
+#create your views here
+def welcome_view(request):
+	print('This line added by view function names welcome_view...!!!')
+	return HttpResponse('<h1>Custom Middleware Demo</h1> <hr />')
+
+Ex:-
+urls.py (MiddlewareProject conf-folder)
+-----------------------------------------
+from MyApps1 import views
+path("welcome/",views.welcome_view),
+
+
+Ex:-	
+==> Finally Run server & verify output on server-console....
+http://localhost:8000/welcome/	
+
+==>> Output::-
+Results ::
+------------
+If we send a request in the server console we can see ::
+This line added at pre-processing of request
+This line added by view function
+This line added at post-processing of request
+Before and After processing every request middleware will be executed.
+
+
+NOTE:-
+==> Execution Process for a Single Middleware Class ::
+----------------------------------------------------
+1) __init__() method will be called only once at the time of server start-up or app initialization
+2)__call__() method will be called for every url-request or view-request
+3) process_view() method is called for every view-request
+4) Inside __call__() method, whenever we code,
+         response = self.get_response(request)
+then view function starts its execution
+5) process_exception() method , then it will be executed if any exception/error occurs inside view function
+6) View Method finishes its execution
+7) finally process_template_response() then it will be executed whenever view returns TemplateResponse
+
+
+
+***Another-Example***
+==>> Middleware applicable to show information saying application under maintenance ::-
+---------------------------------------------------------------------
+(Re-use MiddlewareProject & MyApps1)
+
+Ex:-
+middleware.py (MyApps1 main-folder)
+-----------------------------------------
+from django.http import HttpResponse
+class AppMaintananceMiddleware(object):
+	def __init__(self,get_response):
+		print("init() method is called...");
+		self.get_response = get_response
+		
+	def __call__(self,request):
+		return HttpResponse('<h1>Currently Application under maintenance...Plz try after 8am..!!</h1><hr />')
+	
+	
+	
+(now add/register our middleware-class to settings.py)
+Ex:-			
+settings.py
+--------------
+***(put comment for prev-middleware-class in settings.py)***
+MIDDLEWARE = [
+	............
+	'MyApps1.middleware.AppMaintananceMiddleware'
+]
+
+Ex:-	
+views.py
+-----------
+from django.http import HttpResponse
+# Create your views here.
+def home_page_view(request):
+	return HttpResponse('<h1> Hello This is from home page view </h1><hr />')
+
+
+
+Ex:-
+urls.py
+--------------
+path("home/",views.home_page_view),	
+		
+
+
+Ex:-
+==> Run server & verify output on server-console....
+***(put comment for prev-middleware-class in settings.py)***
+http://localhost:8000/home/	
+
+*** here we get HttpResponse() direcetly from Middleware __call__() but not views.py function
+
+
+
+***Another-Example***
+(Middleware-App with Exceptions)
+==>> Middleware application to show meaningful response if view function raises any error(exception)::-
+----------------------------------------------------------------------
+= In this case we have to use process_exception() method inside Middleware-class
+= It will be executed only if view function raising any exception/error
+Ex:-
+middleware.py (MyApps1 main-folder)
+----------------------------------------
+from django.http import HttpResponse
+class ErrorMessageMiddleware(object):
+    def __init__(self, get_response):
+        print("init() is called for error-app");
+        self.get_response = get_response
+
+    def __call__(self, request):
+        return self.get_response(request)
+
+    def process_exception(self, request, exception):
+        print("Server is printing exception")
+        return HttpResponse(
+        '<h1> Currently we are facing some technical problems..(Exception) Pplz try after some time !!!</h1><hr />')
+			
+
+Ex:-			
+settings.py (Add/register your MW-class here)
+(also put commnet for prev-middleware-class)
+--------------
+MIDDLEWARE = [
+	.....
+	'MyApps1.middleware.ErrorMessageMiddleware',
+]
+
+
+Ex:-
+views.py (MyApps1 main-folder)
+------------------------------------
+from django.http import HttpResponse
+# Create your views here.
+def home_page_view(request):
+	print(10/0)
+	return HttpResponse('<h1>Hello This is from home page view</h1><hr />')
+
+Ex:-
+urls.py
+--------------
+#re-use it
+path("home/",views.home_page_view),				
+		
+
+Ex:-
+==> Run server & verify output on server-console....
+(put comment for prev-middleware-classes in settings.py)
+http://localhost:8000/home/	
+
+		
+=>NOTE:-		
+How to dispay raised exception information :
+---------------------------------------------------------
+    def process_exception(self, request, exception):
+        print("Server is printing exception")
+        return HttpResponse(
+            '<h1> Currently we are facing some technical problems..(Exception) plz try after some time !!!</h1><hr /><h2>Raised Exception:{}</h2><h3>Exception Message : {}</h3>'.format(exception.__class__.__name__, exception));	
+	
+
+==*** re-run server & verify exception extra-info...
+
+
+Finally,
+==>> Configuration of multiple middleware classes :
+----------------------------------------------------------
+= We can configure any number of middleware at-a-time
+= all these middleware will be executed according to same-order declared inside settings.py under MIDDLEWARE=[] variable
+
+(re-use MiddlewareProject & MyApps1)
+Ex:-
+middleware.py
+------------------
+
+class FirstMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        print('This line printed by FirstMiddleware at pre-processing of request');
+        response = self.get_response(request)
+        print('This line printed by FirstMiddleware at post-processing of request')
+        return response;
+
+
+class SecondMiddleware(object):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        print('This line printed by SecondMiddleware at pre-processing of request')
+        response = self.get_response(request)
+        print('This line printed by SecondMiddleware at post-processing of request')
+        return response
+		
+
+(add/register them in settings.py under MIDDLEWARE=[] var)
+Ex:-		
+settings.py (MiddlewareProject conf-folder)
+-----------------------------------------
+(put comment for prev-middleware-classes)
+MIDDLEWARE = [
+	'MyApps1.middleware.FirstMiddleware',
+    'MyApps1.middleware.SecondMiddleware',
+]
+	
+Ex:-	
+views.py
+-----------
+def home_page_view2(request):
+	print('This line printed by home_page_view2 function...')
+	return HttpResponse('<h1>Hello this is from home page view2 </h1><hr />')
+	
+
+
+Ex:-
+urls.py
+--------------
+path("home2/",views.home_page_view2),	
+		
+
+Ex:-
+==> Run server & verify output on server-console....
+(put comment for prev-middleware-classes in settings.py)
+http://localhost:8000/home2/	
+
+
+O/P::-		
+In the Server Console ::
+------------------------------
+This line printed by FirstMiddleware at pre-processing of request
+This line printed by SecondMiddleware at pre-processing of request
+This line printed by view function
+This line printed by SecondMiddleware at post-processing of request
+This line printed by FirstMiddleware at post-processing request
+
+
+NOTE :  If we change the order of middleware inside settings.py then the output at server 
+console is :
+
+This line printed by SecondMiddleware at pre-processing of request
+This line printed by FirstMiddleware at pre-processing of request
+This line printed by view function
+This line printed by FirstMiddleware at post-processing request
+This line printed by SecondMiddleware at post-processing of request
+
+	

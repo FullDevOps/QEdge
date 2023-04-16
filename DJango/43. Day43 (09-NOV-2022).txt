@@ -1,0 +1,383 @@
+***Django Real-time Project***
+----------------------------------------
+==> mail-code in forms, views & html::-
+Ex:- (coding)
+==> forms.py (BlogApp main-folder)
+--------------------------------------
+from django import forms
+class EmailSendForm(forms.Form):
+    name=forms.CharField()
+    email=forms.EmailField()
+    to=forms.EmailField()
+    comments=forms.CharField(required=False,widget=forms.Textarea)
+
+
+Ex:-
+==> views.py (BlogApp main-folder)
+--------------------------------------
+#views for email
+from django.core.mail import send_mail
+from BlogApp.forms import EmailSendForm
+def mail_send_view(request,id):
+    post=get_object_or_404(Post,id=id, status='published')
+    sent=False
+    if request.method=='POST':
+        form=EmailSendForm(request.POST)
+        if form.is_valid():
+            cd=form.cleaned_data
+            post_url=request.build_absolute_uri(post.get_absolute_url())
+            subject='{}({}) recommends you to read "{}"'.format(cd['name'],cd['email'],	post.title)
+            message="Read Post At: \n{}\n\n{} 'Comments:\n{}".format(post_url,cd['name'],cd['comments'])
+            send_mail(subject, message, 'srikanth.sai.sir@gmail.com', cd['to']) #use[]
+            sent=True;
+    else:
+	    form=EmailSendForm()
+    return render(request,'BlogApp/sharebymail.html', {'post':post,'form':form,'sent':sent})
+
+
+***Start-Here****
+Ex:- 
+==> sharebymail.html (BlogApp main-folder)
+-----------------------------------------------
+<!DOCTYPE html>
+{%extends 'BlogApp/base.html'%}
+{%block title %}Share Post By Email{%endblock%}
+{%block content%}
+    {%if sent%}
+        <h1>Email Successfully Sent !!!</h1>
+        <p>"{{post.title}}" was sent by email</p>
+    {%else%}
+        <h1>Share {{post.title}}" by Email!!!"</h1>
+        <form method="post">
+            {{form.as_p}}
+            {%csrf_token%}
+            <input type="submit" name="" class="btn btn-lg btn-success" value="Send Mail">
+        </form>
+    {%endif %}
+{%endblock%}
+
+
+Ex:-
+==> urls.py (BlogRealTimeProject conf-folder)
+-----------------------------------------------
+urlpatterns = [
+	...
+	path("^(?P<id>\d+)/share/$", views.mail_send_view),
+]
+
+
+Ex:-
+==>> Add Send Mail Button in Details Page::-
+Ex:-
+post_detail.html (BlogApp main-folder)
+--------------------------------------------
+<!DOCTYPE html>
+{%extends 'BlogApp/base.html'%}
+{%block title %}{{post.title}}{%endblock%}
+{%block content%}
+    <h1>{{post.title}}</h1>
+    <hr />
+    <p id='date'>Published on {{post.publish}} by {{post.author|title}}</p>
+    {{post.body|linebreaks}}
+    <br />
+    <a href="/{{post.id}}/share" class="btn btn-lg btn-primary">Share Post By Email</a>
+{%endblock%}
+
+
+=================================================================
+==> Basics of Bootstrap CSS:-
+= It is 3rd-party .css file aviable online or offline
+= It contains predefined css in the form of classes
+Ex:-
+	<button class="btn btn-primary">Submit</button>
+= here btn and btn-primary are predefined css in bootstrap
+
+=> How to use bootstrap??
+= goto getbootstrap.com & download 5.2.2 version
+(Compiled CSS and JS)
+= unzip it any use bootstrap.css or bootstrap.min.css in your project folder or working-folder
+(or)
+= online-css(CDN)
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+
+=**Advantages,
+= we get attractive, good-looking & stylish webpage w.o any css UD-code
+(optionally also use bootstarp.bundle.js from downloaded files)
+Ex:-
+	<script src="bootstarp.bundle.js">
+	<script>
+
+
+Ex:-
+==> static/css/bootstrap.css (copy & paste)
+Ex:-
+==> Sample.html (templates/BlogApp)
+----------------------------------------
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--<link href="{% static 'css/bootstrap.css' %}" rel="stylesheet" />-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script src="{% static 'js/bootstrap.bundle.js' %}">
+    </script>
+    <script>
+        const collapseElementList = document.querySelectorAll('.collapse')
+        const collapseList = [...collapseElementList].map(collapseEl => new bootstrap.Collapse(collapseEl))
+    </script>
+</head>
+<body>
+    <h1>Welcome to Python</h1>
+    <hr />
+    <h2>Have a nice day</h2>
+    <h3>****ALL THE BEST****</h3>
+    <hr />
+    <button type="button" class="btn btn-outline-primary btn-lg disabled">Primary</button>
+    <button type="button" class="btn btn-secondary">Secondary</button>
+    <button type="button" class="btn btn-success">Success</button>
+    <button type="button" class="btn btn-danger">Danger</button>
+    <button type="button" class="btn btn-warning">Warning</button>
+    <button type="button" class="btn btn-info">Info</button>
+    <button type="button" class="btn btn-light">Light</button>
+    <button type="button" class="btn btn-dark">Dark</button>
+
+    <button type="button" class="btn btn-link">Link</button>
+    <hr />
+
+    <p>
+  <a class="btn btn-primary" data-bs-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+    Link with href
+  </a>
+  <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+    Button with data-bs-target
+  </button>
+</p>
+<div class="collapse" id="collapseExample">
+  <div class="card card-body">
+    Some placeholder content for the collapse component. This panel is hidden by default but revealed when the user activates the relevant trigger.
+  </div>
+</div>
+</body>
+</html>
+
+
+
+
+Ex:- views.py
+#bootstarp-sample.html-view
+def bs_smaple_view(request):
+    return render(request,"BlogApp/Sample.html")
+
+Ex:- (urls.py)
+path("bssample/",views.bs_smaple_view),
+
+==> Run server & req below url
+http://localhost:8000/bssample/
+
+
+
+(back to project-coding)
+Ex:-
+===> Adding for Comments Section to the Blog::-
+****Activities****:-
+1) We required to create a Model to save comments
+2) We required to create a model based form to submit comments
+3) We required to create a view function to process comments and save to the database
+4) We have to edit post_detail.html to display list of comments and add a form to submit comments
+
+Ex:-
+==> models.py (BlogApp main-folder)
+-------------------------------------------
+= Comments are always associated with Post and without Post there is no chance of existing comments.
+= Each Post can have multiple comments.Hence it is Many-to-One relationship, which can be specified by Foreign Key.
+Ex:-
+#comments for post
+class Comment(models.Model):  #child-table
+	post=models.ForeignKey(Post,related_name='comments')
+
+= We can use related_name to access all comments associated with a particular post.
+Ex:-
+	post.comments.all()
+
+= If we are not using related_name then the default related name is:
+modelclassname_set
+Ex:- 
+	comment_set  #we get set of comments(use with loop to display)
+
+
+Ex:-
+==>> models.py  (BlogApp main-folder)
+------------------------------------------------
+#comments for post
+#comments for post
+class Comment(models.Model):
+	post=models.ForeignKey(Post,related_name='comments',on_delete=models.CASCADE)
+	name=models.CharField(max_length=32)
+	email=models.EmailField()
+	body=models.TextField()
+	created=models.DateTimeField(auto_now_add=True)
+	updated=models.DateTimeField(auto_now=True)
+	active=models.BooleanField(default=True)
+	class Meta:
+		ordering=('created',)
+	def __str__(self):
+		return "Commented By {} on {}".format(self.name,self.post);
+		
+=> Now perform sql-migrations,
+cmd> py manage.py makemigrations
+cmd> py manage.py migrate
+
+=** also-Verify in mysql-db
+mysql> use blogdb;
+cmd> show tables;
+cmd> select * from blogapp_comment;
+(
+blogapp_comment   (child-table)
+blogapp_post		(parent-table)
+)
+
+Ex:-
+==> admin.py (BlogApp main-folder)
+----------------------------------------
+from django.contrib import admin
+from BlogApp.models import Post, Comment
+# Register your models here.
+class PostAdmin(admin.ModelAdmin):
+    list_display = ['title', 'slug', 'author', 'publish', 'created', 'updated', 'status']
+    list_filter = ('status', 'created', 'publish', 'author')
+    search_fields = ('title', 'body')
+    prepopulated_fields = {'slug': ('title',)}
+    raw_id_fields = ('author',)
+    ordering = ['status', 'publish']
+
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'post', 'body', 'created', 'updated', 'active')
+    list_filter = ('active', 'created', 'updated')
+    search_fields = ('name', 'email', 'body')
+
+admin.site.register(Post,PostAdmin)
+admin.site.register(Comment, CommentAdmin)
+
+
+
+Now,
+==> Creation of Model Based form for comments::-
+(as soon as we put comment it is submitted to DB-comments table)
+Ex:-
+forms.py (BlogApp main-folder)
+-------------------------------------
+#model-based-form for comments
+from django import forms
+from BlogApp.models import Comment
+class CommentForm(forms.ModelForm):
+	class Meta:
+ 		model=Comment
+ 		fields=('name','email','body')
+
+Now,
+==> Display and Processing Ccomment Form in views.py
+Ex:-
+views.py (BlogApp main-folder)
+------------------------------------------
+#comment form-view
+from BlogApp.models import Comment
+from BlogApp.forms import CommentForm
+
+def post_detail_view(request, year,month,day,post):
+    post=get_object_or_404(Post,slug=post,
+                status='published',
+                publish__year=year,
+                publish__month=month,
+                publish__day=day)
+    comments=post.comments.filter(active=True)
+    csubmit=False
+    if request.method=='POST':
+        form=CommentForm(data=request.POST)
+        if form.is_valid():
+            new_comment=form.save(commit=False)
+            new_comment.post=post
+            new_comment.save()
+            csubmit=True
+    else:
+        form=CommentForm()
+    return render(request,'BlogApp/post_detail.html',{"post":post, 'form':form, 'comments':comments,'csubmit':csubmit})
+ 
+ 
+ 
+Now, 
+==> Adding Comments to the Detail Page::-
+Ex:-
+post_detail.html (templates/BlogApp folder)
+--------------------------------------------
+= We have to display,
+	1) Number of comments
+	2) For every comment we have to add head part
+	3) Comment body
+	4) Add Comment form to submit new comment
+	5) If already submitted then display success message
+Ex:-
+<!DOCTYPE html>
+{%extends 'BlogApp/base.html'%}
+{%block title %}{{post.title}}{%endblock%}
+{%block content%}
+    <h1>{{post.title}}</h1>
+    <hr />
+    <p id='date'>Published on {{post.publish}} by {{post.author|title}}</p>
+    {{post.body|linebreaks}}
+    <br />
+    <a href="/{{post.id}}/share" class="btn btn-lg btn-primary">Share Post By Email</a>
+    {% with comments.count as comments_count%}
+        <h2>{{comments_count}} Comment{{comments_count|pluralize}}</h2>
+    {%endwith%}
+    {%if comments %}
+        {%for comment in comments %}
+            <p id='ch'> comment {{forloop.counter}} by {{comment.name}} on {{comment.created}}</p>
+		    <div class="cb">{{comment.body|linebreaks}}</div>
+ 	        <hr />
+ 	    {%endfor%}
+ 	{%else%}
+ 	    <p>There are NO Comments Yet !!!</p>
+ 	{%endif%}
+ 	{%if csubmit %}
+		<h2>Your Comment Added Succefully</h2>
+ 	{%else%}
+        <form method="post">
+            {{form.as_p}}
+            {%csrf_token%}
+            <input type="submit" name="" value="Submit-Comment">
+        </form>
+ 	{%endif%}
+{%endblock%}
+
+
+***
+=Note::-
+{% with comments.count as comments_count%}
+	<h2>{{comments_count}} Comment{{comments_count|pluralize}}</h2>
+{% endwith%}
+
+{%with%} can be used to assign a value to new variable. We can use that variable any number of times based on our requirement. Most of the times it can be used to avoid hitting database multiple times.
+
+=***
+Note::-
+= pluralize can be used to add 's' if it is required
+Comment{{comments_count|pluralize}}
+Ex:- 
+	0 Comments
+	1 Comments
+	2 Comments
+
+==> Run server & verify the functionality...
+(http://localhost:8000/)
+
+
+NOTE:- (verify if post/post-detail/post-by-email/comments)
+=  create super-user(sai/sai - already-done) & other normal-users(ram/ali/tom/pop)
+= login to admin-page
+(http://localhost:8000/admin/)
+
+
+
+

@@ -1,0 +1,267 @@
+#11th day 11.05-08-22
+
+"""
+***===>>> Strings in Python:-
+= String is collection-of-chars represented in quotes
+i.e, single-quotes'...' 
+or double-quotes"..."
+or triple-quotes'''....'''
+Ex:-
+s1 = 'Sai';
+s2 = "Sai Ram"; (space is also 1-char)
+s3 = '''
+#101, St.No.9
+HimayathNagar,
+Hyd(TS)
+India
+'''
+
+NOTE:-
+1)
+= Use single-quotes for single-word
+= Use double-quotes for multi-words(1-line)
+= Use triple-quotes for multi-line-text
+2)**
+= Python does not support char-dtype. Even single-char is also taken as string-type
+Ex:-
+ch = 'A'; or "A"
+print(type(ch));
+"""
+##Program (StringsEx1.py)
+##Program to demo strings in python
+##Program (StringsEx1.py)
+##Program to demo strings in python
+
+#str-type
+ch = 'A';
+print(type(ch));
+print(ch);
+
+ch = "A";
+print(type(ch));
+print(ch);
+
+ss='Sai Ram Kumar';
+print(type(ss));
+print(ss);
+
+ss="Sai Ram Kumar";
+print(type(ss));
+print(ss);
+
+print()
+addr = """Sai Ram Kumar,
+HimayathNagar,
+Hyderabad.
+"""; 
+print(addr);
+addr = """
+    Sai Ram Kumar,
+    
+    HimayathNagar,
+    
+    Hyderabad.
+"""; 
+print(addr);
+
+print()
+#quotes with in quotes
+#ss = 'Hi Hello's Welcome';	#Error
+#ss = "Hi Hello's Welcome";
+#ss = 'Hi Hello\'s Welcome';
+#ss = 'Hi Hello"s Welcome';
+#ss = "Hi Hello\"s Welcome";	#Error
+#ss = 'Hi Iam "Sai Ram Kumar"';
+#ss = 'Hi Iam "Sai Ram Kumar" and "Python" Trainer';
+#ss = 'Hi Iam "Sai Ram Kumar" and \'Python\' Trainer';
+#ss = '''#Hi Iam "Sai Ram Kumar" and 'Python' Trainer''';
+ss = """Hi Iam "Sai Ram Kumar" and 'Python' Trainer""";
+print(ss);
+
+"""
+NOTE:-
+1) in triple-quotes string, no need to use \t or \n chars. they are taken auto. wrt given-text
+2) to represent quotes with-in quotes, use one-type-quotes in another(but not same type of quotes)
+3) However we can use same-type-of quotes inside same-type of quotes using \(ESC-SEQ-char)
+
+
+==> Getting or Accessing chars from string:-
+= It is done in 2-ways,
+a) using indexes
+b) using slice operator
+
+a) using indexes:-
+==Diagran==
+Ex:-
+	"hello"
+	
+= Python supports both +ve or -ve indexes
+= +ve indexes are First to Last (L->R) (Forward) (0 to n-1)
+= -ve indexes are Last to First (R->L) (Backward) (-1 to -n)
+Ex:- (we use index with [] subscript-operator/index-oper)
+ss = "Hello";
+print(ss[0]); 1,2,3,4
+print(ss[-1]); -2,-3,-4,-5
+print(s[10]);	#Error (string index out of range)
+
+##Program (StringEx2.py)
+#Program to accept string and print its chars with indexes
+
+NOTE:-
+= the best way to access elements of any collection is with loops(For-loop)
+
+
+b) Using slice-operator:-
+Syntax:-
+	str[beginIndex : endIndex : stepValue]
+
+= This acts like sub-string
+= beginIndex is starting-index
+= endIndex is (last-index - 1)
+= stepValue is increment-value
+
+NOTE:-
+= If beginIndex is not given then it will take from 0-index
+= If endIndex is not given then it will take till last-index
+= Default stepValue is 1
+
+
+==> Strings with Mathematical Operators:-
+= + operator is used for string concatenation
+= * operator is used for string repeatition
+
+==> Length of a String:-
+= len() gives length of a string
+Ex:-
+ss = "Sai Ram Kumar";
+print(len(ss));
+"""
+
+##Program (StringEx2.py)
+#Program to accept string and print its chars with indexes & slice-operator
+
+
+#using index and [] oper
+ss = "Hello";
+print(ss[0]); 
+print(ss[1]); 
+print(ss[2]); 
+print(ss[3]); 
+print(ss[4]); 
+print(ss[-1]); 
+print(ss[-2]); 
+print(ss[-3]); 
+print(ss[-4]); 
+print(ss[-5]); 
+#print(ss[10]);	#IndexError 
+'''
+
+'''
+#string access with loop
+ss = input("Enter any String : ");
+i=0;
+for x in ss:
+	print(i,"=====>",x)
+	i=i+1;
+'''
+	
+''' 
+#using slicing operator
+ss = "Welcome to Python Session";
+print(ss[1:9:1]);
+print(ss[1:9]);	
+print(ss[1:9:2]);
+print(ss[:9]);
+print(ss[9:]);
+print(ss[::]);
+print(ss[:]);	
+print(ss[::-1]);
+print(ss[::-2]);
+print(ss[-1:-9:-1]);
+print(ss[-1:-9:-2]);	
+print(ss[-9:-1:-1]);
+print(ss[1:0:2]);	
+'''
+
+'''
+#str addition(+) & repetition(*)
+s1 = "Sai Ram";
+s2 = " Kumar";
+print(s1+s2);
+print(s1*5);
+print(s1*-5);
+print(s1*0);
+
+
+#len() func
+ss = "Sai Ram Kumar";
+ss="Hello"
+print(len(ss));
+
+"""
+(****)
+==> Checking or Finding or Searching String:-
+= Check whether given string or char is present in original-string or not
+= It is done with "in" or "not in" operator
+(membership-operators)
+"""
+#Program (StringEx3.py)
+#(Prog to work with strings)
+##Program (StringEx3.py)
+#Program to work with strings(check/find/search)
+
+
+#case-1
+ss ="Hello Students, Welcome to Python Class";
+print("to" in ss);
+print("," in ss);
+print("hi" in ss);
+print("Python" not in ss);
+
+
+#case-2
+s1 = input("Enter any main or org. string : ");
+s2 = input("Enter any searching string : ");
+if s2 in s1:
+	print(s2,": is found in org-string");
+else:
+	print(s2,": is NOT found in org-string");
+
+"""
+(*****)
+==> String Comparision:-
+= Comparision operators are used for string-comparison
+i.e, <,<=,>,>=,==,!= Relational Operators
+= Comparision is done based on Character Ascii-Codes
+A-Z (65-90)
+a-z	(97-122)
+0-9	(48-57)
+space (32)
+$	(36)
+@	(64)
++	(43)
+etc...
+==Diagram==(Example)
+
+
+##Program (StringEx4.py)
+(Prog to perform with string-comparisons)
+
+NOTE:-
+= Internally difference of ASCII Codes are taken for comparison
+"""
+##Program...(StringEx4.py)
+#Prog to perform with string-comparisons
+
+s1 = input("Enter 1st string : ");
+s2 = input("Enter 2nd string : ");
+if s1 == s2:
+	print("Both String are SAME");
+elif s1<s2:
+	print("1st String is Less than 2nd String");
+else:
+	print("1st String is Greater than 2nd String");
+	
+print("End of the Program")	;
+
+

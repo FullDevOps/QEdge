@@ -1,0 +1,328 @@
+==> Working with DJango Server::-
+=>  Printing data on Server-Console::-
+----------------------------------------
+= For this, we can use print() function in views.py with view-function
+Step1:-
+(views.py) FirstApp app-folder
+-------------------------------
+(Edit)
+def display(request): #view-function (/welcome/)
+	print("welcome/ url is requested & display() is executed");
+	....
+	....
+
+Step2:-
+= run the server & request below URL
+	http://localhost:8000/welcome
+	
+Step3:-
+= for welcome/ url display() is executed & print() displays data on server-console(where we have run server)
+(background activity on server)
+
+NOTE:-
+= For client/End-user only html-data is displayed as response
+
+
+-----------------------------------------------------
+=>> How to change Django Server Port-no::-
+= DJANGO-server is a service-provider of DJANGO-Apps
+= In every system we have unique port-no for every service or software
+= this port-no given and maintained by OS uniquely
+= By default Django development server will run on port number: 8000
+= However, we can change port number as per our requirement
+Ex:-
+cmd> py manage.py runserver 8888 
+----------------------------------------------------
+NOTE:-
+= Now DJANGO-Server is running on port number: 8888 
+= We have to send the request with this port number only 
+http://127.O.O.1:8888/welcome/  (we will get the response)
+http://127.O.O.1:8000/time 	(Error...no-response)
+-----------------------------------------------------
+
+
+
+
+
+-------------------------------------------------------
+(Assignments)
+==>> Working with Other Programs/Applications, 
+1)
+Create Django Application just to send Hello-User message as response
+views.py
+-----------
+def hello(request):
+	print("hello/ url is requested & hello() is executed");
+	ss='''
+	<html>
+		<head>
+			<title>Hello Webpage</title>
+			<style>
+				h1{
+					color:Blue;
+				}
+				h2{
+					color:Green;
+				}
+				h3{
+					color:Red;
+				}
+				h1,h2,h3{
+					background-color:plum;
+					width:60%;
+					border:2px Solid Brown;
+				}
+			</style>
+		</head>
+		<body>
+			<center>
+				<h1>Hello User..!!!</h1>
+				<hr color='brown' width='80%'/>
+				<h2>Welcome to Django-App</h2>
+				<hr color='brown' width='80%'/>
+				<h3>Have a nice day...</h3>
+			</center>
+		</body>
+	</html>
+	''';
+	return HttpResponse(ss);
+	
+2)
+(FirstApp(views.py---hello() and url-pattern(/hello))
+Ex:-urls.py
+--------------
+	path('hello/',views.hello),
+	
+3)
+(run-server and use new-port-no 8888)
+Ex:-
+(http://localhost:8888/hello)
+
+
+
+===>>> Another-App:-
+----------------
+Write Django application to send server date&time as response 
+--------------------------------------------------------
+1) FirstApp
+views.py
+--------
+import time;	
+def senddatetime(request):
+	print("dtime/ url is requested & senddatetime() is executed");
+	ct = time.ctime()
+	print("Client Request Date & time on server :: ",ct);
+	ss='''
+	<html>
+		<head>
+			<title>Date-time Webpage</title>
+			<style>
+				h1{
+					color:Blue;
+				}
+				h2{
+					color:Green;
+				}
+				h3{
+					color:Red;
+				}
+				h1,h2,h3{
+					background-color:plum;
+					width:60%;
+					border:2px Solid Brown;
+				}
+			</style>
+		</head>
+		<body>
+			<center>
+				<h1>Welcome to DJango-User..!!!</h1>
+				<hr color='brown' width='80%'/>
+				<h2>Server-Date & Time :: </h2>
+				<hr color='brown' width='80%'/>
+				<h3>''',ct,'''</h3>
+			</center>
+		</body>
+	</html>
+	''';
+	return HttpResponse(ss);
+
+2)
+(FirstApp(views.py---senddatetime() and url-pattern(/dtime))
+Ex:-urls.py
+--------------
+	path('dtime/',views.senddatetime),
+	
+3)
+(run-server and use new-port-no 8888)
+Ex:-
+(http://localhost:8888/dtime)
+
+
+
+
+
+(Imp-topic)
+(*****)
+==>> Single-application with multiple views (MultiViewsApp)
+------------------------------------------------------------
+i) Create your Application,
+**= The following is the command to create own-application(app)
+cmd\FirstProject>python manage.py startapp MultiViewsApp
+(goto project-folder & give the above command)
+
+=** Register our MultiViewsApp in settings.py of Project-conf-folder under INSTALLED_APPS=[] variable
+
+ii) goto views.py of MultiViewsApp
+Ex:-
+"views.py" (MultiViewsApp)
+-----------
+from django.shortcuts import render;
+from django.http import HttpResponse;
+
+#Create your views here...
+def f1(request): 
+	return HttpResponse("<h2>Good Morning User..!! Have a Nice day...</h2><hr/>");
+
+def f2(request): 
+	return HttpResponse("<h2>Good Afternoon User..!! Hope you are doing good...</h2><hr/>");
+
+def f3(request): 
+	return HttpResponse("<h2>Good Evening User..!! How was ur day...</h2><hr/>"); 
+
+
+=>>
+iii) Add your URL-patterns
+"urls.py" (FirstProject-conf-folder)
+-----------
+from django.contrib import admin
+from django.urls import path	#old
+from django.conf.urls import url;	#new
+from FirstApp import views;
+from MultiViewsApp import views as v1;	##new-App views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+	#url(r'^welcome/',views.display) #old-method
+	path('welcome/',views.display),
+	
+	#MultiViewsApp as v1(alias to views.py)
+	path('mrng/',v1.f1),
+	path('aftr/',v1.f2),
+	path('evng/',v1.f3)
+]; 
+
+=*** Here views.py is there in FirstApp and also MultiViewsApp
+(Hence for MultiViewsApp, we use v1 as alias in import-stmt)
+
+iv)
+=> Start the DJango-Server from (FirstProject-folder)::-
+= Start the server & send the request from Browser URL
+cmd\FirstProject> py manage.py runserver
+= "http://127.0.0.1:8000/mrng"	(calls f1())
+= "http://127.0.0.1:8000/aftr"	(calls f2())
+= "http://127.0.0.1:8000/evng"	(calls f3())
+
+
+-------------------------------------------------------------------- 
+(***)
+===>>> Single project with multiple applications::- 
+i)
+=> Create your Application1, (App1)
+**= The following is the command to create own-application(app)
+cmd\FirstProject>python manage.py startapp App1
+(goto project-folder & give the above command)
+=** Register your "App1" in "settings.py" of Project-conf-Folder
+
+Ex:-
+"views.py" (App1)
+-----------
+from django.shortcuts import render;
+from django.http import HttpResponse;
+
+#Create your views here...
+def f11(request): 
+	return HttpResponse("<h2>Hello, Good Morning User..!! Have a Nice day...</h2><hr/>");
+	
+ii)	
+=> Create your Application2, (App2)
+**= The following is the command to create own-application(app)
+cmd\FirstProject>python manage.py startapp App2
+(goto project-folder & give the above command)
+=** Register your "App2" in "settings.py" of Project-conf-Folder
+
+Ex:-
+"views.py" (App2)
+-----------
+from django.shortcuts import render;
+from django.http import HttpResponse;
+import datetime;
+
+#Create your views here...
+def f22(request): 
+	time = datetime.datetime.now();
+	msg = "<h2>Hello User..!!<br /><br />Server Date & Time :: "+str(time)+"</h2><hr/>"
+	return HttpResponse(msg);	
+
+=> now() function belongs to datetime-class in datetime-module, it gives current system date & time
+=> str(time) converts time-var into string & sent as html-repsonse-data
+
+
+iii) Add your URL-patterns (both views from App1 & App2)
+= Generally, we have only 1 views.py in all the Applications, hence we use below approach 1&2
+
+"urls.py" (FirstProject-folder)
+-----------
+from django.contrib import admin
+
+from django.urls import path	#old
+from django.conf.urls import url;	#new
+
+from FirstApp import views;
+from MultiViewsApp import views as v1;
+
+#from App1 import views;
+#from App2 import views;
+#approach1
+from App1.views import f11;
+from App2.views import f22;
+#approach2
+from App1 import views as v11;
+from App2 import views as v22;
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+	
+	#firstApp
+	#url(r'^welcome/',views.display) #old-method
+	path('welcome/',views.display),
+	
+	#multiViewsApp
+	path('mrng/',v1.f1),
+	path('aftr/',v1.f2),
+	path('even/',v1.f3),
+	
+	#approach1
+	path('hello/',f11),
+	path('datetime/',f22),
+	
+	#approach2
+	path('hello1/',v11.f11),
+	path('datetime1/',v22.f22)
+	
+];
+
+
+
+iv)
+=> Start the DJango-Server from (FirstProject-folder)::-
+= Start the server & send the request from Browser URL
+cmd\FirstProject> py manage.py runserver
+#approach1
+= "http://127.0.0.1:8000/hello"	(calls f11())
+= "http://127.0.0.1:8000/datetime"	(calls f22())
+#approach2
+= "http://127.0.0.1:8000/hello1"	(calls f11())
+= "http://127.0.0.1:8000/datetime1"	(calls f22())
+
+
+-------------------------------------------------------

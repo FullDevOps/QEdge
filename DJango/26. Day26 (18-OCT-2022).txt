@@ -1,0 +1,832 @@
+================================================================
+==> Temporary-Cookies Vs Permanent-Cookies::-
+= If we are not setting any max_age(property) for a cookie-obj, then the cookies will be stored in browser cache. Once we closed browser automatically cookies will be expired. Such type of cookies are called temporary cookies
+= We can set temporary cookie as follows,
+Ex:-
+	response.set_cookie(name,value);
+= If we are setting max_age(i/p-para/property) for the cookie, then cookies will be stored in local file-system of client till that time permanently
+= Once the specified max_age expires then only cookies will be expired
+= Such type of cookies are called permanent or persistent cookies
+= We can set permanent cookies as follows
+Ex:-
+	response.set_cookie(name,value,max_age=180)
+	response.set_cookie(name,value,180)
+(The time-unit for max_age is in seconds)
+
+NOTE:-
+= Demo previous examples with  temp-cookie & permanent-cookie concepts
+(also used in next-examples)
+##Application-3 (name,age,pname)
+Ex:-
+views.py(make below changes)
+-------------------------------
+def age_view(request):
+	...
+    response.set_cookie('name',name,120)
+	...
+
+def parent_view(request):
+    ...
+    response.set_cookie('age',age,120)
+    ...
+
+def result1_view(request):
+    ....
+    response.set_cookie('pname',pname,120)
+    ....
+
+NOTE:-
+= Dont perform any request activity on app for 120-sec(2-min) then name,age,pname cookies are expired after 2-mins & we get error...
+
+=*** finally re-run server & request below url
+http://localhost:8000/name_view/
+
+
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+##Application-4(cookies) 
+##Session Management by using Cookies
+##(Shopping cart Application)
+Ex:-
+views.py (MyApps1 main-folder)
+---------------------------------------------
+##Application-4
+from django .shortcuts import render
+from MyApps1.forms import ItemAddForm
+#Create your views here.
+def index1(request):
+    return render(request,'MyApps1/home1.html')
+
+def additem_view(request):
+    formobj = ItemAddForm()
+    response=render(request,'MyApps1/additem.html',{'formobj':formobj})
+    if request.method=='POST':
+        formobj=ItemAddForm(request.POST)
+        if formobj.is_valid():
+            name=formobj.cleaned_data['name']
+            quantity=formobj.cleaned_data['quantity']
+            print(name,quantity);
+            response.set_cookie(name,quantity,180) #cookie-age is 180-sec or 3-minutes only
+            #return index(request);
+    return response
+
+def displayitem_view(request):
+    return render(request,'MyApps1/showitems.html');
+
+
+Ex:- 
+forms.py (MyApps1 main-folder)
+-------------------------------------
+#application-4
+from django import forms;
+
+class ItemAddForm(forms.Form):
+	name=forms.CharField();
+	quantity=forms.IntegerField();
+
+
+
+Ex:- 
+home1.html (templates/MyApps1 folder)
+-------------------------------------------
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+    <meta charset="utf-8">
+    <title>DJango-Cookies App-4</title>
+    </head>
+    <body>
+        <div align='center'>
+            <div>
+                <h1>DJango-Cookies App-4(SHOPPING-APP Menu)</h1>
+                <hr />
+                <a href="/additem/">ADD-ITEMS</a> |
+                <a href="/displayitems/">Display-ITEMS</a>
+            </div>
+        </div>
+    </body>
+</html>
+
+
+
+Ex:- 
+additem.html (templates/MyApps1 folder)
+-------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango-Cookies App-4</title>
+    </head>
+    <body>
+        <div align='center'>
+            <h1>DJango-Cookies App-4(Add Item to Shopping-Cart)</h1>
+            <hr />
+            <form method="post">    <!--no action="" form is submitted to itself-->
+                {{formobj.as_p}}
+                {%csrf_token%}
+                <input type="submit" name="" value="Add-Item">
+            </form>
+            <br /><br /><br />
+            <a href="/displayitems/" role="button">Display-ITEMS</a>
+        </div>
+    </body>
+</html>
+
+
+Ex:- 
+showitems.html (templates/MyApps1 folder)
+-------------------------------------------
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango-Cookies App-4</title>
+    </head>
+    <body>
+        <h1>DJango-Cookies App-4(Show-All-Items in Cookie)</h1>
+        <hr />
+        {%if request.COOKIES %}
+            <table border=2 width="50%">
+                <thead>
+                    <th>Item-Name</th>
+                    <th>Quantity</th>
+                </thead>
+                <tbody>
+                    {% for key,value in request.COOKIES.items %}
+                        <tr>
+                            <td>{{key}}</td>
+                            <td>{{value}}</td>
+                        </tr>
+                    {%endfor%}
+                </tbody>
+            </table>
+        {%else%}
+            <p>Shopping-Cart-Items(Cookie Info) not-available!!</p>
+            <a href="/additem/">ADD-ITEMS</a>
+        {%endif%}
+        <br /><br />
+        <a href="/additem/">ADD-MORE-ITEMS</a>
+    </body>
+</html>
+
+NOTE:-
+= In cookie-obj-dict, 1st key,value pair in cookie-obj dictionary is always csrftoken(key) & its corresponding value(unique-token) for client-request
+
+
+**Note::-
+= Before executing this program compulsory we should perform migrate(operation/operation using below command)
+Steps:- (1 & 2 NReq)
+(NReq)1) cmd\SessionsProject> python manage.py makemigrations
+(NReq)2) cmd\SessionsProject> python manage.py sqlmigrate MyApps1 0001 
+3) cmd\SessionsProject> python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  No migrations to apply.
+
+Ex:-
+==> urls.py (SessionsProject main-folder)
+--------------------------------------------
+from MyApps1 import views
+
+urlpatterns = [
+	.......
+	.......
+	#application-4
+    path('home1/',views.index1),
+    path('additem/',views.additem_view),
+    path('displayitems/',views.displayitem_view),
+]
+
+
+==> Finally, run-server & request below URLs
+http://localhost:8000/home1/
+(and follow given links/buttons...)
+
+
+
+
+
+
+================================================================================================
+*****(New-Topic)*****
+----------------------------------------------------------------------
+***2nd-way of Sessions***
+----------------------------
+==>Session Management by using Session API
+##(Django Session Framework)::-
+***New Concept/Topic after cookies***
+==Diagram==
+[client]------req1------>{server}------(session-obj)
+		<--resp1+sessionid--
+		---req2+sessionid--> 
+		....
+		....
+		so-on
+=> Points to Remember:-		
+= Once client sends request to the server to the server, if server wants to remember client information for the future purpose then server will create session-object and store required information in that object
+= For every session object, a unique identifier available which is nothing but session-id
+= Server sends the corresponding session-id to the client as the part of response. Client retrieves the session-id from the response and save in the local file system. With every consecutive request client will use that session id
+= By accessing that session-id and corresponding session-object server can remember client uniquely. This mechanism is nothing but session management by using "Session-Api"
+
+=>Note::-
+= Session information will be stored on Server in one of following possibilities(3-ways)
+1. Inside a file
+2. Inside a database (django-uses this approach)
+3. Inside cache
+=** The most straight forward approach is to use django.contrib.sessions lib/module in our application to store session information in a Django-Model/database
+(auto-process)
+
+= Such Model class Name is: "django.contrib.sessions.models.Session"
+(***)
+=>Note: To use this approach compulsory the following application should be configured inside INSTALLED_APPS list[] variable of settings.py file
+= if it is not there then we can add, but we have to synchronize database,
+cmd> python manage.py syncdb
+(or)
+cmd> py manage.py syncdb
+
+=>Note::- (already available automatically & done(syncdb) by Django server)
+INSTALLED_APPS=[
+....
+'django.contrib.session',
+....
+]
+
+=*** also verify sessions entry in MIDDLEWARE=[] list-var
+(auto-done)
+MIDDLEWARE=[
+...
+'django.contrib.sessions.middleware.SessionMiddleware',
+....
+]
+	
+(Now)
+==>Session-API, Useful Methods for Session Management::-
+(session-obj is also a dict-var(K:V))
+1) request.session['key']=value
+(To Add Data to the Session-obj as dictionary(key:value) pair)
+
+2) value=request.session['key']
+(To get Data from the Session-obj as dictionary(key:value) pair)
+
+3) request.session.set_expiry(seconds)
+(Set the expiry TIME for the Session)****
+
+4) request.session.get_expiry_age()
+Returns the expiry age in SECONDS
+(the number of seconds until this session expires)
+
+5) request.session.get_expiry_date()
+Returns the DATE on which this session will expired
+
+**Note: Before using session object in our application, compulsory we have to migrate-cmd
+Otherwise we will get the following error.
+no such table:django_session
+Ex:-
+**Note::-
+= Before executing this program compulsory we should perform migrate(operation/operation using below command)
+Steps:- (1 & 2 NReq)
+(NReq)1) cmd\SessionsProject> python manage.py makemigrations
+(NReq)2) cmd\SessionsProject> python manage.py sqlmigrate MyApps1 0001 
+3) cmd\SessionsProject> python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+
+
+
+---------------------------------------------------
+##Session-Application-1 
+##Session Management by using Session-API
+##(PageCount-Application)
+[Create new-project(SessionProject2) & new-app(MyApps1)]
+
+Ex:-
+=>views.py (MyApps1 main-folder)
+---------------------------------------
+from django.shortcuts import render
+# Create your views here.
+#Session-Application-1
+def page_count_view(request):
+    count=request.session.get('count',0)
+    newcount=count+1
+    request.session['count']=newcount
+    print(request.session.get_expiry_age())	#check in server-console
+    print(request.session.get_expiry_date())
+    return render(request,'MyApps1/pagecount.html',{'count':newcount})
+
+Ex:-
+=>pagecount.html (templates/MyApps1 folder)
+---------------------------------------------------
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango-Sessions App-1</title>
+        <style>
+            span{
+                font-size:35px;
+                color:green;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>DJango-Sessions App-1(Page-Count)</h1>
+        <hr />
+        <h3>The Page Count/View : <span>{{count}}</span></h3>
+    </body>
+</html>
+
+
+Ex:-
+==> urls.py (SessionsProject2 main-folder)
+--------------------------------------------
+from MyApps1 import views
+
+urlpatterns = [
+	.......
+	.......
+	#session-application-1
+    path('pagecount/', views.page_count_view),
+
+]
+
+
+==> Finally, run-server & request below URLs
+http://localhost:8000/pagecount/
+(and follow given links/buttons...)
+=** Also check above link request from different-systems & also diff-browsers in different-sys or same-sys
+
+===*** 14-days(1209600 sec)is default-age is session-obj on server in django_session(Table)
+(optionally check your migrate-cmd ouptput in SqLite3-db(default) in admin-interface http://localhost:8000/admin/ with superuser(create))
+
+
+*****(Start-Here)*****
+----------------------------------------------------------
+##Session-Application-2 
+(Session Management by using Session API)
+##(Person-Profile Application)
+Ex:-
+=>forms.py (MyApps1 main-folder)
+-------------------------------------
+from django import forms
+class NameForm(forms.Form):
+    name=forms.CharField()
+
+class AgeForm(forms.Form):
+    age=forms.IntegerField()
+
+class ParentForm(forms.Form):    #Parent-Form
+    pname=forms.CharField()
+
+
+
+Ex:-
+=>views.py (MyApps1 main-folder)
+-------------------------------------
+#session-Application-2
+from django.shortcuts import render
+from MyApps1.forms import *
+#Create your views here.
+def name_view(request):
+    formobj1=NameForm();
+    return render(request,'MyApps1/name2.html',{'formobj1':formobj1})
+
+def age_view(request):
+    name=request.GET['name']
+    request.session['name']=name
+    formobj2=AgeForm();
+    return render(request,'MyApps1/age2.html',{'formobj2':formobj2})
+
+def parent_view(request):
+    age=request.GET['age']
+    request.session['age']=age
+    formobj3=ParentForm()
+    return render(request,'MyApps1/parent2.html',{'formobj3':formobj3})
+
+def result_view(request):
+    pname=request.GET['pname']
+    request.session['pname']=pname
+    return render(request,'MyApps1/results.html');
+
+Ex:-
+=>name2.html (templates/MyApps1 main-folder)
+----------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango-Session App-2</title>
+    </head>
+    <body>
+        <h1>DJango-Session App-2(Person-Profile)</h1>
+        <hr />
+        <h2>Name-Registration-Form</h2>
+        <form action="/age">
+            {{formobj1}}
+            {%csrf_token%}<br /><br />
+            <input type="submit" name="" value="Submit-Name">
+        </form>
+    </body>
+</html>
+
+
+Ex:-
+=>age2.html (templates/MyApps1 main-folder)
+----------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango-Session App-2</title>
+    </head>
+    <body>
+        <h1>DJango-Session App-2(Person-Profile)</h1>
+        <hr />
+        <h2>Age-Registration-Form</h2>
+        <form action="/parent">
+            {{formobj2}}
+            {%csrf_token%}<br /><br />
+            <input type="submit" name="" value="Submit-AGE">
+        </form>
+    </body>
+</html>
+
+
+
+Ex:-
+=>parent2.html (templates/MyApps1 main-folder)
+----------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango-Session App-2</title>
+    </head>
+    <body>
+        <h1>DJango-Session App-2(Person-Profile)</h1>
+        <hr />
+        <h2>Parent-Registration-Form</h2>
+        <form action="/results">
+            {{formobj3}}
+            {%csrf_token%}<br /><br />
+            <input type="submit" name="" value="Submit-Parent-Name">
+        </form>
+    </body>
+</html>
+
+
+Ex:-
+=>results.html (templates/MyApps1 main-folder)
+----------------------------------------------
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango-Session App-2</title>
+    </head>
+    <body>
+        <h1>DJango-Session App-2(Person-Profile)</h1>
+        <hr />
+        {%if request.session %}
+            <h2>Thanks for providing Information..Plz confirm it??</h2>
+            <ul>
+                {%for key,value in request.session.items %}
+                    <li><h4>{{key|upper}} ::::: {{value|title}}</h4></li>
+                {%endfor%}
+            </ul>
+        {%else%}
+            <p>No Information available with us anymore!!!</p><br />
+            <a href="/name/">Click-Here to Submit Your Information</a>
+        {%endif%}
+    </body>
+</html>
+
+
+**Note: Before using session object in our application, compulsory we have to migrate.
+Otherwise we will get the following error.
+no such table:django_session
+Ex:-
+**Note::-
+= Before executing this program compulsory we should perform migrate(operation/operation using below command)
+Steps:- (1 & 2 NReq)
+(NReq)1) cmd\SessionsProject> python manage.py makemigrations
+(NReq)2) cmd\SessionsProject> python manage.py sqlmigrate MyApps1 0001 
+3) cmd\SessionsProject> python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  No migrations to apply.
+
+
+Ex:-
+==> urls.py (SessionsProject2 main-folder)
+--------------------------------------------
+from MyApps1 import views
+
+urlpatterns = [
+	.......
+	.......
+	#Session-Application-2
+    path('name/', views.name_view),
+    path('age/', views.age_view),
+    path('parent/', views.parent_view),
+    path('results/', views.result_view),
+
+]
+
+
+==> Finally, run-server & request below URLs
+http://localhost:8000/name/
+(and follow given links/buttons...)
+=** Also check above link request from different-systems & also diff-browsers in different-systems or same-systems
+
+
+
+
+
+-----------------------------------------------------------
+##Session-Application-3  
+##Session Management by using Session API
+##(Shopping Cart Application)
+[use-SessionProject2 & MyApps1]
+
+Ex:- (N-Req) go with SQLite3 DB-only
+==>settings.py (project main-folder)
+--------------------------------------------
+DATABASES={
+	'default':{
+		'ENGINE':'django.db.backends.mysql',
+		'NAME':'employeedb',
+		'USER':'root',
+		'PASSWORD':'root'
+	}
+}
+
+
+Ex:-
+=>forms.py (MyApps1-folder)
+---------------------------------------------
+from django import forms
+class AddItemForm(forms.Form):
+    name=forms.CharField();
+    quantity=forms.IntegerField();
+	
+	
+Ex:-	
+=>views.py (MyApps1-folder)
+----------------------------------------------
+#session-Application-3
+from django .shortcuts import render
+from MyApps1.forms import *
+#Create your views here.
+def add_item_view(request):
+    formobj=AddItemForm()
+    if request.method=='POST':
+        name=request.POST['name']
+        quantity=request.POST['quantity']
+        request.session[name]=quantity
+		request.session.set_expiry(30)
+        #request.session.set_expiry(0)       #expires when browser is closed...
+    return render(request,'MyApps1/additem2.html',{'formobj':formobj})
+
+def display_items_view(request):
+    return render(request,'MyApps1/displayitems.html')
+
+
+
+Ex:-
+=>additem2.html (templates/MyApps1 folder)
+----------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango-Session App-3</title>
+    </head>
+    <body>
+        <h1>DJango-Session App-3(Shopping-App)</h1>
+        <hr />
+        <div>
+            <h2>Add-Item Form</h2>
+            <form method="post">
+                {{formobj.as_p}}
+                {%csrf_token%}
+                <input type="submit" name="" value="Add-Item" />
+            </form>
+            <br /><br /><br />
+            <a href="/display/">Display-ITEMS</a>
+        </div>
+    </body>
+</html>
+
+
+Ex:-
+=>displayitems.html (templates/MyApps1 folder)
+----------------------------------------------
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango-Session App-3</title>
+    </head>
+    <body>
+        <h1>DJango-Session App-3(Shopping-App)</h1>
+        <hr />
+        <h2>Your Shopping Cart items are ::-</h2>
+        {%if request.session %}
+            <table border=2 width="">
+                <thead>
+                    <th>Item-Name</th>
+                    <th>Quantity</th>
+                </thead>
+                <tbody>
+                    {%for key,value in request.session.items%}
+                    <tr>
+                        <td>{{key|upper}}</td>
+                        <td>{{value}}</td>
+                    </tr>
+                    {%endfor%}
+                </tbody>
+            </table> <br /><br />
+            <a href="/additem2/">Click-Here to Add-More-items</a>
+        {%else%}
+            <p>No Items in your shopping cart</p> <br /><br />
+            <a href="/additem2/">Click-Here to Add-items...</a>
+        {%endif%}
+    </body>
+</html>
+
+
+
+**Note: Before using session object in our application, compulsory we have to migrate.
+Otherwise we will get the following error.
+no such table:django_session
+Ex:-
+**Note::-
+= Before executing this program compulsory we should perform migrate(operation/operation using below command)
+Steps:- (1 & 2 NReq)
+(NReq)1) cmd\SessionsProject> python manage.py makemigrations
+(NReq)2) cmd\SessionsProject> python manage.py sqlmigrate MyApps1 0001 
+3) cmd\SessionsProject> python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  No migrations to apply.
+
+
+Ex:-
+==> urls.py (SessionsProject2 main-folder)
+--------------------------------------------
+from MyApps1 import views
+
+urlpatterns = [
+	.......
+	.......
+	#Application-3
+	path('additem2/', views.add_item_view),
+    path('display/', views.display_items_view),
+
+]
+
+
+==> Finally, run-server & request below URLs
+http://localhost:8000/additem2/
+(and follow given links/buttons...)
+=** Also check above link request from different-systems & also diff-browsers in different-systems or same-systems
+
+
+***(IMP-Points)***
+=>Note:-
+= The default max_age of the session is 14 days. But based on our requirement we can set our own expiry time
+Ex:-
+	request.session.set_expiry(time-in-seconds)
+
+==>Important Methods related to Session:
+1) set_expiry(time in seconds)
+= If we are not performing any operation on the session specified amount of time (max inactive interval) than session will be expired automatically
+Ex:-
+	request.session.set_expiry(120)
+= If we set 0 as argument,then the session will expire once we closed browser
+Ex:-
+	request.session.set_expiry(0)
+
+2) get_expiry_age()
+3) get_expiry_date()
+
+=>Note:  
+= We can observer that 0 value and 120 values are perfectly working
+in our application
+Ex:-
+	if request.method=='POST':
+		name=request.POST['name']   #getting data from submitted-form
+		quantity=request.POST['quantity']
+		request.session[name]=quantity
+		request.session.set_expiry(0)
+Ex:-
+def display_items_view(request):
+    print(request.session.get_expiry_age())
+    print(request.session.get_expiry_date())
+    return render(request,'MyApps1/displayitems.html')			
+
+Now,
+==> How Delete Session Data:-
+Ex:-
+	del request.session[session-key]
+	del request.session['mobile']
+	del request.session['keyboard']
+Ex:-
+	for key in request.session.keys():
+		del request.session[key]		##all items will be deleted
+
+
+==> Implement above-code(do-small-changes)::-
+Now, modify below-code....
+==>In settings.py File
+Ex:-
+	SESSION_SAVE_ENTRY_REQUEST=True  #modification of session-obj-data
+(OR)
+==>In views.py,
+	request.session.modified=True
+
+Ex:-(views.py)
+------------------
+def clear_session(request):
+    #request.session.modified=True
+    #for key in request.session.keys():
+        #del request.session[key]  ##all items will be deleted from session-obj(dict)
+    if request.session:
+        del request.session;
+    return render(request,'MyApps1/displayitems.html')
+
+Ex:- (urls.py)
+------------------
+	path('clear/', views.clear_session),
+	
+Ex:- (displayitems.html)
+----------------------------
+ </table> <br /><br />
+            <a href="/additem2">Click-Here to Add-More-items</a>
+            <br /><br />
+            <a href="/clear/">Click-Here to Clear all-items(from Session)...</a>
+        {%else%}
+	
+==> Finally re-run server and verify clear_session views &url
+http://localhost:8000/additem2/
+
+
+
+(***)
+Finally,
+==>Browser Length Session and Persistant Sessions:-
+= If the session information stored inside browsers cache such type of session are called browser length session
+= If the session information stored persistently inside file/database/cache, such type of session are called persistent sessions.
+=>Note:  
+By default sessions are persistent sessions(permanent) 14days
+
+
+******************End of Session-Management topic********************
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

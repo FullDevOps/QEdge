@@ -1,0 +1,441 @@
+*****Django ORM*****
+---------------------------
+==>Django ORM:
+ORM → Object Relation Mapping
+= ORM means Object Relation Mapping
+= Here object means Django-Model-class object
+= Relation means communication b/w Django-application to DBase
+= Mapping means flow of data from Django-app to Dbase
+
+***In general we can retrive data from the database by using the following approach,
+Ex:-
+	employee_list = Employee.objects.all()
+	student_list = Student.objects.all()
+(Employee, Student are model-classes in our DJango-apps)	
+(objects means records)
+(all() means all-columns in records from DB-table)
+
+NOTE:-
+	***The return type of all() method is QuerySet. coll.
+Ex:-
+	qs=Employee.objects.all()
+print(type(qs)) # <class 'django.db.models.query.QuerySet'>
+
+
+Now,
+==> Getting 1-particualar record::-(get())
+***If we want to get only one record then we can use get() method.
+Ex:-
+	emp = Employee.objects.get(id=1)
+	emp = Employee.objects.get(eno=1122)
+	emp = Employee.objects.get(ename='Sai')
+	print(type(emp)) #<class 'MyApps1.models.Employee'>
+Here,
+***The return type of get() method is Employee Object.
+
+
+==> Working Examples::-
+(acutal use is done in views.py)
+***(Terminal-Activity)***
+
+==>Case-1: How to find Dbase-Query associated with QuerySet/Employee-rec
+cmd> py manage.py shell
+>>> from MyApps1.models import Employee;
+Ex:-
+>>> qs = Employee.objects.all()			#query--->sql-cmd
+>>> print(qs)
+>>> print(type(qs))
+>>> print(qs.query)
+	
+>>> emp = Employee.objects.get(id=1)
+print(emp)
+print(type(emp))
+print(emp.id)
+print(emp.eno)
+print(emp.ename)
+print(emp.esal)
+print(emp.eaddr)
+print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+>>> emp = Employee.objects.get(ename='Tom')
+print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+
+==>Case-2: How to Filter Records based on some Condition
+Ex:-
+	>>> emps = Employee.objects.filter(esal__gt=15000)
+	print(emps.query)
+	
+	print(emps[0])
+print(emps[0].id,emps[0].eno,emps[0].ename,emps[0].esal,emps[0].eaddr)
+
+	print(emps[1])
+print(emps[1].id,emps[1].eno,emps[1].ename,emps[1].esal,emps[1].eaddr)
+
+	print(emps[2])
+print(emps[2].id,emps[2].eno,emps[2].ename,emps[2].esal,emps[2].eaddr)
+
+Ex:-	
+	emps = Employee.objects.filter(esal__lt=10000)
+	print(emps.query)
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+NOTE:-	
+=** It returns all employees whose salary greater than 15000 & less-than 10000
+
+Ex:-(another)
+=** It returns all employees whose salary greater-than or equal to 15000
+	emps = Employee.objects.filter(esal__gte=15000)
+	>>> emps
+	<QuerySet []>
+	>>> len(emps)
+	8
+	
+Ex:-	
+	emps = Employee.objects.filter(esal__lte=10000)
+	>>> emps
+	<QuerySet []>
+	>>> len(emps)
+	4
+=** It returns all employees whose salary less-than or equal to 15000
+(Similarly we can use __lt and__lte)			#double __ underscore
+(Similarly we can use __lt and__gte)
+
+
+***Other-Examples***
+--------------------
+==>Various possible Field(column) Lookups::-
+(Column-names/headings)
+1) __exact –> used for Exact Match
+Ex:-
+	emp=Employee.objects.get(id__exact=6)
+	print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+2) __iexact -> Case-insensitive exact Match (ignore the case)
+	emp = Employee.objects.get(ename__exact='Ramlala')
+	print(emp)
+	print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+	
+	emp = Employee.objects.get(ename__iexact='ramlala')
+	print(emp)
+	print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+
+mysql> describe myapps1_employee;	
+mysql> alter table myapps1_employee
+    -> modify column eaddr varchar(50) null;
+mysql> describe myapps1_employee;
+	
+mysql> insert into myapps1_employee
+    -> values(null,1155,'TOM',8600,null);	
+
+mysql> select * from myapps1_employee;
+
+(orm-code)	
+	emp = Employee.objects.get(eaddr__iexact=None)		#null in db
+	print(emp)
+	print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+	
+>>> emps = Employee.objects.filter(ename__iexact='Tom') 
+>>> print(emps) 
+>>> for emp in emps: 
+...     print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr) 
+...  
+>>>
+
+NOTe:-
+= for single-rec use get()
+= for mulitple-recs use filter() or all()
+	
+Note:-
+= The equivalent queries are:
+	SELECT * from myapps1_employee WHERE ename LIKE 'R%';  
+				#% ---> means 0 or more chars
+	SELECT * from myapps1_employee WHERE eaddr IS NULL;
+	SELECT * from myapps1_employee WHERE eaddr IS NOT NULL;
+(NULL in Django-ORM is None)
+(NOT NULL in Django-ORM is != None)	(__ne=None)
+
+3) __contains -> Case-sensitive Containment Test
+(R as contain in given column-data)
+Ex:-
+	emps = Employee.objects.filter(ename__contains='R')
+	print(emps);
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+NOTE:-
+	print(emps.query);
+(SQL equivalent:)
+	SELECT * from myapps1_employee WHERE ename LIKE '%R%';
+
+4) __icontains -> Case-insensitive Containment Test 
+(ignore-case match)
+(R/r as contain in given column-data)
+Ex:-
+	emps = Employee.objects.filter(ename__icontains='r')
+	print(emps);
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+5) __in (checks for given values from given collection in col-data)
+(In a given iterable-coll; Ex:- List, Tuple OR queryset we use __in)
+Ex:-
+	emps = Employee.objects.filter(id__in=[1, 3, 6])
+	print(emps);
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+Ex:-	
+	emps = Employee.objects.filter(eaddr__in=['Hyd','Hitech'])
+	#case insensitive
+	print(emps);
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+6) __gt
+(Greater than)
+Ex:-
+	emps = Employee.objects.filter(id__gt=10)
+	print(emps);
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+7) __gte
+(Greater than or equal to)
+Ex:-
+	emps = Employee.objects.filter(id__gte=10)
+	print(emps);
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+8) __lt
+(Less than)
+Ex:-
+	emps = Employee.objects.filter(id__lt=3)
+	print(emps);
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+9) __lte
+(Less than or equal to)
+Ex:-
+	emps = Employee.objects.filter(id__lte=3)
+	print(emps);
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+		
+10) __startswith
+(Case-sensitive starts-with)
+Ex:-
+	emps = Employee.objects.filter(eaddr__startswith='H')
+	emps = Employee.objects.filter(eaddr__startswith='h')
+	print(emps);
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+11) __istartswith
+(Case-insensitive starts-with)
+Ex:-
+	emps = Employee.objects.filter(eaddr__istartswith='h')
+	print(emps);
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+12) __endswith
+(Case-sensitive ends-with)
+Ex:-
+	emps = Employee.objects.filter(eaddr__endswith='d')
+	emps = Employee.objects.filter(eaddr__endswith='D')
+	print(emps);
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+13) __iendswith
+(Case-insensitive ends-with)
+Ex:-
+	emps = Employee.objects.filter(eaddr__iendswith='d')
+	emps = Employee.objects.filter(eaddr__iendswith='D')
+	print(emps);
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+14) __range
+(Range test (inclusive))
+mysql> select * from myapps1_employee
+    -> where esal between 4500 and 10900;
+Ex1:- (Nreq)
+	import datetime
+	start_date = datetime.date(2000, 1, 1)
+	end_date = datetime.date(2021, 12, 31)
+	Employee.objects.filter(dateofjoin__range=(start_date, end_date))
+
+Ex2:-
+mysql> select * from myapps1_employee
+    -> where esal between 4500 and 5500;
+	
+	emps = Employee.objects.filter(esal__range=(4500,10900))
+	print(emps);
+	for emp in emps:
+		print(emp.id,emp.eno,emp.ename,emp.esal,emp.eaddr)
+
+***Note: There are several other field lookups are possible. (Documentation)
+https://docs.djangoproject.com/en/2.1/ref/models/querysets/#id4
+
+15)*** only()
+(only with given columns)
+Ex:-
+	emps = Employee.objects.only("ename","esal");
+	print(emps);
+	for emp in emps:
+		print(emp.ename,emp.esal)
+
+
+
+
+==>>Case-3: How to implement OR Queries in Django ORM
+(2-ways are available)
+(if any Query is True then True o.w False)
+	1) queryset_1 | queryset_2
+	2) filter(Q(condition1) | Q(condition2))
+		
+Ex1:- To get all employees whose name starts with 'R' OR salary < 4500
+	emps = Employee.objects.filter(ename__startswith='R') | Employee.objects.filter(esal__lte=4500)
+	print(emps);
+	for emp in emps:
+		print(emp.ename,emp.esal)
+
+Ex2:-
+	from django.db.models import Q
+	emps= Employee.objects.filter(Q(ename__startswith='R') | Q(esal__lte=4500));
+	print(emps);
+	for emp in emps:
+		print(emp.ename,emp.esal)
+
+
+==>Case-4: How to implement AND Queries in Django ORM
+(if all Queries is True then only True o.w False)
+(3-ways are there)
+	1) filter(condition1, condition2)
+	2) queryset_1 & queryset_2
+	3) filter(Q(condition_1)&Q(condition_2))
+					
+**Ex:- To get all employees whose name startswith 'R' AND salary < 5500
+1) 	emps=Employee.objects.filter(ename__startswith='R',esal__lte=5500)
+	print(emps);
+	for emp in emps:
+		print(emp.ename,emp.esal)
+
+2) 
+	emps= Employee.objects.filter(ename__startswith='R') & Employee.objects.filter(esal__lte=20000)
+	print(emps);
+	for emp in emps:
+		print(emp.ename,emp.esal)
+		
+3)
+	from django.db.models import Q
+	emps= Employee.objects.filter(Q(ename__startswith='R') & Q(esal__lte=20000))
+	print(emps);
+	for emp in emps:
+		print(emp.ename,emp.esal)
+
+
+==>Case-5: How to implement NOT Queries in Django ORM
+(2-ways)
+(True is False and False is True)
+	1) exclude(condition)
+	2) filter(~Q(condition))
+					
+Ex:-
+(To select all employees whose name not starts with 'R')
+	emps= Employee.objects.exclude(ename__startswith='R')
+	print(emps);
+	for emp in emps:
+		print(emp.ename,emp.esal)
+
+	from django.db.models import Q
+	emps= Employee.objects.filter(~Q(ename__startswith='R'))
+	print(emps);
+	for emp in emps:
+		print(emp.ename,emp.esal)
+
+
+==>Case-6: 
+= How to perform Union Operation for Query Sets of the Same OR different Models(db-tables)
+(By using union-operation, we can combine results of 2 or more query-sets)
+Ex:-
+	q1=Employee.objects.filter(esal__lte=5500)
+	q2=Employee.objects.filter(ename__endswith='m')
+	q3=q1.union(q2)
+	print(q3)
+	for emp in q3:
+		print(emp.ename,emp.esal)
+
+=>Note: The union operator can be performed only with the only querysets having the same fields(Cols) and data types. Otherwise we will get error saying
+django.db.utils.OperationalError: SELECTs to the left and right of UNION do not have the same number of result columns
+
+**However, We can perform union operation on common columns from diff-query-sets
+Ex:- 	
+	Student(name, mailid, aadharnumber, marks)
+    Teacher(name, mailid, aadharnumber, subject, salary)
+Now,	   
+q1 = Student.objects.all().values_list('name','mailid','aadharnumber')
+q2 = Teacher.objects.all().values_list('name','mailid', 'aadharnumber')
+q3 = q1.union(q2)
+
+#values_list() is used to specify given-columns...
+
+
+==>Case-7: 
+How to select only some columns in the queryset
+(3-Ways)
+1) By using values_list() function,
+Ex:-
+q1 = Employee.objects.all().values_list('ename','esal')
+print(q1)
+for emp in q1:
+	print(emp)
+
+=** here we directly get list-of-tuples as result	
+	
+
+2) By using values() function,
+Ex:-
+q1 = Employee.objects.all().values('ename','esal')
+print(q1)
+for emp in q1:
+	print(emp)
+
+=** here we directly get list-of-dict as result	
+
+3) By using only() function,
+Ex:-
+q1 = Employee.objects.all().only('ename','esal');
+print(q1)
+for emp in q1:
+	print(emp.ename,emp.esal)
+	
+=** here we directly get queryset with objs as result		
+	
+
+=>Note:-
+(Difference between values() and only() Methods)
+= In the case of values() only specified columns will be selected. 
+= But in the case of only() in addition to specified columns, we get them as objects
+
+
+==>Case-8: Aggregate Functions (use with aggregate(function-name))
+= Django ORM defines several functions to perform aggregate operations.
+Avg(), Max(), Min(), Sum(), Count() etc...
+(from django.db.models.functions use above functions)
+
+***mysql-cmds for practice***
+------------------------------
+mysql> select sum(esal) from myapps1_employee;
+mysql> select min(esal) from myapps1_employee;
+mysql> select max(esal) from myapps1_employee;
+mysql> select avg(esal) from myapps1_employee;
+mysql>
+
+
+
+
+

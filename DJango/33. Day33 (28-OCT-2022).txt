@@ -1,0 +1,419 @@
+(*****)
+==> DJANGO ORM Project::-
+Example-Project::-
+(Create new-project(DJORMProject) & new-app(MyApps1))
+----------------------------------------------------------
+Ex:-
+(create a new mysql-db(empormdb))
+mysql> create database empormdb;
+mysql> show databases;
+mysql> use empormdb;
+mysql> show tables;
+Empty set (0.02 sec)
+
+
+***Start-Coding***
+Ex:-
+=>views.py (MyApps1 main-folder)
+--------------------------------------------
+from django.shortcuts import render
+from django.db.models import Q
+from django.db.models import Avg, Sum, Max, Min, Count
+from MyApps1.models import Employee
+
+# Create your views here.
+def display_view(request):
+    avg1=Employee.objects.all().aggregate(Avg('sal'))
+    max=Employee.objects.all().aggregate(Max('sal'))
+    min=Employee.objects.all().aggregate(Min('sal'))
+    sum=Employee.objects.all().aggregate(Sum('sal'))
+    count=Employee.objects.all().aggregate(Count('sal'))
+    my_dict={'avg1':avg1,'max':max,'min':min,'sum':sum,'count':count}
+    return render(request,'MyApps1/aggregate.html',my_dict)
+
+
+Ex:-
+=>aggregate.html (templates/MyApps1 folder)
+-----------------------------------------------
+<!DOCTYPE html>
+{% extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h2>Employee-Table Aggregate Information</h2>
+    <ul>
+        <li>Average Salary : {{avg1}}</li>
+        <li>Average Salary : {{avg1.sal__avg}}</li>
+        <li>Max Salary : {{max}}</li>
+        <li>Max Salary : {{max.sal__max}}</li>
+        <li>Min Salary : {{min}}</li>
+        <li>Min Salary : {{min.sal__min}}</li>
+        <li>Total Salary : {{sum}}</li>
+        <li>Total Salary : {{sum.sal__sum}}</li>
+        <li>Number of employees : {{count}}</li>
+        <li>Number of employees : {{count.sal__count}}</li>
+    </ul>
+{%endblock%}
+
+
+Ex:-
+=>base.html (templates/MyApps1 folder)
+-----------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Base(DJ-ORM) HTML Page</title>
+</head>
+<body>
+    <h1>Django ORM Base HTML Page</h1>
+    <hr />
+    {% block body_block %}
+    {% endblock %}
+    <hr />
+    <h4>End of DJ-ORM Base HTML Page</h4>
+</body>
+</html>
+
+
+Ex:-
+models.py (MyApps1 main-folder)
+----------------------------------
+from django.db import models
+
+# Create your models here.
+class Employee(models.Model):
+    empno=models.IntegerField();
+    ename=models.CharField(max_length=50);
+    job=models.CharField(max_length=50);
+    sal=models.FloatField();
+    address=models.CharField(max_length=100);
+    def __str__(self):
+        return str(self.empno)+" "+self.ename+" "+str(self.sal)+" "+self.job+" "+self.address;
+
+		
+Ex:-
+admin.py (MyApps1 main-folder)
+----------------------------------
+from django.contrib import admin
+from MyApps1.models import Employee
+
+# Register your models here.
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ['empno','ename','job','sal','address'];
+
+#admin.site.register(Employee,EmployeeAdmin);
+admin.site.register(Employee);
+
+		
+		
+==>> Now, perform DB-configurations::-		
+Ex:-
+settings.py (DJORMProject conf-folder)
+------------------------------------------
+DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'PORT': '3302',		#3306 or 3308
+        'NAME': 'empormdb',
+        'USER': 'root',
+        'PASSWORD': 'root',
+    }
+}
+
+Ex:-
+=> Now, install mysqlclient
+cmd> pip install --only-binary :all: mysqlclient
+
+Ex:-
+=> Now makemigrations,
+cmd> py manage.py makemigrations
+Migrations for 'MyApps1':
+  MyApps1\migrations\0001_initial.py
+    - Create model Employee
+
+Ex:-
+=> Now perform sqlmigrate,
+cmd> py manage.py sqlmigrate MyApps1 0001
+
+Ex:-
+=> Now run migrate,
+cmd> py manage.py migrate
+
+Ex:-
+=> Finally, verify created-tables in mysql-db,
+mysql> show tables;
++----------------------------+
+| Tables_in_empormdb         |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
+| myapps1_employee           |
++----------------------------+
+11 rows in set (0.05 sec)
+
+
+Ex:-(**)
+=> now create a superuser
+cmd> py manage.py createsuperuser
+(uname-sai, pwd-sai)
+
+Ex:-
+=> Now start server & login to admin-interface,
+http://localhost:8000/admin/
+(login & perform insert/update/del of emp-records)
+
+**(insert)
+EMPNO	ENAME	JOB		SAL		ADDRESS
+1166	POP		HR		48000	Hitech
+1155	Tom		PROG	36000	Secbad
+1144	Ali		DEV		45000	Hyderabad
+1133	Ram		HR		56000	Secbad
+1122	Sai	Manager		65000	Hyderabad
+5 employees
+
+Ex:-
+=> also verify in mysql-db,
+mysql> select * from myapps1_employee;
++----+-------+-------+---------+-------+-----------+
+| id | empno | ename | job     | sal   | address   |
++----+-------+-------+---------+-------+-----------+
+|  1 |  1122 | Sai   | Manager | 65000 | Hyderabad |
+|  2 |  1133 | Ram   | HR      | 56000 | Secbad    |
+|  3 |  1144 | Ali   | DEV     | 45000 | Hyderabad |
+|  4 |  1155 | Tom   | PROG    | 36000 | Secbad    |
+|  5 |  1166 | POP   | HR      | 48000 | Hitech    |
++----+-------+-------+---------+-------+-----------+
+5 rows in set (0.01 sec)
+
+
+Ex:-
+urls.py (DJORMProject conf-folder)
+--------------------------------------
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('display/', views.display_view),
+]
+
+
+Ex:-
+==> Finally, re-start the server, and request below url
+http://localhost:8000/display/
+
+=** if required, used base.css in static/css folder
+
+
+
+==>>
+***Another DJ-ORM-Example***
+-----------------------
+===>Case-9: How to Create, Update, Delete Records
+(using terminal-tab(using shell) without views & templates...)
+cmd> py manage.py shell
+Ex1:-
+***How to Add/Insert Record
+------------------------------
+>>> from MyApps1.models import Employee
+>>> Employee.objects.all().count()
+5
+>>>emp1=Employee(empno=1177,ename='Krishna',job='DEV',sal=59000,address='Pune')
+>>> emp1.save();
+>>> Employee.objects.all().count()
+6
+>>>
+
+=>2nd alternate-Way:-
+>>>Employee.objects.create(empno=1188,ename='Shiva',job='PROG',sal=89000,address='Banglore')
+<Employee: 1188>
+>>> Employee.objects.create(empno=1199,ename='Arjun',job='MGR',sal=79000,address='VIZAG') 
+<Employee: 1199> 
+
+Ex:-
+=> (verify in admin-interface & also mysql-db)
+EMPNO 	ENAME	JOB		SAL		ADDRESS
+1199	Arjun	MGR		79000.0	VIZAG
+1188	Shiva	PROG	89000	Banglore
+1177	Krishna	DEV		59000	Pune
+1166	POP		HR		48000	Hitech
+1155	Tom		PROG	36000	Secbad
+1144	Ali		DEV		45000	Hyderabad
+1133	Ram		HR		56000	Secbad
+1122	Sai		Manager	65000	Hyderabad
+
+mysql> select * from myapps1_employee;
++----+-------+---------+---------+-------+-----------+
+| id | empno | ename   | job     | sal   | address   |
++----+-------+---------+---------+-------+-----------+
+|  1 |  1122 | Sai     | Manager | 65000 | Hyderabad |
+|  2 |  1133 | Ram     | HR      | 56000 | Secbad    |
+|  3 |  1144 | Ali     | DEV     | 45000 | Hyderabad |
+|  4 |  1155 | Tom     | PROG    | 36000 | Secbad    |
+|  5 |  1166 | Pop     | HR      | 48000 | Hitech    |
+|  6 |  1177 | Krishna | DEV     | 59000 | Pune      |
+|  7 |  1188 | Shiva   | PROG    | 89000 | Banglore  |
+|  8 |  1199 | Arjun   | MGR     | 79000 | VIZAG     |
++----+-------+---------+---------+-------+-----------+
+
+
+Now,
+===>How to Add/Insert Multiple Records at a Time:-
+(***By using bulk_create() method)
+Ex2:-
+
+>>> exit()
+cmd> py manage.py shell
+
+>>> from MyApps1.models import Employee 
+>>> Employee.objects.bulk_create([Employee(empno=1211,ename='Raj',job='HR',sal=49500,address='Pune'), 
+... Employee(empno=1222,ename='Bob',job='DEV',sal=29000,address='Secbad'), 
+... Employee(empno=1233,ename='Pavan',job='MGR',sal=69000,address='Hyd')]); 
+(**o/p)
+[<Employee: 1211 Raj 49500 HR Pune>, <Employee: 1222 Bob 29000 DEV Secbad>, <Employee: 1233 Pavan 69000 
+MGR Hyd>]
+
+Ex:-
+=> (verify in admin-interface & in mysql-db)
+EMPNO 	ENAME	JOB		SAL		ADDRESS
+1222	Pavan	MGR		69000	Hyd
+1211	Bob		DEV		29000	Secbad
+1199	Raj		HR		49500	Pune
+1188	Shiva	PROG	89000	Banglore
+1177	Krishna	DEV		59000	Pune
+1166	POP		HR		48000	Hitech
+1155	Tom		PROG	36000	Secbad
+1144	Ali		DEV		45000	Hyderabad
+1133	Ram		HR		56000	Secbad
+1122	Sai		Manager	65000	Hyderabad
+
+
+mysql> select * from myapps1_employee;
++----+-------+---------+---------+-------+-----------+
+| id | empno | ename   | job     | sal   | address   |
++----+-------+---------+---------+-------+-----------+
+|  1 |  1122 | Sai     | Manager | 65000 | Hyderabad |
+|  2 |  1133 | Ram     | HR      | 56000 | Secbad    |
+|  3 |  1144 | Ali     | DEV     | 45000 | Hyderabad |
+|  4 |  1155 | Tom     | PROG    | 36000 | Secbad    |
+|  5 |  1166 | POP     | HR      | 48000 | Hitech    |
+|  6 |  1177 | Krishna | DEV     | 59000 | Pune      |
+|  7 |  1188 | Shiva   | PROG    | 89000 | Banglore  |
+|  8 |  1199 | Raj     | HR      | 49500 | Pune      |
+|  9 |  1211 | Bob     | DEV     | 29000 | Secbad    |
+| 10 |  1222 | Pavan   | MGR     | 69000 | Hyd       |
++----+-------+---------+---------+-------+-----------+
+
+===>How to Delete a Single Record:
+>>> emp1=Employee.objects.get(empno=1155)
+>>> emp1.empno
+1155
+>>> emp1.ename
+'Tom'
+>>> emp1.job  
+'PROG'
+>>> emp1.sal
+'36000'
+>>> emp1.address
+'Secbad'
+
+==>how to delete a record???
+>>> emp1.delete()
+(1, {'MyApps1.Employee': 1})
+>>> 
+=> (verify in admin-interface & also mysql-db)
+(1155 will be deleted...)
+
+
+==>How to Delete Multiple Records::-
+Ex3:-
+>>> qs=Employee.objects.filter(sal__gte=66000)
+>>> qs.count()
+2
+>>> qs.delete()
+(2, {'MyApps1.Employee': 2})
+>>> 
+=> (verify in admin-interface & mysql-db)
+(1188,1222 will be deleted...)
+
+
+===>How to Update Field of a Particular Record:
+Ex5:-
+>>> from MyApps1.models import Employee
+>>> emp1=Employee.objects.get(empno=1122)
+>>> emp1.ename
+'Sai'
+>>> emp1.ename="SaiBaba"
+>>> emp1.save()
+>>> emp1.ename           
+'SaiBaba'
+>>>
+=> (verify in admin-interface & also mysql-db)
+(1122 ename is updated/modifed to "SaiBaba")
+
+
+==>> How to Order queryset in Sorting Order::-
+Ex6::-
+>>> emps = Employee.objects.all().order_by("empno") 
+>>> emps
+(All records will be arranged according to ascending order of eno
+Default sorting order is ascending order)
+
+=> For Descending order we have to use(-)
+>>> emps = Employee.objects.all().order_by("-empno") 
+>>> emps 
+
+=>(another-example)
+>>> emps = Employee.objects.all().order_by("-sal")[0]
+>>> emps
+<Employee: 1122>
+(Returns 1st-highest salary employee-object)
+
+=>(another-example)
+>>> emps = Employee.objects.all().order_by("-sal")[1] 
+>>> emps                                              
+<Employee: 1177>
+(Returns 2nd-highest salary employee-object)
+
+=>(another-example)
+>>> emps = Employee.objects.all().order_by("-sal")[0:3] 
+>>> emps                                                
+<QuerySet [<Employee: 1122>, <Employee: 1177>, <Employee: 1133>]>
+>>>
+(Returns list of top 3 highest salary employees info)
+
+=>But in the case of strings for alphabetical order:
+=>(another-example)
+>>> emps = Employee.objects.all().order_by("ename")    
+>>> emps = Employee.objects.all().order_by("-ename")    
+>>> emps   
+(In this case, case will be considered)
+
+=> If we want to ignore case then we should use Lower() Function
+=>(another-example)
+>>> from django.db.models.functions import Lower
+>>> emps = Employee.objects.all().order_by(Lower("ename"))
+>>> emps   
+
+
+==>How to Delete all Records
+(Truncate Operation in SQL):-
+Ex4:- ***(but dont do-it)***
+>>> Employee.objects.all().delete()
+
+
+
+

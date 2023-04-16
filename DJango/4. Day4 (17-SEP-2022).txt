@@ -1,0 +1,171 @@
+==>>> Django Framework Software Installation::-
+
+==> Pre-Requisites:-
+(Mininum System Requirements)
+a) Python software (3.0 or Later)
+b) Windows OS 7 or Later (8,8.1,10,11...etc)
+
+
+=> How to install DJango:-
+(STEPS)
+1) Make sure Python is already installed in our system 
+Ex:- (Type the command in prompt)
+(start--->type(cmd)---->select "Command-Prompt-App"
+(Windows-Command-Prompt is opened)
+	cmd> python --version 
+	cmd> py --version 
+	
+=**Optionally verify your windows-OS version
+(Rt.click on  This-PC(My-PC) ----> Select-Properties ----> Verify "Windows-Edition"
+(Windows 10 Home/Professional/Enterprise)
+
+2) Install django by using pip (command)
+(DJango will be downloaded directly from Python-Server-Repository & it will be installed or integrated with Python Software in our system)
+[**pip --->Python Installer for packages]
+Ex:-
+	cmd> pip install django 
+	(pip install django x.x.x version)
+
+cmd>pip install django  (ENTER)
+(latest-version is Django-4.1.1)
+(internet conn is compulsory)
+(django-framework is installed as module(lib) in python-software)
+
+3) Checking & Verifying DJango version,
+Ex:-
+cmd> py -m django --version 
+cmd> python -m django --version 
+(or)
+>>>(in py-interactive-mode)
+>>>help("modules")
+
+
+
+
+***(Working with First-Project & First-App in DJango)***
+-------------------------------------------------------------
+=>> Django Project vs Diango Appljcation:-
+------------------------------------------
+= A Django project is a collection of diff-Django-applications and  its configurations, this makes up a full-web-application
+Ex:- Bank-Project or Google-Project
+==Diagram==
+
+Ex:-
+= A Django-Application is responsible to perform a particular specific-task in our entire web application
+****Bank-Project****
+Ex:- Loan-App,
+	Registration-App,
+	Deposit-App,
+	Customer-App,
+	Withdraw-App.
+	Locker-App,
+	CreditCard-App,
+	DebitCard-App
+	etc 
+==Diagram==
+[Above-Apps + Configurations ==> Django-Project]
+
+
+NOTE:-
+1) 
+= DJango applications reusable apps
+i.e, they can be plugged into other projects-easily
+(Pluggable Django Applications) 
+2) 
+= Without DJango project there is no chance of DJango Application
+i.e, Before creating any DJango-App, 1st we are required to create DJango-Project
+(Compulsory create 1st Django-Project & then 2nd Django-apps)
+
+
+
+(****)First-Project in Django
+-------------------------------
+==>> How to create Django Project:-
+= Once we installed django in our system, we have to get 'django-admin' command-line tool, which can be used to create our Django-project
+
+Ex:-
+= To work with DJango-Project, we require our working-directory
+(F:\SAISIR\DJANGO> is our working-directory)
+[cmd> django-admin startproject FirstProject]
+django-admin --version
+Ex:-
+F:\SAISIR\DJANGO>django-admin startproject FirstProject 
+= The following project structure will be created 
+F:\SAISIR\DJANGO>
+	+-- FirstProject(proj-folder)
+		-> manage.py 
+		+-- FirstProject(pkg-Folder)
+			-> __init__.py
+			-> asgi.py
+			-> settings.py 
+			-> urls.py 
+			-> wsgi.py 
+		
+
+# 👇️ create virtual environment
+python -m venv venv
+
+# 👇️ activate on Windows (cmd.exe)
+venv\Scripts\activate.bat
+
+# 👇️ activate on Windows (PowerShell)
+venv\Scripts\Activate.ps1
+
+# 👇️ activate on Unix or MacOS
+source venv/bin/activate
+
+# 👇️ install django in the virtual environment
+pip install django
+
+# 👇️ start your django project
+django-admin startproject mysite
+
+
+==>How to Run DJango Development Server: :-
+= Whenever we install DJANGO-Framework in our system, 2-imp. things are installed in our system
+(cmd> pip install django)
+	i) DJANGO-library (to write programs)
+	ii) DJANGO Live-Development-Server 
+	(to run our-apps from django-project)
+	
+= We have to move to the "manage.py" file-location and we have to execute the following command
+Ex:-
+**[py manage.py runserver]**
+
+------------------------------------------------------------------
+F:\SAISIR\DJANGO\FirstProject> (preferable)
+(or)
+F:\SAISIR\DJANGO\FirstProject>py manage.py startserver
+------------------------------------------------------------------
+
+(***)
+NOTE:-
+= After giving this command, our DJANGO Live-Development-Server starts automatically in our system & gives below message
+-----------------------------------------
+Django version 4.1.1, using settings 'FirstProject.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CTRL-BREAK.
+-------------------------------------------
+*********Above msg indicates DJango-Server is started***********
+(Server-Request-URL ::- http://127.0.0.1:8000/)
+
+
+
+***(Verifying Django-Server Status)***
+==>How to Send First Request:-
+= Open browser and send request with above-URL: 
+(Type this in Address-Bar)
+Ex:-
+	http://127.0.0.1:8000/
+(Instead of "127.0.0.1", we can also use localhost i.e, current-system-ip)
+Ex:-
+	http://localhost:8000/
+
+NOTE:-
+= We get Django Running Server Homepage, if everything goes fine 
+i.e, for successful client-request
+
+
+
+
+

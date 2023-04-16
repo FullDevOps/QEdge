@@ -1,0 +1,801 @@
+****Start-Here****
+(Another CBV CRUD Project)
+==> Django Class Based Views Complete Project::-
+(Employee-model-class & employeedb(mysql-db))
+(Create CRUDCBVProject2-project & MyApps1(app))
+
+***Start-Coding***
+Ex:- 
+(create database "employeedb: in mysql-db)
+------------------------------------------------
+mysql> create database employeedb;
+Query OK, 1 row affected (0.22 sec)
+mysql> use employeedb;
+Database changed
+mysql> show tables;
+Empty set (0.08 sec)
+
+Now, (configure mysql-db in our project)
+Ex:-
+settings.py (CRUDCBVProject2-project conf-folder)
+----------------------------------------------------
+DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+    'default': {
+		'ENGINE': 'django.db.backends.mysql',
+		'HOST': 'localhost',
+		'PORT': '3306',		#3302 or 3308
+		'NAME': 'employeedb',
+		'USER': 'root',
+		'PASSWORD': 'root',
+   }
+}
+
+=> Install & Verify DB-connection:-
+(terminal-tab)
+cmd> pip install --only-binary :all: mysqlclient
+Now,
+cmd> py manage.py shell
+>>> from django.db import connection
+>>> mycursor = connection.cursor()
+>>> print(mycursor);                     
+<django.db.backends.utils.CursorDebugWrapper object at 0x000002134E8A57F0>
+>>> exit()
+
+
+=> Now, create a model-class:-
+Ex:-
+=> models.py (MyApps1 main-folder)
+---------------------------------------------------
+from django.db import models
+#from django.core.urlresolvers import reverse
+from django.urls import reverse;
+#Create your models here....
+class Employee(models.Model):
+    empno=models.IntegerField();
+    ename=models.CharField(max_length=128)
+    job=models.CharField(max_length=128)
+    sal=models.FloatField(max_length=128)
+    def __str__(self):
+        return self.ename
+    def get_absolute_url(self):
+        return reverse('detail',kwargs={'pk':self.pk})
+
+
+
+(Now)
+Ex:-
+admin.py (MyApps1 main-folder)
+-------------------------------------------------
+from django.contrib import admin
+from MyApps1.models import Employee
+#Register your models here.
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ['empno','ename','job','sal']
+
+admin.site.register(Employee, EmployeeAdmin)
+
+
+
+Now,
+(Work with or perform migrations...)
+(in Terminal-tab)
+cmd> py manage.py makemigrations
+Migrations for 'MyApps1':
+  MyApps1\migrations\0001_initial.py
+    - Create model Employee  
+
+cmd> py manage.py sqlmigrate MyApps1 0001
+--
+-- Create model Employee
+--
+CREATE TABLE `MyApps1_employee` (`id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY, `empno` integer NOT NULL
+, `ename` varchar(128) NOT NULL, `job` varchar(128) NOT NULL, `sal` double precision NOT NULL);
+
+cmd> py manage.py migrate
+Operations to perform:
+  Apply all migrations: MyApps1, admin, auth, contenttypes, sessions
+Running migrations:
+  Applying MyApps1.0001_initial... OK
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+
+**=> Verify tables in mysql-db,
+mysql> use employeedb;
+mysql> show tables;
+mysql> select * from employeedb_employee;
+(empty)
+
+**=> Also verify tables in admin-interface,
+cmd> py manage.py createsuperuser
+(uname:sai, pwd:sai)
+Username (leave blank to use 'office'): sai
+Email address: sai@gmail.com
+Password: sai
+Password (again): sai
+The password is too similar to the username.
+This password is too short. It must contain at least 8 characters.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+Ex:-
+=> Now run-server, & request below URL,
+http://localhost:8000/admin/
+(give username & password)
+(select Employees-link & perform add/del/update records) -> Not-Req
+
+Now, create a view,
+Ex:-
+=> views.py (MyApps1 main-folder)
+---------------------------------------------------
+from django.shortcuts import render
+from MyApps1.models import Employee
+#from django.core.urlresolvers import reverse_Jazy #old-lib
+from django.urls import reverse_lazy	#new-lib
+from django.views.generic import ListView
+from django.views.generic import DetailView
+from django.views.generic import CreateView
+from django.views.generic import UpdateView
+from django.views.generic import DeleteView
+# Create your views here.
+class EmployeeListView(ListView):
+    model = Employee
+
+class EmployeeDetailView(DetailView):
+    model = Employee
+
+class EmployeeCreateView(CreateView):
+    model = Employee
+    #fields=('empno', 'ename','job', 'sal')
+    fields = '__all__'
+
+class EmployeeUpdateView(UpdateView):
+    model = Employee
+    fields = ('ename', 'job', 'sal')
+
+class EmployeeDeleteView(DeleteView):
+    model = Employee
+    success_url = reverse_lazy('home')
+
+
+
+Ex:-
+=> urls.py (CRUDCBVProject2 conf-folder)
+------------------------------------------
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('home/', views.EmployeeListView.as_view(), name='home'),
+    path('detail/<pk>', views.EmployeeDetailView.as_view(), name='detail'),
+    path('create/', views.EmployeeCreateView.as_view(),name='create'),
+    path('update/<pk>', views.EmployeeUpdateView.as_view(),name='update'),
+    path('delete/<pk>', views.EmployeeDeleteView.as_view(),name='delete'),
+]
+
+
+
+***Now(template-files)
+Ex:-
+=> base.html (templates/MyApps1)
+------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Base HTML File</title>
+        <link href="{%static 'css/empstyles.css'%}" rel="stylesheet" />
+    </head>
+    <body>
+        <div>
+            {%block body_block%}
+            {%endblock%}
+        </div>
+    </body>
+</html>
+
+
+
+
+Ex:-
+=> employee_list.html (templates/MyApps1 folder)
+------------------------------------------------------
+<!DOCTYPE html>
+{% extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Employee Information List</h1>
+    <hr />
+    <table border='2'>
+        <thead>
+            <th>EmpNo</th>
+            <th>EmpName</th>
+            <th>JOB</th>
+            <th>Salary</th>
+            <th colspan="3">Operations</th>
+        </thead>
+        {%for employee in employee_list%}
+        <tr>
+            <td>{{employee.empno}}</td>
+            <td>{{employee.ename|title}}</td>
+            <td>{{employee.job|title}}</td>
+            <td>{{employee.sal|title}}</td>
+            <td><a href="/detail/{{employee.id}}">Details</a></td>
+            <td><a href="/update/{{employee.id}}">Update</a></td>
+            <td><a href="/delete/{{employee.id}}">Delete</a></td>
+        </tr>
+        {%endfor%}
+    </table>
+    <br /><br /><br />
+    <a href="/create">CLICK-HERE to Insert New-Employee-Record!!</a>
+{%endblock%}
+
+
+Ex:-
+=> employee_detail.html (templates/MyApps1 folder)
+------------------------------------------------
+<!DOCTYPE html>
+{% extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <div>
+        <h1>Employee-Details!!!</h1>
+        <hr />
+        <ul>
+            <li>Emp-No : {{employee.empno}}</li>
+            <li>Emp-Name : {{employee.ename}}</li>
+            <li>JOB : {{employee.job}}</li>
+            <li>Salary : {{employee.sal}}</li>
+        </ul>
+        <a href="/home">Click to Go-Back</a>
+    </div>
+{%endblock%}
+
+
+
+Ex:-
+=>employee_form.html:- (templates/MyApps1 folder)
+------------------------------------------------
+<!DOCTYPE html>
+{% extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Add New Employee Here</h1><hr>
+    <form method="post">
+        {{form.as_p}}
+        {%csrf_token%}
+        <input type="submit" value="Insert/Update">
+    </form>
+{%endblock%}
+
+
+Ex:-
+=> employee_confirm_delete.html (templates/MyApps1 folder)
+---------------------------------------------------------
+<!DOCTYPE html>
+{% extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Do You Want to Delete ("{{employee.id}}->{{ employee.ename }}") Record??</h1>
+    <hr />
+    <form method="post">
+        {%csrf_token%} <br />
+        <input type="submit" value="DELETE-EMP-RECORD" /> <br /><br />
+        <a href="/home">CANCEL to Go-Back</a>
+    </form>
+{%endblock%}
+
+
+Ex:-
+empstyles.css (static/css folder)
+-------------------------------------
+body{
+    background-color: lightyellow;
+    color:darkgreen;
+}
+
+
+(also do static-settings in below files)
+Ex:-
+settings.py (CRUDCBVProject2 main-folder)
+---------------------------------------------
+STATIC_URL = '/static/'
+import os;
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+
+==>> Finally run-server in project & request below URL,
+http://localhost:8000/home/
+
+(insert)
+EmpNo	EmpName	JOB	Salary	Operations
+1001	Sai	Manager	6500.0	Details	Update	Delete
+1002	Ram	Hr	5600.0	Details	Update	Delete
+1003	Ali	Developer	4500.0	Details	Update	Delete
+
+(update)
+EmpNo	EmpName	JOB	Salary	Operations
+1001	Sai Baba	Manager	6500.0	Details	Update	Delete
+1002	Ram Lala	Hr	5600.0	Details	Update	Delete
+1003	Ali Syed	Developer	4500.0	Details	Update	Delete
+
+(delete all-3-records)
+EmpNo	EmpName	JOB	Salary	Operations
+(empty)
+
+
+"Assignment"
+= perform CBV CRUD operations
+(StudentCBVproject & MyApps1)
+(studentdb mysql-db)
+
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+==> CRUD Operations by using Function Based Views (FBVs)::
+(project-overview)
+(using Faker-class with fake-data) or mysql-db
+8-steps:-(refer-notes)
+---------
+1) Create-Project (CRUDFBVProject)
+2) Create-App(MyApps1)
+3) Templates → MyApps1 → for *.html files
+4) Add Application and Templates Path to settings.py (automatic)
+5) Create Employee Model Class (models.py)
+6) Installmysql-client & Make Migrations and Migrate (db-operations)
+7) Register this Model inside admin.py and Create Super User(admin-interface) [uname:sai, pwd:sai]
+8) Execute populate.py Script (Faker-class with fake-details)
+
+***Start-Coding***
+Ex:-
+=> views.py  (MyApps1 main-folder)
+-----------------------------------------------
+from django.shortcuts import render, redirect
+from MyApps1.forms import EmployeeForm
+from MyApps1.models import Employee
+
+# Create your views here.
+def show_view(request):
+    employees = Employee.objects.all()
+    return render(request, 'MyApps1/index.html', {'employees': employees})
+
+def insert_view(request):
+    form = EmployeeForm()
+    if request.method == "POST":
+        form = EmployeeForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/index')
+    return render(request, "MyApps1/insert.html", {"form":form})
+
+
+def delete_view(request,pk):        #use pk only here (same as url)
+    employee=Employee.objects.get(id=pk)
+    employee.delete()
+    return redirect('/index')
+
+def update_view(request,pk):    #use pk only here(same as url)
+    employee=Employee.objects.get(id=pk)
+    if request.method=="POST":
+        form=EmployeeForm(request.POST,instance=employee)
+        if form.is_valid():
+            form.save()
+            return redirect('/index')
+    return render(request,'MyApps1/update.html',{'employee':employee})
+
+
+
+Ex:-
+=> models.py (MyApps1 main-folder)
+--------------------------------------
+from django.db import models
+#Create your models here.
+class Employee(models.Model):
+    eno=models.IntegerField()
+    ename=models.CharField(max_length=64)
+    esal=models.FloatField()
+    eaddr=models.CharField(max_length=256)
+
+
+Ex:-
+==> forms.py (MyApps1 main-folder)
+--------------------------------------
+from django import forms
+from MyApps1.models import Employee
+
+class EmployeeForm(forms.ModelForm):
+    class Meta:
+        model = Employee
+        fields = '__all__'
+
+
+Ex:- 
+=> populate.py (CRUDFBVProject main-proj-folder)
+---------------------------------------------
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE','CRUDFBVProject.settings')
+import django
+django.setup()
+
+from MyApps1.models import *
+from faker import Faker
+from random import *
+faker=Faker()
+
+def populate(n):
+    for i in range(n):
+        feno=randint(1001,9999)
+        fename=faker.name()
+        fesal=randint(10000,20000)
+        feaddr=faker.city()
+        emp_record=Employee.objects.get_or_create(eno=feno,ename=fename,esal=fesal,eaddr=feaddr)
+
+populate(10)
+
+
+Ex:-
+=> views.py (Delete & Update) (MyApps1 main-folder)
+------------------------------------------------------
+(already-done)
+def delete_view(request,pk):        #use pk only here (same as url)
+    employee=Employee.objects.get(id=pk)
+    employee.delete()
+    return redirect('/index')
+
+def update_view(request,pk):    #use pk only here(same as url)
+    employee=Employee.objects.get(id=pk)
+    if request.method=="POST":
+        form=EmployeeForm(request.POST,instance=employee)
+        if form.is_valid():
+            form.save()
+            return redirect('/index')
+    return render(request,'MyApps1/update.html',{'employee':employee})
+
+
+
+(***)
+Note:: 
+= In the following line if we are not using instance then a new record will be created.
+form = EmployeeForm(request.POST,instance = employee)
+form = EmployeeForm(request.POST) → New Record will be created
+form = EmployeeForm(request.POST, instance = employee) → Existing Record will be updated
+
+Now,
+Ex:- (urls.py) (CRUDFBVProject conf-folder)
+------------------------------------------------
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('index/', views.show_view),
+    path('insert/', views.insert_view),
+    path('delete/<int:pk>/', views.delete_view,name="delete"),
+    path('update/<pk>/', views.update_view,name="update"),
+]
+
+Ex:-
+index.html (templates/MyApps1 folder)
+-----------------------------------------------
+<!DOCTYPE html>
+{% extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Employee Information(Details) FBVs</h1>
+    <hr />
+    <table border='2'>
+        <thead>
+            <th>Emp-No</th>
+            <th>Emp-Name</th>
+            <th>Emp-Sal</th>
+            <th>Emp-Addr</th>
+            <th colspan="2">Operations</th>
+        </thead>
+        {%for emp in employees %}
+            <tr>
+                <td>{{emp.eno}}</td>
+                <td>{{emp.ename}}</td>
+                <td>{{emp.esal}}</td>
+                <td>{{emp.eaddr}}</td>
+                <td>
+                <a href="/update/{{ emp.id }}">Update</a> |
+                <a href="/delete/{{ emp.id }}">Delete</a>
+                </td>
+            </tr>
+        {%endfor%}
+    </table><br /><br ><br />
+    <a href="/insert">Click to Insert New-Employee</a>
+{%endblock%}
+
+
+
+Ex:-
+base.html (templates/MyApps1 folder)
+-----------------------------------------------
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Base HTML Page</title>
+    </head>
+    <body>
+        <div align='center'>
+			{%block body_block%}
+			{%endblock%}
+        </div>
+    </body>
+</html>
+
+
+Ex:-
+insert.html (templates/MyApps1 folder)
+-----------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Employee Insert Form</h1>
+    <hr />
+    <form method="post">
+        <table border='1'>
+            {{form}}
+        </table>
+        {%csrf_token%}
+        <br/>
+        <input type="submit" value="Insert-Record">
+    </form>
+{%endblock%}
+
+
+
+Ex:-
+update.html (templates/MyApps1 folder)
+-----------------------------------------------
+<!DOCTYPE html>
+{%extends 'MyApps1/base.html'%}
+{%block body_block%}
+    <h1>Employee Update Form</h1>
+    <hr />
+    <form method="post">
+        {%csrf_token%}
+        Employee-Number: <input type="text" name="eno" value="{{employee.eno}}"><p></p>
+        Employee-Name: <input type="text" name="ename" value="{{employee.ename}}"><p></p>
+        Employee-Salary: <input type="text" name="esal" value="{{employee.esal}}"><p></p>
+        Employee-Address: <input type="text" name="eaddr" value="{{employee.eaddr}}"> <p></p>
+        <input type="submit" value="Update-Record">
+    </form>
+{%endblock%}
+
+NOTE:-
+==> How to use django form for update::
+= In views.py, create the form with instance employee as
+"form = EmployeeForm(instance = employee)"
+Send the form object intead of employee object in render function of update_views as
+"{'form':form}"
+{{form.as_p}}
+
+
+
+**Now**
+=>> Perform MYSQL-DB operations,
+(In MySQL,)
+mysql> create database empsdb;
+Query OK, 1 row affected (0.21 sec)
+
+mysql> show databases;
+
+mysql> use empsdb;
+Database changed
+
+mysql> show tables;
+Empty set (0.14 sec)
+
+Ex:-
+(configure mysql db-settings)
+Now,
+settings.py  (CRUDFBVProject conf-db-folder)
+-------------------------------------------
+DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+    'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'HOST': 'localhost',
+            'PORT': '3302',		#3306 or 3308
+            'NAME': 'empsdb',
+            'USER': 'root',
+            'PASSWORD': 'root',
+        }
+}
+
+=>> Now install mysqlclient in django
+cmd> pip install --only-binary :all: mysqlclient
+
+=> verify DB-connection
+cmd> py manage.py shell
+>>> from django.db import connection
+>>> mycursor = connection.cursor()
+>>> print(mycursor);
+<django.db.backends.utils.CursorDebugWrapper object at 0x000001FBD0D2FD90>
+>>> exit()
+
+=> now perform make-migrations
+cmd> py manage.py makemigrations
+Migrations for 'MyApps1':
+  MyApps1\migrations\0001_initial.py
+    - Create model Employee
+	
+=> now perform sql-migrate(Verify)
+cmd> py manage.py sqlmigrate MyApps1 0001
+--
+-- Create model Employee
+--
+CREATE TABLE `MyApps1_employee` (`id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY, `eno` integer NOT NULL, 
+`ename` varchar(64) NOT NULL, `esal` double precision NOT NULL, `eaddr` varchar(256) NOT NULL);
+
+=> now do migrate operation
+cmd> py manage.py migrate
+Operations to perform:
+  Apply all migrations: MyApps1, admin, auth, contenttypes, sessions
+Running migrations:
+  Applying MyApps1.0001_initial... OK
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+
+=> Now verify tables in MYSQL-DB,
+mysql> show tables
++----------------------------+
+| Tables_in_empsdb           |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
+| myapps1_employee           |
++----------------------------+
+11 rows in set (0.08 sec)
+
+=> Now, create superuser
+cmd> py manage.py createsuperuser
+(uname:sai, pwd:sai)
+Username (leave blank to use 'office'): sai
+Email address: sai@gmail.com
+Password: 
+Password (again):
+The password is too similar to the username.
+This password is too short. It must contain at least 8 characters.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+Now, create admin-model for display,
+Ex:-
+=> admin.py (MyApps1 main-folder)
+--------------------------------------
+from django.contrib import admin
+from django.db import models
+from MyApps1.models import Employee
+#Create your models here.
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ['eno','ename','esal','eaddr']
+
+admin.site.register(Employee,EmployeeAdmin)
+	
+
+Ex:-
+=>Now restart server & request /admin page,
+http://localhost:8000/admin/
+(selec your table any perform add/update/del operations)
+Ex:-
+ENO		ENAME	ESAL	EADDR
+1133	Ali		4500.0	Hitech
+1133	Ram		6500.0	Secbad
+1122	Sai		5600.0	Hyd
+
+=> also verify in mysql-db
+mysql> select * from myapps1_employee;
++----+------+-------+------+--------+
+| id | eno  | ename | esal | eaddr  |
++----+------+-------+------+--------+
+|  1 | 1122 | Sai   | 5600 | Hyd    |
+|  2 | 1133 | Ram   | 6500 | Secbad |
+|  3 | 1133 | Ali   | 4500 | Hitech |
++----+------+-------+------+--------+
+3 rows in set (0.00 sec)
+
+NOTE:-
+==> Finally, restart server & request for below-url
+http://localhost:8000/index/
+
+(update/del)
+
+Emp-No	Emp-Name    Emp-Sal	    Emp-Addr	Operations
+1122	SaiBaba	    5600.0	    hyd	        Update | Delete
+1133	Ramlala	    6500.0	    Secbad	    Update | Delete
+1144	AliSyed	    4500.0	    Hitecch	    Update | Delete
+1155	Tom	    2500.0	        DSNR	    Update | Delete
+
+
+
+
+
+
+(****Start-here****)
+==Differences between CBVs and FBVs::
+CBVs:
+-----
+1) CBVs can be easily extended
+2) CBVs promotes Reusability of the Code
+3) CBVs can use Object Oriented
+Techniques such as Mixins
+(Multiple Inheritance)
+4) In CBVs, Less Coding
+5) Default Context Dictionary and Default
+Template Files Support Available
+6) Handling HTTP Methods by seperate
+Class Methods such as get() and post()
+7) There is a Restriction on Functionality
+and hence Less Power.
+8) Implicit Execution Flow and hence
+reduces Readability.
+
+==>FBVs:
+-----------
+1) FBVs cannot extended easily
+2) FBVs cannot promote Reusability of the Code
+3) FBVs cannot use Object Oriented Techniques
+4) In FBVs, More Coding
+5) Default Context Dictionary and Default Template Files Support not Available
+6) Handling HTTP Methods via Conditional Braching if request.method == 'POST'
+7) Based on Requirement we can implementany Functionality and hence these are more powerful
+8) Explicit Execution Flow and hence improves Readability.
+
+***Note: 
+= In Real Time the most commonly used views are CBVs. If CBV can not handle our requirement then only we should go for FBVs.
+
+
+
+

@@ -1,0 +1,370 @@
+==> Working_with_Advanced_Model_Concept::-
+----------------------------------------------------
+=>>Model Inheritance:-
+(PC-model & CC-model)
+-----------------------
+(It is very useful and powerful feature of django)
+= There are 4-types of Model Inheritance
+1) Abstract-Base-Class Inheritance
+2) Multi-table Inheritance
+3) Proxy-Model Inheritance
+4) Multiple Inheritance
+
+
+1)Abstract-Base-Class Model Inheritance::-
+--------------------------------------------
+= If several Model classes having common fields , then it is not recommended to write these fields seperately in every model class. It increase length of the code and reduces readability.
+Ex:-
+	Person-class 
+	(StudentPerson/EmployeePerson)
+= We can seperate these common fields into another Model class, which is also known as Base model class.
+= If we extend Base class automatically common fields will be inherited to the child classes.
+(User Parent-model-class & perform Re-usability in child-model-class)
+(Inheritance-mechanism -> Re-usability-of-code from Parent-Class to Child-Class)
+
+
+
+***Program(project)****
+----------------------------
+==> Create a new-project(AdvModelsProject) & new-app(MyApps1)::-
+(also create mysql-db(advmodeldb))
+(database-creation)
+mysql> create database advmodeldb;
+mysql> show databases;
+
+mysql> use advmodeldb;
+mysql> show tables;
+Empty set (0.08 sec)
+
+Now,
+Without model-Inheritance::-
+------------------------
+Ex:- models.py
+--------------------
+class Student(models.Model):
+	name = models.CharField(max_length = 64)
+	email=models.EmailField()
+	address=models.CharField(max_length = 256)
+	rollno=models.IntegerField() 		#separate
+	marks = models.IntegerField()		#separate
+	
+class Teacher(models.Model):
+	name = models.CharField(max_length = 64)
+	email=models.EmailField()
+	address=models.CharField(max_length = 256)
+	subject = models.CharField(max_length = 64)	#separate
+	salary = models.FloatField()				#separate
+	
+
+	
+==>> With model-Inheritance::-
+---------------------
+(models.py MyApps1 main-folder)
+--------------------------------------
+Ex:-##"ContactInfo" is base-model-class
+
+from django.db import models
+# Create your models here.
+class ContactInfo(models.Model):
+    name = models.CharField(max_length=64)
+    email = models.EmailField()
+    address = models.CharField(max_length=256)
+    class Meta:
+        abstract = True  ##"ContactInfo" is base-model(Abstract-Base-Class)
+
+class Student(ContactInfo):
+    rollno = models.IntegerField()
+    mark = models.IntegerField()
+
+class Teacher(ContactInfo):
+    subject = models.CharField(max_length=64)
+    salary = models.FloatField()
+
+NOTE:-
+    class Meta:
+        abstract = True
+(it is Meta inner class for ContactInfo-parent-model-class)
+(it becomes abstract-base-model-class)
+(obj cannot be created)
+(simple use in child-class)
+
+
+Now,
+==> Perform DB-configuations/settings::-
+Ex:-
+settings.py
+--------------------
+DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+    'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'HOST': 'localhost',
+            'PORT': '3302',		#3306 or 3308
+            'NAME': 'advmodeldb',
+            'USER': 'root',
+            'PASSWORD': 'root',
+        }
+}
+
+
+Ex:-
+=> install mysqlclient,
+cmd> pip install --only-binary :all: mysqlclient
+
+Ex:-
+=> makemigrations,
+cmd> py manage.py makemigrations
+Migrations for 'MyApps1':
+  MyApps1\migrations\0001_initial.py
+    - Create model Student
+    - Create model Teacher
+
+Ex:-
+=> do sqlmigrate,
+cmd> py manage.py sqlmigrate MyApps1  0001 
+
+=> finally run "migrate"
+cmd> py manage.py migrate
+
+NOTE:-
+=***In this case only Student and Teacher tables will be created which includes all the fields of ContactInfo(base-model-class) but not ContactInfo(abstract-base-model)
+
+Ex:-
+=**(Verify tables in mysql-db after migrations...)	
+mysql> show tables;
+mysql> desc MyApps1_Student;
+mysql> desc MyApps1_Teacher;
+mysql> desc MyApps1_ContactInfo; #error not-created...
+
+NOTE:  	
+ContactInfo class is an abstract-class and hence table won't be created.
+It is not possible to register abstract model classes to the "admin.py" interface. If we are trying to do then we will get error.....	
+
+
+
+
+***Case-2***
+2)	Multi-Table Inheritance ::-
+----------------------------------
+= If the base-model-class is not abstract-class then such typeof inheritance is called multi-table-inheritance.
+= here In Multitable inheritance inside database tables will be created for both parent and child classes. 
+(both parent-tables & child-tables created in DB)
+= Multi-table inheritance uses an implicit One-To-One-Field relationship to link parent and child. i.e by using one-to-one relationship multi-table inheritance is internally implemented.
+= Django hides internal structure and creates feeling that both tables are independent.
+
+
+****prog-code in Pycharm***
+Ex:- 
+(models.py)
+----------------------
+class BasicModel(models.Model):		#base-class(not a abs-model-class)
+	f1 = models.CharField(max_length = 64)
+	f2 = models.CharField(max_length = 64)
+	f3 = models.CharField(max_length = 64)
+	
+class StandardModel(BasicModel):		#child-class
+	f4 = models.CharField(max_length = 64)
+	f5 = models.CharField(max_length = 64)
+	
+
+Ex:-
+=> makemigrations,
+cmd> py manage.py makemigrations
+
+Ex:-
+=> do sqlmigrate,
+cmd> py manage.py sqlmigrate MyApps1  0001 
+
+Ex:-
+=> finally run "migrate"
+cmd> py manage.py migrate
+
+
+Ex:-	
+=**(Verify tables in mysql-db after migrations...)		
+Corresponding Database Tables are:
+------------------------------------------------
+mysql> show tables;
+mysql> desc MyApps1_basicmodel;
+mysql> desc MyApps1_standardmodel;
+
+
+
+***case***
+3) 	Multi-Level Inheritance:
+------------------------------------
+(A---->B---->C---->etc...)
+Inheritance at Multiple levels.
+Ex:- (models.py)
+----------------------
+class Person (models.Model):
+	name = models.CharField(max_length = 64)
+	age = models.IntegerField()
+	
+class Employee(Person):
+	eno = models.IntegerField()
+	esal = models.FloatField()
+	
+class Manager(Employee):
+	exp = models.IntegerField()
+	team_size = models.IntegerField()
+
+
+Ex:-
+=> makemigrations,
+cmd> py manage.py makemigrations
+
+Ex:-
+=> do sqlmigrate,
+cmd> py manage.py sqlmigrate MyApps1  0001 
+
+Ex:-
+=> finally run "migrate"
+cmd> py manage.py migrate
+
+
+Ex:-
+=**(Verify tables in mysql-db after migrations...)	
+mysql> show tables
+mysql> desc MyApps1_Person;
+mysql> desc MyApps1_Employee;
+mysql> desc MyApps1_Manager;
+	
+NOTE:
+= Multilevel inheritance internally multitable-inheritance only
+(for every class model table is created)
+
+
+4) Multiple-Inheritance::-
+---------------------------------
+(multiple-parents & single-child)
+= If model class extends multiple parent classes simultaneously then such type of inheritance is called Multiple-model Inheritance.
+
+Ex:-
+(models.py)
+---------------------------
+class Parent1(models.Model):
+	parent1_id = models.AutoField(primary_key=True)
+	f1 = models.CharField(max_length = 64)
+	f2 = models.CharField(max_length = 64)
+	
+class Parent2(models.Model):
+	parent2_id = models.AutoField(primary_key=True)
+	f3 = models.CharField(max_length = 64)
+	f4 = models.CharField(max_length = 64)
+	
+class Child(Parent1,Parent2):
+	f5 = models.CharField(max_length = 64)
+	f6 = models.CharField(max_length = 64)
+
+
+Ex:-
+=> makemigrations,
+cmd> py manage.py makemigrations
+
+Ex:-
+=> do sqlmigrate,
+cmd> py manage.py sqlmigrate MyApps1  0004 
+
+Ex:-
+=> finally run "migrate"
+cmd> py manage.py migrate
+
+	
+=**(Verify tables in mysql-db after migrations...)
+mysql> show tables;	
+mysql> desc MyApps1_Parent1;
+mysql> desc MyApps1_Parent2;
+mysql> desc MyApps1_Child;
+
+NOTE:-
+MyApps1.Child: (models.E005) The field 'id' from parent model 'MyApps1.parent1' clashes with the field 'id
+' from parent model 'MyApps1.parent2'.
+(user diff-primary_key field for diff-parent-classes)
+
+
+NOTE : 	
+1. Multiple Inheritance is also internally multi-table inheritance only.
+(for every model-class, table is created)
+2. In Multiple inheritance parent classes should not contain any common field, otherwise we will get error. (including default primary_key(id) field)
+
+
+
+***(New-concept)***
+=>> Model Manager ::
+----------------------
+(is pre-def class, which makes comm. b/w DJ-model-class & DB-tables)
+(create/insert/update/del/drop etc with sql-cmds)
+
+= Model-class manager can be used to interact with the database. 
+= By default Model Manager is available through the "Model.objects" property 
+i.e, our Model.objects is of type (django.db.models.manager.Manager)
+
+=> Imp_points(IQ)::-
+1) What is the purpose of Model Manager-class?
+=>	To interact or comm. with database
+2) How to get Default Model Manager class?
+=>	By using Model.objects property
+3) Model Manager is what type ?
+=>	"django.db.models.manager.Manager" class-type
+
+
+***Program-code***
+--------------------------
+Ex:-
+models.py (MyApps1 main-folder)
+--------------------------------------
+class Employees(models.Model):
+	eno = models.IntegerField()
+	ename = models.CharField(max_length = 64)
+	esal = models.FloatField()
+	eaddr = models.CharField(max_length = 256)
+
+
+Ex:-(perform)
+=> makemigrations,
+cmd> py manage.py makemigrations
+Ex:-
+=> do sqlmigrate,
+cmd> py manage.py sqlmigrate MyApps1  0005 
+
+Ex:-
+=> finally run "migrate"
+cmd> py manage.py migrate
+
+
+Ex:-
+=**(Verify tables in mysql-db after migrations...)	
+mysql> show tables;
+mysql> desc MyApps1_Employees;
+
+
+
+***Imp-step***
+-----------------
+Now,
+Ex:- (verify...Model-Manager)	
+(Terminal-tab)
+cmd> py manage.py shell
+>>> from MyApps1.models import Employees
+>>> type (Employees.objects)
+<class 'django.db.models.manager.Manager'>
+>>> exit();
+
+
+**IMP**
+-------
+NOTE:-
+= We can customize the default behaviour of Model Manager by defining our own Customer Manager as follows,
+=> How to define our own Custom Manager ::-
+--------------------------------------------
+i) We have to write child-class inherited from models.Manager.
+ii) Whenever we are using all() method, internally it will call get_queryset() method.(from models.Manager class)
+Ex:- Employees.objects.all()
+iii) To customize behaviour we have to override this method in our Custom-Manager class.
+
+
+

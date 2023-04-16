@@ -1,0 +1,182 @@
+===> DJango Server Project-Files::-
+(5-Files)
+(F:\SAISIR\DJANGO\FirstProject\FirstProject)
+
+i) __init__.py file:-
+= It is a blank empty-file or python script. 
+= Because of this special file name, Django treates this project-folder as python package-folder
+
+NOTE:- 
+= If any folder contains __init__.py file then only that folder is treated as Python package. However, this rule is applicable until Python 3.3 Version
+
+ii) settings.py:-
+= In this file, we have to specify all our project-settings and configurations
+Ex:-
+	like installed applications, 
+	middileware configurations, 
+	database configurations 
+	etc...etc 
+ 
+iii) urls.py:-
+= Here we have to store all our url-patterns of our project
+Ex:-
+www.FirstProject.com/Home
+www.FirstProject.com/AboutUs
+www.FirstProject.com/Products
+www.FirstProject.com/Services
+www.FirstProject.com/Careers
+www.FirstProject.com/ContactUs
+= Every URL-pattern is one request or link from client in our webpage
+= For every-request(url-pattern), we provide view(.py file) on DJango-Server
+= this view(.py) can be in diff-applications
+= This view(.py) provides response to client-request.
+= For every view(web-page), we have to define separate url-patterns
+(End user can use url-patterns to access our webpages)
+
+
+iv) wsgi.py:-
+= wsgi means "Web Server Gateway Interface"
+= We can use this file while deploying our project/application in production on live-online-internet-server 
+(website is live to access for clients)
+
+
+v) asgi.py::-
+= It stands "Application-Server-Gateway-Interface"
+= This file helps us to configure our reusable-apps in diff-projects
+
+-------------------------------------------------------------------
+***Sp-file***
+--------------
+(F:\SAISIR\DJANGO\FirstProject) -> main-Folder
+i) manage.py:-
+= The most commonly used python script is manage.py 
+= It is a command line utility to interact with Django project in various ways like to 
+	"run Django development server", 
+	"run test-cases"
+	"create Dbase migrations"
+	etc
+
+=============================================
+==> Django Development Server URL::-
+Ex:-
+	http://127.0.0.1:8000/
+	http://localhost:8000/
+	
+=> It is called as URL (Uniform-Resource-Locator)
+(it is used to identify our DJango-project uniquely on network/internet)
+
+=> http (hyper-text-transfer-protocol)
+	= it is internet-set-of-rules for transfering html-page/data(Webpage) from server to client(browser) & display in browser
+	(every-browser supports this rule)
+	
+=> 127.0.0.1 (ip address)	
+	= it is unique ip-address of the system where our DJANGO-server is running
+	(every system connected on internet has this unique ip-address)
+	= 127.0.0.1 means default local-system ip-address
+	= we can also use it as "localhost"
+	
+=> 8000 (port-number)	
+	= it is unique port-number(identity or id) of DJANGO-server-s/w in our system
+	(every software running in our system has this unique port-no)
+	(it is given & controlled by OS)
+	
+==*** Hence http://localhost:8000/ us unique URL on internet to give Web-App-Services(Website) to clients	
+
+NOTE:-
+= Use below command to check the ip-address of your current system
+cmd> ipconfig
+
+------------------------------------------------
+
+NOTE:-
+= How to stop Django live develoment server???
+(Press Ctrl+pause-break) or (Ctrl+C)
+= Once DJANGO server is stopped & in browser request with URL(http://localhost:8000/), we get "Site cannot be reached" 
+
+
+
+
+
+
+-----------------------------------------
+==> Role of Django Web-Server:-
+= Web-Server provides environment to run our web applications
+= Web-Server is responsible to receive the client-request and forward client-request to the corresponding (view)web-component, based on url-pattern and to provide response to the end user
+==Diagram==
+
+=** By Default, Django framework is providing "Live-Development-Server" & Even Django framework is providing one inbuilt default-database "sqlite3"
+(db.sqlite3 database-file is created for 1st-time, when we run the server)
+[F:\SAISIR\DJANGO\FirstProject]
+
+= Hence DJango Framework is full-fleged working environment for developing dynamic Web-Apps using Python Programming
+
+
+***NOTE:-(Imp-Point)
+= Once we started Server a special database(DB) related file will be generated in our project main-folder structure
+Ex:-
+	**[db.sqlite3]**
+(D:\PythonORG\DJANGO\Programs\FirstProject)
+
+-------------------------------------------------------------------
+****Working with (1st)First-App in Django-Project****
+------------------------------------------------------
+==>Creation of First Web Application: 
+= Once we creates Single-Django-project, we can create any-number-of applications(apps) in that project
+(Coll-of-Apps is => DJ-Project)
+
+(Use below command)
+**= The following is the command to create own-application(DJ-app)
+(Goto Project-main-Folder in cmd-prompt)
+
+cmd\FirstProject>python manage.py startapp FirstApp
+Ex:-
+F:\SAISIR\DJANGO\FirstProject>py manage.py startapp FirstApp
+
+(After giving this command)
+=> Now for "FirstApp" application, folder-structure is created as follows,
+F:\...\FirstProject> project-main-folder
+	|-> FirstApp> app-folder (6-files)
+		|-> admin.py 
+		|-> apps.py 
+		|-> models.py 
+		|-> tests.py 
+		|-> views.py 
+		|->	__init__.py 
+		|-> migrations> sub-folder(dbase)
+			|-> __init__.py 
+	
+
+Note:-
+= Observe that App-Folder contains 6-files and Project-Folder contains 5 files & one special file: manage.py 
+
+
+
+==> Working the FirstApp (DJ-App-folder-Files)::-
+---------------------------------------------
+1) __init__.py:-
+= It is a blank empty-Python script. 
+= Because of this special name, Python treates our app-folder(FirstApp) as a package-folder
+
+2) admin.py:-
+= Here we register our DB-models(py-class) in this file. 
+= Django uses these models with Django's admin interface. 
+
+3) apps.py:-
+= In this file, we have to specify our-application's specific configurations
+
+4) models.py:-
+= In this file, we have to write our-app data models(py-class)
+
+5) tests.py:-
+= In this file, we write developer-testing-code for Unit-Testing
+
+***6) views.py:-
+= In this file, Here we write view-functions for client's requests, process and return required responses
+
+7) migrations:- (folder)
+= It stores database specific information related to models(py-class)
+
+NOTE:-
+= In this App related files, most commonly used files in every project are "views.py" and "models.py"
+-----------------------------------------------
+

@@ -1,0 +1,225 @@
+=====================================================================
+==>> "Custom Filter with argument(i/p-para)"
+-------------------------------------
+Ex:- custom_filters2.py (MyApp1/templatetags folder)
+----------------------------------------------------
+#custom-filter with args(i/p-para)
+from django import template
+register=template.Library()
+@register.filter(name='c_and_c')
+def cut_and_concate(value,arg):
+  result=value[:3]+str(arg)
+  return result
+#register.filter('c_and_c', cut_and_concate)
+
+ 
+**Note: -
+= The main advantage of template-filters is we can display the same data in different styles based on our requirement
+=** Registering new custom-filter in same custom_filters.py file, makes old filter to replace with new-custom-filter
+(use single one filters in different-files i.e, 1-file with 1-filter-func only)
+
+Ex3:- 
+custom_filters3.py (MyApp1/templatetags folder)
+-------------------------------------------------
+from django import template
+register=template.Library()
+#@register.filter(name='truncate5')
+def truncate5(value):
+  result=value[0:5]
+  return result
+register.filter('truncate5', truncate5);
+
+
+Ex4:- 
+custom_filters4.py (MyApp1/templatetags folder)
+-------------------------------------------------
+from django import template
+register=template.Library()
+@register.filter(name='t_n')
+def truncate_n(value,n):
+  result=value[0:n]
+  return result;
+register.filter('t_n', truncate_n);
+  
+
+Ex:-
+demo2.html (templates/MyApp1) --> child-template-file
+-----------------------------------------------------------------
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Custom-Filters</title>
+    </head>
+    <body>
+        <h1>Custom Filters</h1>
+        <hr />
+        {%load custom_filters%}
+        {%load custom_filters2%}
+        {%load custom_filters3%}
+        {%load custom_filters4%}
+        <ul>
+            <li>{{name|c_and_c:'Krishna'}}</li>
+            <li>{{subject|truncate5}}</li>
+            <li>{{dept|t_n:3}}</li>
+            <li>{{date1|timesince}}</li>
+            <li>{{date1|date:"d-m-Y"}}</li>
+        </ul>
+        <hr/>
+    </body>
+</html>
+
+Ex:-
+views.py (MyApp1 folder)
+-----------------------------
+import datetime;
+def demo2(request):
+    date1 = datetime.datetime.now();
+    dict1 ={'name':'SaiRamKumar','subject':'CSEEngg','dept':'CSEDept','date1':date1}
+    return render(request,'MyApps1/demo2.html',context=dict1);
+
+Ex:-
+urls.py (TemplateProject1 folder)
+-----------------------------------
+....
+from MyApps1 import views
+
+urlpatterns = [
+    .....
+	path('demo2/',views.demo2),
+]
+
+NOTE:-
+= Finally, start the server & request below URL...
+http://localhost:8000/demo2/
+
+
+---------------------------------------------------------------
+***(Another-Use)***
+3):Template Tags with Relative-URLs in Hyper-links::-
+= Relative URL means requesting URL from current-page or current-url
+Syntax:-
+==Diagram==(Template Tags Relative URLs)
+(template-url-tag)
+	{% url 'some-url-name' v1 v2 %}		#with args
+	{% url 'some-url-name' arg1=v1 arg2=v2 %}	
+	#with args-names & values
+Ex:-
+	<a href='/thankyou/'>Thank You </a>
+	<a href='../thankyou'>Thank You1 </a>
+	<a href="{%url 'thankyou'%}">Thank You </a> 	#name="" in path()
+	Ex:-
+		path('thankyou/',views.thankyou,name='thankyou'),
+
+
+(Re-use TemplateProject1 and MyApps1)	
+Ex:-
+thankyou.html (templates/MyApp1 folder)
+----------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Template tags URLS</title>
+</head>
+<body>
+    <h1>Template-tags in URLs using HyperLinks</h1>
+    <hr />
+    <h2>Thank you html-page..!!</h2>
+    <hr />
+	<a href="/demo3/">Go-Back to main-page</a> <br /><br />
+    <a href="{%url 'demo3'%}">Go-Back to main-page</a>
+</body>
+</html>
+
+
+Ex:-
+demo3.html (templates/MyApp1 folder)
+----------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Template URLs</title>
+</head>
+<body>
+    <h1>Template URLs</h1>
+    <hr />
+    <a href='../thankyou/'>Thank You1 </a> <br /><br />
+    <a href='/thankyou/'>Thank You2 </a> <br /><br />
+    <a href="{% url 'thankyou'%}">Thank You3 </a> <br /><br />
+
+</body>
+</html>
+
+
+Ex:-
+views.py (MyApp1 folder)
+------------------------------
+def demo3(request):
+    return render(request,'MyApps1/demo3.html');
+
+def thankyou(request):
+    return render(request,'MyApps1/thankyou.html');
+
+Ex:-
+urls.py (TemplateProject1 folder)
+-----------------------------------
+....
+from MyApp1 import views
+
+urlpatterns = [
+    .....
+    path('demo3/', views.demo3,name='demo3'),
+    path('thankyou/',views.thankyou,name='thankyou'),
+]
+
+NOTE:-
+= Finally, start the server & request below URL...
+http://localhost:8000/demo3/
+
+NOTE:-
+= Also add hyperlink to go-back to demo3.html from thankyou.html
+
+
+
+
+
+===================================================================
+***New-Topic***(***)
+---------------------
+===>> Session Management in DJANGO::-
+----------------------------------------
+
+==> DJANGO Session Management::-
+= Client and Server can communicate with some common languages which is nothing but HTTP
+(Hyper-Text-Transfer-Protocol)
+= The basic limitations of HTTP is,it is stateless-protocol
+i.e, it cannot remember client information for future purpose on server across multiple request from same-client
+= Every request to the server from client is treated as new request
+= Hence some mechanism must be required at server side to remember client information across multiple requests from same-client
+= This mechanism is nothing but session management mechanism.
+= The following are various session management mechanisms.
+(4-types)
+1) Cookies (***)
+2) Session API (****)
+3) URL Rewriting (*)
+4) Hidden Form Fields (**)
+etc..
+
+***Cookies***
+==> Session-Management By Using Cookies mechanism::-
+= Cookies(obj) is a very small amount of information created by Server(auto.) and it is maintained by client(machine i.e, Browser)
+==Diagram==
+	[client]-------req1---------->[server](create cookie-c1)
+(c1-store-browser)<-------res1+c1--------
+			-------req2+c1-------> (server-identifies client-req(c1))
+			<-------res2+c1--------
+
+= Whenever client sends a request to the server, if server wants to remember client information for future-purpose then server will create cookie-object(c1) with the required information about client
+(ip-addr/location/date&time)
+= Server will send that cookie-object(c1) to the client as the part of response
+= Client will save that cookies(c1) in its local machine and send to the server with every next requests there-after...
+= By accessing cookies-obj(c1) from the next client-request auto by server, server can identify or remember client information(or client-request)
+
+

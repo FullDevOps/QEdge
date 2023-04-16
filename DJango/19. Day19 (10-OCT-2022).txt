@@ -1,0 +1,825 @@
+==>> Working with Django Forms::-
+-------------------------------------------------
+= It is very important concept in web development.
+= The main purpose of forms is to take user input in webpage
+Ex:- login-form, registration-form, enquiry-form etc...
+= Using forms we can read end-user provided input-data and we can use that data based on requirement in our DJ-Application
+Ex:-
+	Username & Password (For login to email-App)
+	Fname, Lname, Username, Pwd, DOB, Address etc..(for Registration)
+= We can store such data in database for future purpose 
+= We may use just for validation/authentication purpose also
+=*** For this, we have "Django-specific-forms" but not HTML forms(old-style)
+ 
+=> Advantages of Django Forms over HTML Forms:-
+	  (1) We can develop forms very easily with python-code
+	  (2) We can generate HTML Form widgets/components (like text-fields,text-area,email-field,pwd-field etc) very quickly & simple
+	  (3) Validation of input-data is very easy & simple
+	  (4) Processing/storing data into python data-structures like lists,sets,dict etc is very simple & easy
+	  (5) Creation of Models based on forms is simple & easy
+
+NOTE:-
+= Some commonly used HTML form input-controls/fields are,
+		Textfield
+		Number-field
+		Textarea
+		Radio-btns
+		Checkboxes
+		Email-field
+		Combobox(Listbox)
+		Password-field
+		Hidden-fields
+		Labels
+		Submit-btn
+		Reset-btn
+		Regular-btn
+(***for all these input controls, have name="" value="" html-attributes)
+(this name-value is submitted to server, when we perform submit-button operation)
+(for every submit btn click we have url-pattern login/, register/)
+(such submitted-data can be used in views-function)
+Syntax:-
+(html-form)
+<form name="" id="" action="login/" method="get/post">
+....
+....
+	we get form input-controls/fields auto.
+....
+....
+</form>
+(when we click submit-btn, form-data is submitted to action-page/url)
+
+
+(*****)
+NOW,
+==(Steps for DJango-Forms)==
+==> Steps or Process to generate Django Forms::-
+(Use same-project as previous "StudentDBProject" & "StudentDBApp")
+
+**Step1::-
+= Creation of forms.py file in our application folder(StudentDBApp) with our required fields.
+Ex:-  
+forms.py::- (under StudentDBApp app-folder)
+-----------
+(write from-class)
+from django import forms;
+class StudentForm(forms.Form):
+	name=forms.CharField();
+	marks=forms.IntegerField();
+
+-----------
+**Note::-
+= here "name" and "marks" are the field-names which will be available in html-form-auto
+= here our-forms-class is inherited from (Form parent-class, which belongs to "django.forms")
+= CharField, IntegerField are classes in django.forms module. Such classes provides different form-input-controls/fields in html-page
+
+
+**Step-2:
+(usage of forms.py inside views.py file)
+= views.py file of our app is responsible to send this form to the template html-file 
+Ex:-  
+views.py: (StudentDBApp folder) ##add in last...
+---------------------------------------------------
+#form-view(html-form)
+from StudentDBApp import forms;
+#Create your views here.
+def studentinputview(request):
+    formsObj=forms.StudentForm()
+    dict1={'form1':formsObj}
+    return render(request,'StudentDBApp/input.html',context=dict1)
+
+
+(****)
+#Alternative short way:
+#alternate-short-way
+def studentinputview(request):
+	formsObj=forms.StudentForm()
+	return render(render,'StudentDBApp/input.html',{'form1':formsObj})
+	
+=** directly pass dict-obj instead of context=dict1 keyword-args	
+**Note: context parameter is optional. We can pass context parameter value directly without using keyword name 'context'
+
+
+**Step-3:
+(Creation of html-file to hold a form input controls)
+= Inside template-file(input.html) we have to use template-tag to inject our-form 
+Ex:-
+	{{form1}}
+= It will add only form fields automatically
+= But there is no <form> tag and no submit button
+= Even the form-fields are not arranged properly. It looks ugly-form
+= However, we can make proper form as follows,
+Ex:-
+<h1>Registration Form</h1>
+<div class="container" align="centre">
+	<form action="/studinputverifyview" method="post">
+		{{form1.as_p}}
+		{{form1.as_table}}
+		<input type="submit" value="Submit">
+	</form>
+</div>
+(use this code inside <form>.....</form>)
+
+
+NOW,
+input.html (under templates/StudentDBApp folder)
+-------------------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="{%static "css/studentform.css"%}">
+        <title>Student Form-Input</title>
+    </head>
+    <body>
+    <h1>Student Registration Form</h1>
+    <hr />
+    <div align="center">
+        <form action="/studinputverifyview" method="post">
+            {{form1.as_p}}
+          
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+</body>
+</html>
+
+NOTE:-
+==> HTML tags basics::-
+----------------------------
+= to work with forms, we use below element
+Ex:-
+	<form action="" name="" method="get/post">
+		.....
+		.....
+	</form>
+= action="" html-attribute, means form will be submitted to action-page/url on server
+= name="" html-attribute, means form-name(studform1, empform1)
+= method="get/post" html-attribute, means request-method from client
+(get means form-data is visible on address-bar after submit)
+(post means form-data is not-visible on address-bar after submit)
+(use get-request, if we have non-private/non-confidential data in form-submit)
+(use post-request, if we have private/confidential data in form-submit Ex:- username/pwd/pin/debitcard-no/otp)
+(get-request is used mainly to get reply-data from server)
+(post-request is used mainly to post form-data to server)
+(default request to server is get-request 
+
+****imp-topic***
+------------------
+==> url-request in 3-ways::-
+Ex1:- url-request directly(address-bar)
+	(http://localhost:8000/studlist/)
+Ex2:-  url-request with hyperlink
+	<a href="/studlist/">Click-here for Student-data</a>
+	<a href="studlist/">Click-here for Student-data</a>
+Ex:- url-request in form action=""
+	<form action="/studlist/" method=""> #default is get-request
+	</form>
+(all 3-used by client/enduser) especailly 2&3 examples
+
+
+=*** inside <form> element, we write different form-input-controls/fields
+Ex:-
+	<input type="submit"  name="" value="" /> #submit-button for form
+	<input type=""  name="" value="" /> ---->standard syntax
+		type="text" (text-field)
+		type="number" (number-field)
+		type="password" (password-field)
+		type="radio" (radio-button) Ex:- male or female (T/F)
+		type="checkbox" (checkbox) Ex:- languages(english/telugu/hindi) -> mulitple-selections
+		type="email"  (email-field)
+		type="button" (normal-button)
+		type="reset" (reset-button)
+		type="hidden" (hidden-field) Ex:- app-no
+	<textarea rows="" cols="">......</text-area> #multiple-line text-box
+	<select name="city">	#selecting list of values (combo-box)
+		<option>Hyd</option>
+		<option>Secbad</option>
+		<option>Hitech</option>
+	</select>
+
+=**** When form is submitted, all fields name="" & value="" are submitted to action="" page or url
+(In Django forms all above fields are generated automatically using forms.py class-obj)
+
+
+===>diff-ways to display DJango-Forms::-
+==> form-object variable inside template-file(input.html)::-
+Ex:-
+	{{form1.as_p}}
+= here form1-var is comming from views.py as dict-key
+= this var contains formobj from StudentForm-class(forms.py)	
+= StudentForm-class has different form-fields as variables
+= such variables are displayed in html-form page
+=** form1.as_p (it means form-fields are displayed as paragraphs)
+=** form1.as_table (it means form-fields are displayed as table-format)
+=** form1.as_ul (it means form-fields are displayed as unordered-list)
+	
+		
+		
+Ex:-
+studentform.css (under static\css-folder)
+---------------------------------------
+body{
+    background-color: lightyellow;
+    color:darkgreen;
+}
+
+
+Ex:-
+=> urls.py  (StudentDBProject configuration-folder)
+-----------------------------------------------------
+from django.contrib import admin
+from django.urls import path
+from StudentDBApp import views;
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('studentview/', views.studentview),
+    path('studenthomepage/', views.student_homepage),
+
+    #forms
+    path('studentinputview/', views.studentinputview),
+]
+
+
+==> Run server & request below URL,
+http://localhost:8000/studentinputview/
+= Fill form (name/marks) & click submit(data goes to server)
+
+***NOTE::-
+If we submit this form we will get below error...
+Forbidden (403)
+CSRF verification failed. Request aborted.
+Help
+Reason given for failure:
+    CSRF token missing or incorrect.
+	
+
+
+***(NOW)***
+==>> CSRF (Cross Site Request Forgery) Token::-
+= Every django-form should satisfy CSRF(Cross Site Request Forgery) Verification, otherwise Django won't accept our form.
+= It is meant for form website security. Being a programmer we are not required to worry anything about this. Django will takes care everything.
+ =But we have to add csrf_token in our <form> tag
+(above-program)
+<h1>Student Registration Form</h1>
+    <hr />
+    <div class="container" align="center">
+    <form action="/studinputverifyview" method="post">
+            {{form1.as_p}}
+            {%csrf_token%}
+            <input type="submit" value="Submit">
+        </form>
+    </div>
+
+NOTE:-
+= If we add csrf_token var then in the generate form the following hidden field will be added, which makes our post request secure.
+Ex:-
+<input type="hidden" name="csrfmiddlewaretoken" value="OhJVCDipsGXZ3Mls5kvZtHMjxE42URd3Wtcg4YJNdRl3o9op95Yj1hW2wHBdEgyc">
+(or)
+<input type='hidden' name='csrfmiddlewaretoken'
+value='1ZqIJJqTLMVa6RFAyPJh7pwzyFmdiHzytLxJIDzAkKULJz4qHcetLoKEsRLwyz4h'>
+=** The value="" of this hidden-field keeps on changing from request to request. Hence it is impossible to forgery of our request
+= If we configured csrf_token in html form then only django will accept our form o.w not we get Error...
+(CSRF verification failed. Request aborted.)
+
+----------------------------------------------------------------------
+***(Now, Imp-concept...)***
+==>> How to accept & process Form-Input-Data from the form inside views.py File::-
+= After submitting the form to action="" page or url
+Ex:-
+	action="/studinputverifyview/"
+= We have to access form-data in that particular-view	
+= Here we required to write views.py file with new-view
+Ex:-
+	def studentinputverifyview(request):
+=*** Now, the end-user provided input-data(name,marks) available in a dictionary-var named with "cleaned_data"(in our view). it is provided to view after submitting the form
+Ex:-
+	cleaned_data={'name':'Sai', 'marks':98}
+	***Access:- dict1["key"]
+	cleaned_data["name"]
+	cleaned_data["marks"]
+	
+Ex:-
+(Verification-view)
+views.py (of StudentDBApp)
+-----------------------
+import time;
+from StudentDBApp import forms;
+def studentinputverifyview(request):
+    if request.method == 'POST':
+        formsObj = forms.StudentForm(request.POST);
+        if formsObj.is_valid():
+            print('Form-Request validation success and printing data');
+            time.sleep(5)
+            print('Name:', formsObj.cleaned_data['name'])
+            print('Marks:', formsObj.cleaned_data['marks'])
+            formsObj = forms.StudentForm();     #empty-form
+            dict1 = {'form1': formsObj,'msg':'Data Submitted successfully...(Enter another data)'}
+    return render(request, 'StudentDBApp/input.html',context=dict1);
+
+
+
+Ex:- (modified template-file) --> add csrf_token & msg
+==> input.html (templates/StudentDBApp)
+-----------------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="{%static "css/studentform.css"%}">
+        <title>Student Form-Input</title>
+    </head>
+    <body>
+    <h1>Student Registration Form</h1>
+    <hr />
+    <div align="center">
+        {% if form1 %}
+            <p>{{ msg }}</p>
+            <form action="/studinputverifyview/" method="post">
+                {{form1.as_p}}
+                {%csrf_token%}
+                <input type="submit" value="Submit">
+            </form>
+        {% endif %}
+    </div>
+</body>
+</html>
+
+
+ 
+Ex:- 
+(verify-url)
+=> urls.py  (StudentDBProject configuration-folder)
+-----------------------------------------------------
+urlpatterns = [
+    .........
+	.........
+	#forms
+    path('studentinputview/', views.studentinputview),
+    path('studinputverifyview/',views.studentinputverifyview),
+]
+ 
+ 
+NOTE:-
+1)
+= Finally Run Django Server and request below URL,
+	http://localhost:8000/studentinputview/ 
+= Fill form-data & submit
+= data goes to "studinputverifyview/" & gets form-submitted-data using cleaned_data={} dict-var
+= creates empty-form-obj with msg, and sends that with input.html as dict1 with replay(response)
+= after submitting-form {{msg}} is displayed with empty-form for submitting new-data
+2)
+=***  formsObj = forms.StudentForm(request.POST);
+	= here we are creating StudentForm() object after submitting the form in view
+	= request.POST means the form submitted request method data, which is used inside form
+	= in this case we get form-obj with data(name,marks)
+
+=***  formsObj = forms.StudentForm(); 
+	= in this case we get form-obj as Empty-form (without data(name,marks))
+ 
+ 
+
+==>> Student Name and Marks Submission Form Project(StudentDBProject)::-
+==Diagram== (Project-Tree in PyCharm-IDE) 
+	**StudentDBProject**
+		= static
+			= css
+				* studentform.css
+				* studinfo.css
+		= StudentDBProject
+			* __init__.py
+			* settings.py
+			* urls.py
+			* wsgi.py
+			* asgi.py
+		= templates
+			= StudentDBApp
+				* input.html
+				* index.html
+				* students.html
+				* thankyou.html (extra...)
+		= StudentDBApp
+			= migrations
+			* __init__.py
+			* admin.py
+			* apps.py
+			* forms.py(**)
+			* models.py
+			* tests.py
+			* views.py
+	* db.sqlite3 (default-db)
+	* manage.py
+	* populate_student_info.py (faker-module)
+
+
+
+
+
+(*****)
+==Another-Program== 
+(Same above example with "thankyou.html" to end-user as response...)
+Ex:-
+=> forms.py (same-as-prev) [StudentDBApp folder]
+---------------------
+(already there, re-use it)
+
+from django import forms;
+class StudentForm(forms.Form):
+	name=forms.CharField();
+	marks=forms.IntegerField();
+
+
+Ex:-
+=> views.py (StudentDBApp folder)
+---------------------
+#add-code-in-last
+import time;
+from django.shortcuts import render
+from StudentDBApp.forms import StudentForm
+#Create your views here>
+def studentinputview2(request):
+    sentdata=False;
+    if request.method=='POST':
+        formObj=StudentForm(request.POST)
+        if formObj.is_valid():
+            print('Form-Request-data Validation Success and printing data')
+            time.sleep(5)
+            print('Name:',formObj.cleaned_data['name'])
+            print('Marks:',formObj.cleaned_data['marks'])
+            sentdata=True;
+            formObj = StudentForm();            #empty-form
+            dict1 = {'form1': formObj, 'sentdata': sentdata}
+            return render(request, 'StudentDBApp/thankyou.html', context=dict1);
+    formObj=StudentForm();
+    dict1={'form1': formObj}
+    return render(request,'StudentDBApp/input2.html',context=dict1);
+
+
+
+	
+Ex:- 
+=> input2.html (templates/StudentDBApp folder)
+------------------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <link rel="stylesheet" href="{%static "css/studentform.css"%}">
+        <title>Student Form-Input2</title>
+    </head>
+    <body>
+
+    <div align="center">
+        <h1>Student marks Submit Form2</h1>
+        <hr />
+        <form method="post">
+            {{form1.as_p}}
+            {%csrf_token%}
+            <input type="submit" name=""value="Submit">
+        </form>
+    </div>
+</body>
+</html>
+
+
+ 
+Ex:- 
+=> thankyou.html (templates/StudentDBApp folder)
+-------------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr>
+    <head>
+        <meta charset="utf=8">
+        <title>Student Thankyou!!</title>
+    </head>
+    <body bgcolor="LightYellow">
+        {%if sentdata%}
+            <h1>Thanks for Providing Information..!!</h1>
+            <hr />
+            <h2>Enter Next Student Marks</h2>
+        {%endif%}
+        <a href="/studentinputview2/">Go to Form Submit Page</a>
+    </body>
+ </html>
+
+ 
+Ex:- 
+=> urls.py  (StudentDBProject configuration-folder)
+-----------------------------------------------------
+urlpatterns = [
+	......
+    path('studentinputview2/', views.studentinputview2),	
+]
+
+
+NOTE:-
+= Finally Run Django Server and request below URL,
+	http://localhost:8000/studentinputview2/
+
+
+NOTE:-
+1) <form action="/studinputverifyview/" .....>
+	</form>
+= In this form, we have action="" url for form-submit
+= this action-url, give / forward-slash both begin & end
+(applicable only in form-submit request)
+
+2) <form method="POST">
+	</form>
+= In this form, we do-not have action="" url for form-submit
+= here when we submit form, it is submitted to same-url/same-view
+
+3) <a href="/studentinputview2">Go to Form Submit Page</a>
+= here request-method for server is "GET", in case of hyperlink-url-request
+
+4) http://localhost:8000/studentinputview2/
+= here request-method for server is "GET" only, in case of direct-url-request
+
+
+
+
+=======================================(2nd-session)==================================================
+=============================================================
+(*****)
+##Another-Program## (DJango-Forms)
+---------------------------------
+==> Login-Form with uname & pwd::- 
+(Re-use StudentDBProject(same-project) & StudentDBApp(Same-app)
+Ex:-
+urls.py (StudentDBProject main-folder)
+------------------------------------
+(add-in-last)
+path('studentloginpage/', views.studentloginpageview),
+
+
+Ex:-
+views.py (StudentDBApp main-folder)
+--------------------------------------
+from django.shortcuts import render
+from StudentDBApp.forms import StudentLoginForm
+#Create your views here>
+def studentloginpageview(request):
+    formObj=StudentLoginForm(); #Empty-form
+    dict1={'form1': formObj}
+    return render(request,'StudentDBApp/login.html',context=dict1);
+
+
+Ex:-
+forms.py (StudentDBApp main-folder)
+---------------------------------------
+(initially forms.py not-available, create it & re-use it)
+class StudentLoginForm(forms.Form):
+	username=forms.CharField();
+	password=forms.CharField(widget=forms.PasswordInput)
+
+
+NOTE:-
+= IN Django forms, we dont have separate Password-field-class
+= Hence, we use CharField() with special-input-para to constructor "widget=forms.PasswordInput"
+Ex:-
+password=forms.CharField(widget=forms.PasswordInput)
+
+
+Ex:-
+login.html (templates/StudentDBApp folder)
+----------------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <link rel="stylesheet" href="{%static "css/studentloginform.css"%}">
+        <title>Student Login Form</title>
+    </head>
+    <body>
+
+    <div align="center">
+        <h1>Student LOGIN Form</h1>
+        <hr />
+        <form action="/studentloginverifypage/" method="post">
+            {{form1.as_ul}}
+            {%csrf_token%}
+            <input type="submit" name=""value="Submit">
+        </form>
+    </div>
+</body>
+</html>
+
+
+Ex:-
+studentloginform.css (static/css)
+--------------------------------------------
+body{
+    background-color: lightyellow;
+    color:darkgreen;
+}
+
+Ex:-
+urls.py (StudentDBProject conf-folder)
+----------------------------------------
+(add-in-last)
+path('studentloginverifypage/', views.studentloginverifypageview),
+
+
+Ex:-
+views.py (StudentDBApp main-folder)
+--------------------------------------
+from django.shortcuts import render
+from StudentDBApp.forms import StudentLoginForm
+
+def studentloginverifypageview(request):
+    sentdata = False;  # intially get-method(url)
+    if request.method=='POST':
+        formObj=StudentLoginForm(request.POST)
+        if formObj.is_valid():
+            print('Login-Form-Request-data Validation Success and printing data')
+            print('User-Name : ',formObj.cleaned_data['username'])
+            print('Password : ',formObj.cleaned_data['password'])
+            username = formObj.cleaned_data['username'];
+            password = formObj.cleaned_data['password'];
+            if username=="sai" and password=="ram":
+                sentdata=True;  #post-method(Form-submit)
+                username = formObj.cleaned_data['username'];
+                dict1 = {'sentdata': sentdata, 'username':username}
+                return render(request, 'StudentDBApp/loginsuccess.html', context=dict1);
+            else:
+                return render(request, 'StudentDBApp/loginunsuccess.html');
+    else:
+        return render(request, 'StudentDBApp/loginunsuccess.html');
+
+
+Ex:-
+loginsuccess.html (templates/StudentDBApp folder)
+-----------------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr>
+    <head>
+        <meta charset="utf=8">
+        <title>Student-Login Success!!</title>
+    </head>
+    <body bgcolor="LightYellow">
+        {%if sentdata%}
+            <h1>Thanks for Login..!!</h1>
+            <hr />
+            <h2>Welcome : {{ username }}</h2>
+            <hr/>
+            <h3>Here is your Student-Data & Records!!!</h3>
+            <p>...RollNo...</p>
+            <p>...Name...</p>
+            <p>...Marks...</p>
+            <p>...Total...</p>
+            <p>...Average...</p>
+        {% else %}
+            <a href="/studentloginpage/">Go-to Login-Page...</a>
+        {%endif%}
+
+    </body>
+ </html>
+
+ 
+Ex:-
+loginunsuccess.html (templates/StudentDBApp folder)
+-----------------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr>
+    <head>
+        <meta charset="utf=8">
+        <title>Student-Login Success!!</title>
+    </head>
+    <body bgcolor="LightYellow">
+        <h1>Invalid Login..!!</h1>
+        <hr />
+        <h2>Hello : new-user</h2>
+        <hr/>
+        <h3>To get your data, please login-back!!!</h3>
+        <a href="/studentloginpage/">Go-to Login-Page...</a>
+
+    </body>
+ </html>
+
+
+==>> Finally start the server & request below URL,
+http://localhost:8000/studentloginpage/
+
+
+
+====================================================================
+(*****)
+##Another-Program## (DJango-Forms)
+==> Student FeedBack Form Project::- 
+(Re-use StudentDBProject(same-project) & StudentDBApp(same-app)
+Ex:-
+=> forms.py::-	(StudentDBApp main-folder)
+------------------------------------
+(file already there re-use it)
+
+from django import forms;
+class FeedBackForm(forms.Form):
+	name = forms.CharField()
+	rollno = forms.IntegerField()
+	email = forms.EmailField()
+	feedback = forms.CharField(widget=forms.Textarea)
+
+
+NOTE:-
+= IN Django forms, we dont have separate Textarea-field-class
+= Hence, we use CharField() with special-input-para to constructor "widget=forms.Textarea" (mulit-line text-field)
+Ex:-
+password=forms.CharField(widget=forms.Textarea)
+	
+	
+Ex:-  
+==> views.py		(StudentDBApp main-folder)
+-------------------------------------------
+#another-view
+from django.shortcuts import render;
+from StudentDBApp import forms;
+def feedbackview(request):
+    sentdata=False;
+    formsObj = forms.FeedBackForm();
+    if request.method == 'POST':
+        formsObj = forms.FeedBackForm(request.POST);
+        if formsObj.is_valid():
+            print('Form Validation Success and printing information');
+            print('Name:', formsObj.cleaned_data['name'])
+            print('Roll No:', formsObj.cleaned_data['rollno'])
+            print('Email:', formsObj.cleaned_data['email'])
+            print('FeedBack:', formsObj.cleaned_data['feedback'])
+            formsObj = forms.FeedBackForm();
+            sentdata=True;
+    return render(request, 'StudentDBApp/feedback.html', {'form1': formsObj,'sentdata':sentdata});
+
+
+ 
+Ex:-  
+=> feedback.html 	(templates/StudentDBApp)
+-----------------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="{%static "css/feedback.css"%}">
+        <title>Student Feeback</title>
+    </head>
+    <body>
+        <div align='center'>
+            <h1>Student Feedback Form</h1>
+            <hr />
+            {% if sentdata %}
+                <p>Thank your rou valuable feedback....!!!</p>
+                <p>Submit another one...</p>
+            {% endif %}
+            <form class="" action="" method="post">
+                {{form1.as_p}}
+                {%csrf_token%}
+                <input type="submit" value="Submit-Feedback">
+            </form>
+        </div>
+    </body>
+</html>
+
+
+NOTE:-
+= In this form, we do not have action="" page/url, hence form is submitted to same page/url/view
+i.e, http://localhost:8000/studentfeedback/
+
+
+Ex:-
+feedback.css (static/css folder)
+---------------------------------------
+body{
+    background-color: lightyellow;
+    color:darkgreen;
+}
+h1{
+    text-align: center;
+    color:green;
+    background-color: yellow;
+    border:2px Solid Blue;
+}
+h2{
+    color:orangered;
+}
+
+
+Ex:-
+urls.py		(StudentDBProject configuration-folder)
+-------------------------------------------------------
+(add-in-last)
+
+urlpatterns = [
+	.......
+    path('studentfeedback/', views.feedbackview),		##add-in-last
+]
+
+NOTE:-
+= Finally, Run Django Server and request below URL,
+	http://localhost:8000/studentfeedback/
+
+
+
+
+
+

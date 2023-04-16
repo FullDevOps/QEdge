@@ -1,0 +1,923 @@
+************************
+==> Another-Example for Model-class:- 
+(DBModelProject & DBModelApp)
+= Working with Company-model
+(compid,compname,noofemps,compaddr,compsharevalue)
+
+Steps:-
+-------------
+1) Create(Re-use) DBModelProject & DBModelApp
+(already there, simple re-use)
+2) Goto settings.py configure mysql-Database(empdb)
+(already there, simple re-use)
+3) install mysqlclient
+cmd> pip install --only-binary :all: mysqlclient
+(already there, simple re-use)
+4) goto shell & verify connection
+cmd> py manage.py shell
+>>> from django.db import connection;
+>>> mycursor = connection.cursor();
+>>> print(mycursor);
+(already there, simple re-use)
+**5) models.py (DBModelApp app-folder)
+---------------------------------------
+(compid,compname,noofemps,compaddr,compsharevalue)
+
+from django.db import models
+class Company(models.Model):
+    compid= models.IntegerField();
+    compname=models.CharField(max_length=50);
+    noofemps=models.IntegerField();
+    compaddr=models.CharField(max_length=100);
+    compsharevalue = models.FloatField();
+    #def __str__(self):
+    #    return 'Company object with compid:'+str(self.compid);
+
+6) admin.py (DBModelApp folder)
+------------------------------------
+= register our model-class here...
+
+from DBModelApp.models import Company
+admin.site.register(Company)
+
+=** register in another-statment only because it is new-model
+
+7)****very-imp
+cmd> py manage.py makemigrations
+Migrations for 'DBModelApp':
+  DBModelApp\migrations\0002_company.py
+    - Create model Company
+
+8) 
+cmd> py manage.py sqlmigrate DBModelApp 0002
+--
+-- Create model Company
+--
+CREATE TABLE `DBModelApp_company` (`id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY, `compid`
+ integer NOT NULL, `compname` varchar(50) NOT NULL, `noofemps` integer NOT NULL, `compaddr`
+varchar(100) NOT NULL, `compsharevalue` double precision NOT NULL);
+
+9)
+cmd> py manage.py migrate
+Operations to perform:
+  Apply all migrations: DBModelApp, admin, auth, contenttypes, sessions
+Running migrations:
+  Applying DBModelApp.0002_company... OK
+
+NOTE:-
+= verify in MySQL-DB
+mysql> show tables;
+(11 + 1extra-new-table)
+
+10) create superuser
+cmd> py manage.py createsuperuser
+(already-done ,simply re-use)
+uname: saisir
+pwd: Saisir123@
+
+11) goto browser & access below url (start the server)
+http://localhost:8000/admin/
+= select "Companys" link & add 3-data(TCS,Infosys,Wipro)
+
+COMPID	COMPNAME	NOOFEMPS	COMPADDR	COMPSHAREVALUE
+7777	Wipro		45000		Pune			1500.89
+8888	Infosys		68000		Banglore		1800.5
+9999	TCS			100000		Hyderabad		2560.65
+
+= Verify this in MySQL-DB
+mysql> select * from dbmodelapp_company;
+(3-records)
+= in admin-page, we can perform ADD/Update/Delete options
+
+12) Displaying Table-format of Companys in Admin-page,
+Ex:-
+admin.py (DBModelApp main-folder)
+------------------------
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = ['compid','compname','noofemps','compaddr','compsharevalue']
+	
+admin.site.register(Company,CompanyAdmin)
+(***register both here in single-stmt o.w error...)
+
+=** restart-server & refresh admin-page in browser
+http://localhost:8000/admin/
+(here we get "Company" model in table-format)
+(*** here __str__() is not required in model-class)
+
+
+***imp-step***
+13) Now provide, table-views to client/customer
+Ex:-
+views.py  (DBModelApp main-folder)
+---------------------------------------------
+from DBModelApp.models import Company
+def companydata(request):
+    complist=Company.objects.all()
+    dict1={'complist':complist}
+    return render(request, 'DBModelApp/company.html', context=dict1);
+
+14)
+company.html (templates/DBModelApp folder)
+-------------------------------------------
+<!DOCTYPE html>
+{%load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Company DBModel</title>
+    <link rel="stylesheet" href="{%static '/css/mystyles.css'%}">
+</head>
+<body>
+    <h1>The Companies list is ::</h1>
+    <hr />
+    <br />
+    {% if complist%}
+    <table border="2" width="350">
+        <caption>Company-Details</caption>
+        <thead>
+            <th>Company-ID</th>
+            <th>Company-Name</th>
+            <th>Total-Emps</th>
+            <th>Comp-Addr</th>
+            <th>Share-Value</th>
+        </thead>
+        <tbody>
+            {% for comp in complist%}
+            <tr>
+                <td> {{comp.compid}}</td>
+                <td>{{comp.compname}}</td>
+                <td>{{comp.noofemps}}</td>
+                <td> {{comp.compaddr}}</td>
+                <td> {{comp.compsharevalue}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {%else%}
+        <p>****No company-records found****</p>
+    {% endif %}
+
+</body>
+</html>
+
+
+15)
+mystyles.css (static/css folder) (re-use-it)
+-------------------------------------------
+h1{
+    color:Blue;
+    border:2px Solid Brown;
+    text-align: center;
+    background-color: yellow;
+}
+table{
+    border: 2px Solid Blue;
+    background-color: beige;
+    text-align: center;
+}
+caption{
+    border-top: 2px Solid Blue;
+    border-left: 2px Solid Blue;
+    border-right: 2px Solid Blue;
+    background-color: yellow;
+    text-align: center;
+    font-size: 23px;
+    font-weight: bolder;
+    color:Green;
+}
+p{
+    color:red;
+    background-color: lightyellow;
+    font-size:20px;
+    border:2px Solid Red;
+    width:35%;
+}
+
+
+16)
+urls.py   (DBModelProject configuration-folder)
+-----------------------------
+path('compdata/', views.companydata),
+
+17) finally, re-start the server & request below url,
+http://localhost:8000/compdata/
+
+
+
+****Assignment***
+= Create a DBStudentProject with DBStudentApp & Student-model-class, StudentAdmin-model with studentdata() view-func  & student.html & mystyles.css (studdata/ is url-pattern)
+(Display as table(sno,sname,course,5-sub-marks,total,avg,grade)
+(calculate total for 5-subjs in student.html using django-template-coding with forloop)
+NOTE:-
+= create new-db (studentdb) in mysql-db(8.0)
+(Follows all-steps from prev-example)
+mysql> create database studentdb;
+mysql> use studentdb;
+
+
+
+
+
+
+
+----------------------------------------------------------------------
+==>>MVT Architecture::-
+= MVT stands for Model-View-Template
+= Model(Data) is nothing but a class in django "models.py". This class has different fields of a table(as vars). It is inherited from django.db.models.Model parent-class. For this model-class, we perform migrations-command(3) & table is created physically in Database. Finally model is a Data for our Django-App
+
+= View is nothing but controller-function for our Django-app. It is a function/class-with-method i.e, view-function. Here we accept client-request based on url-pattern, process that request and provide HttpResponse(html-data) back to client as reply. It's filename is "views.py"
+
+= Template, is nothing but .html-data or file with html-tags. Here we present the reply back to client in the form of html-tags. In this tags, we use dynamic-data available from views.py as dictionary-context-var. Such data is presented using DJango-Template-Language({{vars}} or {%..code..%}). Its filename is "templates/AppName/.html files
+
+==Diagarm==
+client(user)---Req--->[DJango-Server](urls---->views(V))<---->Model<-->DB
+											|
+											|
+										Send-Dynamic-data
+											|
+	(user)<----------Res------------Templates(.html+css+static)	
+	
+	
+	
+	
+	
+	
+	
+	
+
+==> Important FAQs Related to Model and database configurations:-
+1) How to configure database inside settings.py?
+2) How to check connections?
+3) How to define Model class inside models.py
+4) How we can perform makemigrations?
+5) How we can perform migrate?
+6) How to add our model to admin interface inside admin.py
+7) How To display total data how to write ModelAdmin class inside admin.py
+8) How to create superuser?
+9) How to login to admin interface and add/modify/del data(Records) to our tables?
+10) How to see generated sqlcode because of makemigrations
+
+
+
+====================================================================
+==>DJANGO-DB-Models(next-topic)::-
+==>>"faker" Module::-
+= We can use faker Module to generate fake data for our database models,
+(faker module gives fake-data w.o any interaction with Database)
+=(How to install it using pip command)
+C:\Users\Office\PycharmProjects\DBModelProject> pip install faker
+cmd> pip install faker		(in Terminal-tab)
+
+##Sample-Demo-Program
+Ex:- (FakerEx1.py) 
+under "DBModelApp" directly in app-folder & run individually...
+------------------------------------------------------
+from faker import Faker;
+from random import *;
+
+fakerObj=Faker()
+fullname=fakerObj.name()
+print(fullname)
+fname=fakerObj.first_nam
+lname=fakerObj.last_name()
+print(fname)
+print(lname)
+date1=fakerObj.date()
+print(date1)
+num=fakerObj.random_number(5)   #5-digit-number is generated
+print(num)
+email1=fakerObj.email()
+print(email1)
+print(fakerObj.city())
+print(fakerObj.random_int(min=0, max=9999))
+print(fakerObj.random_element(elements=('Manager', 'HR', 'Developer', 'Director', 'CEO')));
+
+(Run-cmd)
+cmd\DBModelApp>py .\FakerEx1.py
+
+
+NOTE:-
+(Verifying Faker-class content)
+cmd\DBModelProject> py manage.py shell
+>>> from faker import Faker
+>>> help(Faker)
+(or)
+>>> dir(Faker)
+
+
+
+(*****)
+##Another-Project "StudentDBProject" (using MySQL-database)
+==>>Working with MYSQL Database (StudentDBApp project):
+=> Create a new Project:-
+	File--> New --> DJango-project with given App(StudentDBApp)
+(templates-folder are auto-created... & also create StudentDBApp under templates-folder)
+(Also create "static" folder with "css" sub-folder under ur project-folder)
+
+=** Now perform settings.py,
+settings.py (StudentDBProject configuration-folder)
+-------------------------------
+BASE_DIR = Path(__file__).resolve().parent.parent
+#TEMPLATE_DIR=os.path.join(BASE_DIR,"templates')
+INSTALLED_APPS = [
+	........
+    'StudentDBApp.apps.StudentdbappConfig',
+	#StudentDBApp
+]
+
+TEMPLATES = [
+    {
+        'DIRS': [BASE_DIR/'templates'],
+		#'DIRS': [TEMPLATE_DIR],
+    },
+]
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'studentdb',
+        'USER':'root',
+        'PASSWORD':'root',
+        'PORT':'3306',
+        'HOST':'localhost',
+    }
+}
+
+STATIC_URL = '/static/'
+import os;
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+***NOTE:-
+= In MySQL, create "studentdb" database and keep it ready...
+(if already there then re-use it...)
+mysql> create database studentdb;
+Query OK, 1 row affected
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| empdb              |
+| information_schema |
+| mysql              |
+| performance_schema |
+| studentdb          |
+| sys                |
++--------------------+
+
+
+**Start-coding**
+Ex:-
+models.py (StudentDBApp)
+--------------------------
+from django.db import models
+#Create your models here.
+class Student(models.Model):
+    name=models.CharField(max_length=30)
+    marks=models.IntegerField()
+
+
+Ex:-
+admin.py (StudentDBApp)
+--------------------------
+from django.contrib import admin
+from StudentDBApp.models import Student
+#Register your models here.
+class StudentAdmin(admin.ModelAdmin):
+    list_display=['name','marks']
+admin.site.register(Student,StudentAdmin);
+
+
+Ex:-
+views.py (StudentDBApp)
+-----------------------------
+from django.shortcuts import render
+from StudentDBApp.models import Student
+
+#Create your views here.
+def studentview(request):
+    studentlist = Student.objects.order_by('marks')
+    dict1={'studentlist':studentlist}
+    return render(request,'StudentDBApp/students.html',context=dict1);
+
+
+Ex:-
+students.html (templates/StudentDBApp folder)
+----------------------------------------------
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+          <meta charset="utf-8">
+          <title>Students-Data</title>
+    </head>
+    <body>
+        <h1>StudentDB-Project with StudentDB-App...</h1>
+        <hr />
+        {%if studentlist %}
+            <table border="1" margin='auto'>
+                <caption>Student-Table-Details</caption>
+                <thead>
+                    <th>Names</th>
+                    <th>Marks</th>
+                </thead>
+                <tbody>
+                    {% for stud in studentlist %}
+                        <tr>
+                            <td>{{stud.name}}</td>
+                            <td>{{stud.marks}}</td>
+                        </tr>
+                    {% endfor %}
+                <</tbody>
+            </table>
+        {% else %}
+            <p>No Students Records found...</p>
+        {% endif %}
+    </body>
+</html>
+
+
+Ex:-
+urls.py (StudentDBProject folder)
+-----------------
+from django.contrib import admin
+from django.urls import path
+from StudentDBApp import views;
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('studentview/', views.studentview),
+]
+
+
+
+NOTE:-
+(Other-Imp-Activities before running the Project)
+1) Install mysqlclient in your StudentDBProject
+cmd\StudentDBProject> pip install --only-binary :all: mysqlclient
+Collecting mysqlclient
+  Using cached mysqlclient-2.1.0-cp39-cp39-win_amd64.whl (180 kB)
+Installing collected packages: mysqlclient
+Successfully installed mysqlclient-2.1.0
+
+2) Verify MySQL-DB connection
+cmd\StudentDBProject> py manage.py shell
+>>> from django.db import connection
+>>> mycursor = connection.cursor();
+>>> print(mycursor);
+<django.db.backends.utils.CursorDebugWrapper object at 0x0000021CEAE00D00>
+#No-Error...
+
+3) Create model-class (models.py) --> Already-Done
+4) Convert Model-class into Database specific SQL-code...
+cmd\StudentDBProject> python manage.py makemigrations
+Migrations for 'StudentDBApp':
+  StudentDBApp\migrations\0001_initial.py
+    - Create model Student
+
+5) Check/verify SQL-Code of Migrations
+cmd\StudentDBProject> python manage.py sqlmigrate StudentDBApp 0001
+Ex:-
+--
+-- Create model Student
+--
+CREATE TABLE `StudentDBApp_student` (`id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY, `name` varchar(30) NOT NULL, `marks` integer NOT NULL);
+
+6) RUN/Execute generated SQL-Code(migrate-command)
+cmd\StudentDBProject> py manage.py migrate
+Operations to perform:
+  Apply all migrations: StudentDBApp, admin, auth, contenttypes, sessions
+Running migrations:
+  Applying StudentDBApp.0001_initial... OK
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+
+=*** Verify in MySQL-DB, use below commands,
+mysql> use studentdb;
+Database changed
+mysql> show tables;
++----------------------------+
+| Tables_in_studentdb        |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
+| studentdbapp_student       |
++----------------------------+
+11 rows in set
+
+mysql> describe studentdbapp_student;
++-------+-------------+------+-----+---------+----------------+
+| Field | Type        | Null | Key | Default | Extra          |
++-------+-------------+------+-----+---------+----------------+
+| id    | bigint      | NO   | PRI | NULL    | auto_increment |
+| name  | varchar(30) | NO   |     | NULL    |                |
+| marks | int         | NO   |     | NULL    |                |
++-------+-------------+------+-----+---------+----------------+
+3 rows in set
+
+mysql> select * from studentdbapp_student;
+Empty set
+
+7) Check & Verify created tables in DJango admin interface
+= For this create one super-user
+cmd\StudentDBProject> python manage.py createsuperuser
+Username (leave blank to use 'office'): sai
+Email address: sai@gmail.com
+Password: sai
+Password (again): sai
+The password is too similar to the username.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+8) Run server & request below URL and give above username/password for login to admin-interface
+(http://localhost:8000/admin)
+(Next, goto STUDENTDBAPP(section) & Students(table) & perform Add/Change/Delete operations)
+
+cmd> py manage.py runserver
+(http://localhost:8000/admin) & given username/password to login...
+(Next, goto STUDENTDBAPP(section) & Students(table) & perform Add/Change/Delete operations)
+(Add-operation)
+Names	Marks
+Ali	65
+Ram	86
+Sai	95
+(Change-operation)
+Names	Marks
+Ali	65
+Ram	86
+SaiBaba	95
+(delete-operation) -->"Ali"
+Names	Marks
+Ram	86
+SaiBaba	95
+
+=*** Also verify in MySQL-DB(studentdb/studentdbapp_student table)
+mysql> select * from studentdbapp_student;
++----+---------+-------+
+| id | name    | marks |
++----+---------+-------+
+|  1 | SaiBaba |    95 |
+|  2 | Ram     |    86 |
++----+---------+-------+
+2 rows in set
+
+==> finally, verify table-data in end-user-view url-request
+http://localhost:8000/studentview/
+(Apply your own-css mystyles.css & link in students.html file)
+(use {%load static%})
+
+
+
+
+(******)
+==>> Working with MYSQL Database and Faker Module::-
+(StudentDBProject & StudentDBApp):
+==Project Tree Diagram from PyCharm==
+
+Ex:-
+settings.py (StudentDBProject configuration-folder)
+-------------------------------
+BASE_DIR = Path(__file__).resolve().parent.parent
+#TEMPLATE_DIR=os.path.join(BASE_DIR,"templates')
+INSTALLED_APPS = [
+	........
+    'StudentDBApp.apps.StudentdbappConfig',
+	#StudentDBApp
+]
+
+TEMPLATES = [
+    {
+        'DIRS': [BASE_DIR/'templates'],
+		#'DIRS': [TEMPLATE_DIR],
+    },
+]
+
+DATABASES = {
+    'default': {
+        #'ENGINE': 'django.db.backends.sqlite3',
+        #'NAME': BASE_DIR / 'db.sqlite3',
+
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'studentdb',
+        'USER':'root',
+        'PASSWORD':'root',
+        'PORT':'3306',
+        'HOST':'localhost',
+    }
+}
+
+STATIC_URL = '/static/'
+import os;
+STATIC_DIR = os.path.join(BASE_DIR,'static')
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
+
+
+**start-coding**
+Ex:-
+models.py (StudentDBApp folder)
+--------------------------------
+from django.db import models
+
+#Create your models here.
+class Student(models.Model):
+    name=models.CharField(max_length=30)
+    marks=models.IntegerField()
+
+class Student2(models.Model):       #Faker-data
+    rollno=models.IntegerField()
+    name=models.CharField(max_length=30)        #single-line-text
+    dob=models.DateField()
+    marks=models.IntegerField()
+    email=models.EmailField()
+    phonenumber=models.BigIntegerField()
+    address=models.TextField()          #multi-line-text
+
+
+
+NOTE:-(***)
+i) Convert Model-class into Database specific SQL-code...
+cmd\StudentDBProject> python manage.py makemigrations
+Migrations for 'StudentDBApp':
+  StudentDBApp\migrations\0002_student2.py
+    - Create model Student2
+
+ii) Check/verify SQL-Code of Migrations
+cmd\StudentDBProject> python manage.py sqlmigrate StudentDBApp 0002
+Ex:-
+--
+-- Create model Student2
+--
+CREATE TABLE `StudentDBApp_student2` (`id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY, `rollno` integer NOT NULL, `name` varchar(30) NOT NULL, `dob` date NOT NULL,
+ `marks` integer NOT NULL, `email` varchar(254) NOT NULL, `phonenumber` integer NOT NULL, `address` longtext NOT NULL);
+
+
+iii) RUN/Execute generated SQL-Code(migrate-command)
+cmd\StudentDBProject> py manage.py migrate
+Operations to perform:
+  Apply all migrations: StudentDBApp, admin, auth, contenttypes, sessions
+Running migrations:
+  Applying StudentDBApp.0002_student2... OK
+
+
+Ex:-
+admin.py (StudentDBApp folder)
+---------------------------
+from django.contrib import admin
+from StudentDBApp.models import Student,Student2
+#Register your models here.
+
+class StudentAdmin(admin.ModelAdmin):
+    list_display=['name','marks']
+
+class Student2Admin(admin.ModelAdmin):
+    list_display=['rollno', 'name', 'dob','marks','email', 'phonenumber','address']
+
+admin.site.register(Student,StudentAdmin);  #register takes only 2-args at a time
+admin.site.register(Student2,Student2Admin);    #hence use 2 register() functions statements
+
+
+=*** Creation of super-user NOT-required(already done)
+uname:sai
+pwd:sai
+
+
+=*** Verify tables in MySQL-DB, use below commands,
+mysql> use studentdb;
+Database changed
+mysql> show tables;
++----------------------------+
+| Tables_in_studentdb        |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
+| studentdbapp_student       |
+| studentdbapp_student2      |
++----------------------------+
+12 rows in set
+
+mysql> describe studentdbapp_student2;
++-------------+--------------+------+-----+---------+----------------+
+| Field       | Type         | Null | Key | Default | Extra          |
++-------------+--------------+------+-----+---------+----------------+
+| id          | bigint       | NO   | PRI | NULL    | auto_increment |
+| rollno      | int          | NO   |     | NULL    |                |
+| name        | varchar(30)  | NO   |     | NULL    |                |
+| dob         | date         | NO   |     | NULL    |                |
+| marks       | int          | NO   |     | NULL    |                |
+| email       | varchar(254) | NO   |     | NULL    |                |
+| phonenumber | int          | NO   |     | NULL    |                |
+| address     | longtext     | NO   |     | NULL    |                |
++-------------+--------------+------+-----+---------+----------------+
+8 rows in set
+
+mysql> select * from studentdbapp_student2;
+Empty set
+
+iv) Check & Verify created tables in DJango admin interface
+= For this create one super-user
+cmd\DBModelProject> python manage.py createsuperuser
+Username (leave blank to use 'office'): sai
+Email address: sai@gmail.com
+Password: sai
+Password (again): sai
+The password is too similar to the username.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+v) Run server & request below URL and give above username/password for login to admin-interface
+(http://localhost:8000/admin) & given username/password to login...
+(Next, goto STUDENTDBAPP(section) & select Student2s(table))
+(Initially we have 0-records)
+
+cmd> py manage.py runserver
+
+***Last-Imp-Step***
+------------------
+Ex:-
+(Now using Faker-class object we will generate fake-data w.o actual MySQL-DB)
+Ex:-
+populate_student_info.py (Under StudentDBProject main-folder)
+--------------------------------------------------------------------
+(install Faker module in windows-command-prompt or PyCharm-IDE command-prompt for StudentDBProject)
+
+import os
+os.environ.setdefault('DJANGO_SETTINGS_MODULE','StudentDBProject.settings');
+import django
+django.setup()
+
+from StudentDBApp.models import Student2;
+from faker import Faker;
+from random import *;
+fakerObj=Faker();
+
+def phonenumbergen():
+    d1=randint(6,9)     #6,7,8,9
+    num=str(d1)
+    for i in range(9):
+        num=num+str(randint(0,9))   #0-9 9-times
+	print(num)
+    return int(num)
+
+def populate(n):
+    for i in range(n):
+        frollno=fakerObj.random_int(min=1,max=999)
+        fname=fakerObj.name()
+        fdob=fakerObj.date()
+        fmarks=fakerObj.random_int(min=1,max=100)
+        femail=fakerObj.email()
+        fphonenumber=phonenumbergen();
+        faddress=fakerObj.address()
+        studentrecord=Student2.objects.get_or_create(rollno=frollno,name=fname,dob=fdob,marks=fmarks,email=femail,phonenumber=fphonenumber,address=faddress)[0]		#[0] not-required
+
+populate(5);
+
+
+NOTE:-
+= Run the above file individaully in PyCharm-IDE terminal/command-prompt
+cmd\StudentDBProject> py ./populate_student_info
+(run above file to keep populating multiple-records)
+
+=*** Verify in MySQL-DB, use below commands,
+mysql> select * from studentdbapp_student2;
+(5 records)
+
+==** Also start server & verify in admin-Interface(Student2s link)
+http://localhost:8000/admin/
+
+
+***Finally,
+Ex:- (End-user-view)
+views.py  (StudentDBApp folder)
+---------------------------------
+from django.shortcuts import render
+from StudentDBApp.models import Student
+
+#Create your views here.
+def studentview(request):		#old
+    studentlist = Student.objects.order_by('marks')
+    dict1={'studentlist':studentlist}
+    return render(request,'StudentDBApp/students.html',context=dict1);
+
+
+from StudentDBApp.models import Student2;
+def student_homepage(request):				#new
+    #students= Student2.objects.all()
+    #students=Student2.objects.filter(marks__lt=35)
+    #students=Student2.objects.filter(name__startswith='A')
+    #students=Student2.objects.all().order_by('marks')  #ASC
+    students=Student2.objects.all().order_by('-marks')   #DESC
+    return render(request, 'StudentDBApp/index.html', {'students':students})
+
+
+
+
+Ex:-
+index.html  (templates/StudentDBApp)
+------------------------------------
+<!DOCTYPE html>
+{%load static%}
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Student Homepage!!</title>
+        <link rel="stylesheet" href="{%static "css/studinfo.css"%}">
+    </head>
+<body>
+    <div class="container">
+        <h1>Student Information(complete)</h1>
+        <hr />
+        {% if students%}
+            {%for ss in students%}
+                <h2>{{ss.name}} Information</h2><hr />
+                <ul>
+                    <li>Student Rollno : {{ss.rollno}}</li>
+                    <li>Student DOB : {{ss.dob}}</li>
+                    <li>Student Marks : {{ss.marks}}</li>
+                    <li>Student Email : {{ss.email}}</li>
+                    <li>Student Phone-Number : {{ss.phonenumber}}</li>
+                    <li>Student Address : {{ss.address}}</li>
+                </ul>
+            <br />
+            {%endfor%}
+        {%else%}
+            <p>Student Records Are Not Available</p>
+        {%endif%}
+    </div>
+
+</body>
+</html>
+
+
+Ex:-
+studinfo.css	(under static/css folder)
+-------------------------------------------
+body.container
+{
+    background: blue;
+    color:white;
+}
+h1{
+    text-align: center;
+}
+h2{
+    color:yellow;
+}
+
+
+Ex:-
+urls.py (StudentDBProject)
+-------------------------------
+from django.contrib import admin
+from django.urls import path
+from django.urls import re_path
+from StudentDBApp import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('studenthomepage/', views.student_homepage),
+
+    re_path('^.*$', views.student_homepage),
+]
+
+
+NOTE:-
+= Start the server and request the base-url(No-URL)
+	http://localhost:8000/studenthomepage/
+
+

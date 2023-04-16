@@ -1,0 +1,515 @@
+==========================================================
+==> Cookies (in Session-Management) Programming::-
+I) Testing Cookies in Browser::-
+==> How To Test Our Browser Supports Cookies or Not:
+(G.Chrome/M.Firefox/Apple-Safari)
+= We have to use the following 3-methods on the request object
+	1) set_test_cookie()	#creates test-cookie-obj in session
+	2) test_cookie_worked() 
+			#checks cookie-obj there or not in session(True/False)
+	3) delete_test_cookie()	
+			#deletes cookie-obj if already present in session
+
+
+##Program (SessionsProject-proj & MyApps1-application)
+(Create new-project and new-app)
+Ex:-
+==> views.py (MyApps1-folder)
+-----------------------------------------
+from django.shortcuts import render
+from django.http import HttpResponse
+
+#Create your views here.
+def index(request):
+    request.session.set_test_cookie()
+    print('Cookies are set for Initial-request..!!')
+    return HttpResponse('<h1>Index page of Cookies...</h1><hr /><h2>Request check_view/ url...</h2>')
+
+def check_view(request):
+    if request.session.test_cookie_worked():
+        print('Cookies are working properly')
+        request.session.delete_test_cookie()
+        return HttpResponse('<h1>Cookie Checking Page Working Properly..!!!</h1><hr />')
+    else:
+        print('Cookies are NOT working properly')
+        return HttpResponse('<h1>Cookie Checking Page NOT-Working Properly..!!!</h1><hr />')
+
+
+**Note::-
+= Before executing this program compulsory we should perform migrate-cmd(operation/operation using below command)
+Steps:- (1 & 2 NReq)
+(NReq)1) cmd\SessionsProject> python manage.py makemigrations
+(NReq)2) cmd\SessionsProject> python manage.py sqlmigrate MyApps1 0001 
+3) cmd\SessionsProject> python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+(*** by running this step-3, sessions are applied/enabled to our application in our project)
+
+Ex:-
+==> urls.py (SessionsProject main-folder)
+--------------------------------------------
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('index/',views.index),
+    path('check_view/',views.check_view),
+]
+
+
+==> Finally, run-server & request below URLs
+http://localhost:8000/index/   (1st-req)
+http://localhost:8000/check_view/		(2nd,3rd-req)
+NOTE:-
+1) request index/ url with and without below-code in def index(request) view-function, and followed by check_view/ url in both cases to test cookies are created successfully for not..!!
+Ex:-
+	#request.session.set_test_cookie()
+(session created with this stmt or not-created if commented#)
+
+
+
+-------------------------------------------------------
+==> Main-Application-1  
+(Session Management by using Cookies with extra-data/vars)
+##(PageCount Application)
+##Program (use-SessionsProject & MyApps1-application)
+Ex:-
+==>views.py (MyApps1)
+--------------------------------
+##Application-1
+from django .shortcuts import render
+#Create your views here.
+def count_view(request):
+    if 'count' in request.COOKIES:
+        newcount=int(request.COOKIES['count'])+1
+    else:
+        newcount=1;
+
+    response=render(request,'MyApps1/count.html',{'count':newcount})
+    response.set_cookie('count',newcount)  #cookie with data or variable(count)
+    return response;
+
+==*** cookie-obj acts like dict-var-obj{k:v,....}
+Ex:-
+	{"count":1}
+=** set_cookie() used on response-obj to set k,v in COOKIES-obj
+
+Ex:-
+==>count.html: (templates/MyApps1 folder)
+-------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Cookies Counter-Page</title>
+        <style>
+            span{
+                font-size:30px;
+                font-weight:900;
+                color:Green;
+            }
+            h1{
+                color:blue;
+                text-align: center;
+                background-color: lightcyan;
+            }
+            h3{
+                color:darkred;
+                text-align: left;
+                background-color: lightgreen;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Cookies Counter-Page in DJango-App</h1>
+        <hr />
+        <h3>
+            Page Count is:<span>{{count}}</span>
+        </h3>
+    </body>
+</html>
+
+
+
+**Note::-
+= Before executing this program compulsory we should perform migrate-cmd(operation/operation using below command)
+Steps:- (1 & 2 NReq)
+(NReq)1) cmd\SessionsProject> python manage.py makemigrations
+(NReq)2) cmd\SessionsProject> python manage.py sqlmigrate MyApps1 0001 
+3) cmd\SessionsProject> python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  No migrations to apply.
+
+Ex:-
+==> urls.py (SessionsProject main-folder)
+--------------------------------------------
+from MyApps1 import views
+
+urlpatterns = [
+	.......
+	.......
+	#application-1
+    path('count_view/',views.count_view),
+]
+
+
+==> Finally, run-server & request below URLs
+http://localhost:8000/count_view/
+cases:-
+-------
+a) request above url multiple-times (to check for increment in count)
+b) request above url by clearing browser history(all-time with cookies)
+(count should again start from 1)
+c) also check request for above url from 2-different browser from 2-different machines
+
+
+
+
+*****start-here*****
+-------------------------------------------------------
+##Cookies-Application-2  
+##Session Management by using Cookies
+(User-Login-page with cookies)
+Ex:-
+views.py (MyApps1 main-folder)
+-------------------------------------
+##Application-2
+from django .shortcuts import render
+from MyApps1.forms import LoginForm
+import datetime;
+#Create your views here.
+def home_view(request):
+    formobj=LoginForm()
+    return render(request,'MyApps1/home.html',{'formobj':formobj})
+
+def date_time_view(request):
+    #form=LoginForm(request.GET)
+    name=request.GET['name']
+    response=render(request,'MyApps1/datetime.html',{'name':name})
+    response.set_cookie('name',name)
+    return response;
+
+def result_view(request):
+    name=request.COOKIES['name']
+    date_time=datetime.datetime.now()
+    dict1={'name':name,'date_time':date_time}
+    return render(request,'MyApps1/result.html',dict1)
+
+
+Ex:- 
+forms.py (MyApps1 main-folder)
+-------------------------------------
+from django import forms;
+
+class LoginForm(forms.Form):
+	name=forms.CharField();
+
+
+
+Ex:- 
+home.html (templates/MyApps1 folder)
+-------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango-Cookies-App2</title>
+    </head>
+    <body>
+        <h1>Welcome to Django Cookies App2(Home-page)</h1>
+        <hr />
+        <form action="/second">
+            {{formobj.as_p}}
+            {%csrf_token%}
+            <input type="submit" name="" value="Enter Name & Click">
+        </form>
+    </body>
+</html>
+
+
+Ex:- 
+datetime.html (templates/MyApps1 folder)
+------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango Cookies Date&Time App2</title>
+    </head>
+    <body>
+        <h1>Django Cookies Date&Time App2</h1>
+        <hr />
+        <h2>Hello :: {{name}}</h2>
+        <hr/>
+        {{name}}...<a href="/result">Click Here to get Date and Time</a>
+    </body>
+</html>
+
+
+	
+Ex:- 
+result.html (templates/MyApps1 folder)
+------------------------------------------	
+<!DOCTYPE html>
+<html lang="en"dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Django Cookies Result-page App2</title>
+    </head>
+    <body>
+        <h1>DJango Cookies Result-page App2</h1>
+        <hr />
+        <h2>Welcome : {{name}}</h2>
+        <hr/>
+        <h3>Server Current Date and Time : {{date_time}}</h3>
+        <hr />
+        <a href="/result">Again...Click Here to get Updated Date & Time!!</a>
+    </body>
+</html>
+
+
+**Note::-
+= Before executing this program compulsory we should perform migrate-cmd(operation/operation using below command)
+Steps:- (1 & 2 NReq)
+(NReq)1) cmd\SessionsProject> python manage.py makemigrations
+(NReq)2) cmd\SessionsProject> python manage.py sqlmigrate MyApps1 0001 
+3) cmd\SessionsProject> python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  No migrations to apply.
+
+Ex:-
+==> urls.py (SessionsProject main-folder)
+--------------------------------------------
+from MyApps1 import views
+
+urlpatterns = [
+	.......
+	.......
+	#application-2
+    path('home_view/',views.home_view),
+    path('second/',views.date_time_view),
+    path('result/',views.result_view),
+]
+
+
+==> Finally, run-server & request below URLs
+http://localhost:8000/home_view/
+(and follow given links...)
+
+
+
+
+
+
+---------------------------------------------
+##Application-3  
+###Session Management by using Cookies
+(Cookies in multiple-requests)
+Ex:-
+views.py (MyApps1 main-folder)
+------------------------------------------
+##Application-3
+from django .shortcuts import render
+#Create your views here.
+def name_view(request):
+    return render(request,'MyApps1/name.html');
+
+def age_view(request):
+    name=request.GET['name']
+    response=render(request,'MyApps1/age.html',{'name':name})
+    response.set_cookie('name',name)
+    return response
+
+def parent_view(request):
+    age=request.GET['age']
+    name=request.COOKIES['name']
+    response=render(request,'MyApps1/parent.html',{'name':name})
+    response.set_cookie('age',age)
+    return response
+
+def result1_view(request):
+    name=request.COOKIES['name']
+    age=request.COOKIES['age']
+    pname=request.GET['pname']
+    response=render(request,'MyApps1/result1.html',{'name':name,'age':age,'pname':pname})
+    response.set_cookie('pname',pname)
+    return response
+
+
+Ex:- 
+name.html (templates/MyApps1 folder)
+-------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango Cookies App-3</title>
+    </head>
+    <body>
+        <h1>DJango Cookies App-3(Name-View)</h1>
+        <hr />
+        <form action='/age_view'>
+            Enter your Name :
+            <input type="text" name="name" value="" /><br /><br />
+            <input type="submit" name="" value="Submit Your Name" />
+        </form>
+    </body>
+</html>
+
+
+Ex:- 
+age.html (templates/MyApps1 folder)
+-------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>DJango Cookies App-3</title>
+    </head>
+    <body>
+        <h1>DJango Cookies App-3(Age-View)</h1>
+        <hr />
+        <h2>Hello : {{name}}!!</h2>
+        <hr />
+        <form action='/parent_view'>
+            Enter Your Age :
+            <input type="text" name="age" value=""><br/><br/>
+            <input type="submit" name="" value="Submit Your Age">
+        </form>
+    </body>
+</html>
+
+
+Ex:- 
+parent.html (templates/MyApps1 folder)
+-------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Django-Cookies App3</title>
+    </head>
+    <body>
+        <h1>DJango Cookies App-3(Parent-View)</h1>
+        <hr />
+        <h2>Hello : {{name}}!!</h2>
+        <hr />
+        <form action='/result1_view'>
+            Enter your Parent-Name:
+            <input type="text" name="pname" value=""><br/><br/>
+            <input type="submit" name="" value="Submit Parent Name">
+        </form>
+    </body>
+</html>
+
+
+
+Ex:- 
+result1.html (templates/MyApps1 folder)
+-------------------------------------------
+<!DOCTYPE html>
+<html lang="en"dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Django-Cookies App3</title>
+    </head>
+    <body>
+        <h1>DJango Cookies App-3(Final Result-View)</h1>
+        <hr />
+        <h2>Hello : {{name}}!! Thanks for providing details...</h2>
+        <hr />
+        <h3>&lt;&lt;Once Verify your Details & Confirm&gt;&gt;</h3><hr>
+        <ul>
+            <li>Your-Name : {{name}}</li>
+            <li>Your-Age : {{age}}</li>
+            <li>Parent-Name : {{pname}}</li>
+        </ul>
+        <hr />
+    </body>
+</html>
+
+
+
+**Note::-
+= Before executing this program compulsory we should perform migrate-cmd(operation/operation using below command)
+Steps:- (1 & 2 NReq)
+(NReq)1) cmd\SessionsProject> python manage.py makemigrations
+(NReq)2) cmd\SessionsProject> python manage.py sqlmigrate MyApps1 0001 
+3) cmd\SessionsProject> python manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions
+Running migrations:
+  No migrations to apply.
+
+Ex:-
+==> urls.py (SessionsProject main-folder)
+--------------------------------------------
+from MyApps1 import views
+
+urlpatterns = [
+	.......
+	.......
+	#application-3
+    path('name_view/',views.name_view),
+    path('age_view/',views.age_view),
+    path('parent_view/',views.parent_view),
+    path('result1_view/',views.result1_view),
+]
+
+
+==> Finally, run-server & request below URLs
+http://localhost:8000/name_view/
+(and follow given links/buttons...)
+
+NOTE:-
+1) use &lt; and &gt; for < and > symbols in html-page for display
+2)
+In views.py function,
+= we can also use request.GET["form-field-name"]
+= it gives corresponding submitted value
+Ex:-
+	name = request.GET["name"]			
+	age = request.GET["age"]
+(we can use formobj.cleaned_data["name"] to get form-submitted-data but here it requires formobj from froms.py prog)
+
+
+
+(*****)
+==>> NOTES::-
+=>Limitations of Cookies:-
+(refer-notes)
+= By using cookies we can store very less amount of information. The size of the cookie-obj is fixed. Hence if we want to store huge amount of information then cookie is not best choice
+= Cookie can hold only string information. If we want to store non-string objects them we should not use cookies
+= Cookie information is stored at client side and hence there is no security to such-data (especially private or confidential-data)
+= Everytime with every client-request, browser will send all cookies related to that application to server and there-by it creates network traffic problems
+= There is a limit on the max number of cookies supported by browser per server-application (ex:- 256/512/etc...depends on server also)
+=** To overcome all those limitations we should go for sessions
+
+
+
+

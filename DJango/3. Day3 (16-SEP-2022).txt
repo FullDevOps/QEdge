@@ -1,0 +1,110 @@
+==>> ****Introduction to DJango****
+----------------------------------------
+= Django is Python Framework, using which we develop Dynamic Web-Apps
+(Web-App means website)
+(Website is coll.of.webpages)
+Ex:-
+	www.gmail.com (website)
+		= Inbox-page (Webpage)
+		= Sent-items page
+		= Drafts page
+		= Spam page
+		= Trash page
+		....etc
+
+=>** Framework means Pre-defined-Lib + Runtime-Environment
+(Pre-defined-Lib is Python-Django-Modules(pkgs))
+(Runtime-Environment is DJango Live Development Server)
+
+
+=>> DJango Tech-Points:-
+= Django is a free and open-source web-development framework
+= It is written & developed in Python only
+= It follows the Model-View-TempIate (MVT) architectural pattern
+= It is maintained by the Django Software Foundation (DSF)
+= Django is used by several top websites like
+	Youtube,
+	Google,
+	Dropbox,
+	Yahoo Maps,
+	Mozilla,
+	Instagram,
+	Washington-Post,
+	Nasa
+	etc
+
+=**> Other Popular Examples,
+(refer-notes)
+= https://www.shuup.com/articles/25-of-the-most-popular-python-and-django-websites/
+= http://ddi-dev.com/blog/programming/top-sites-built-django-framework/
+= https://djangostars.com/blog/10-popular-sites-made-on-django/
+
+
+--------------------------
+****History of DJango****
+--------------------------
+= Diango was created in 2003 as an "internal project" for web-app development 
+= It was created at "Lowrence-Journal-World", News-Paper-company for  own their website development
+= The Original authors of Django Framework are: 
+(it was created by)
+	Adrian Holovaty, 
+	Simon Willison 
+
+=** Later in 2005(July 21st), it was released to IT-Developers as Open-Source-Framework
+(Before releasing to developers, Heavy Testing was done on DJango-Framework to with hold heavy network-traffic-users)
+(Network-Traffic means no.of.client-request to Web-App Server)
+
+NOTE:-
+(name Django)
+= Django was named in the memory of 
+Guitarist "Django Reinhardt"
+= Official website for DJango-Framework:
+		"www.djangoproject.com"
+
+
+
+
+==>> Top 5 Features of Diango Framework:-
+--------------------------------------------------
+= Django was invented to meet news-updates for clients quick & fast
+= DJango provided web-app development requirements to different Web developers(programmers)
+
+= The following are main important features of Django,
+i) Fast:-
+= Using Django we can design & Develop web-apps very Quick in short-time
+
+2) Fully loaded Features:-
+= Django provides lots of extra-features for developing web-apps
+Ex:-
+	User authentication,
+	Content administration,
+	Site maps,
+	RSS feeds,
+	etc...
+	
+3) Security:-
+= Django Framework provides security features like,
+	Ex:-
+		SQL injection, 
+		cross-site scripting, 
+		cross-site request forgery,
+		click-jacking,
+		User accounts and passwords mgmt,
+		etc...
+		
+4) Scalability:-
+= DJango Web-Apps are capable of providing services to heavy client-requests on internet
+(network-traffic-users)
+
+5) Versatile:-
+= DJango Web-apps provide flexible sharing content from one app to another very simple & easy
+
+
+NOTE:-
+(Commercial web-apps & Enterprise web-apps)
+= Finally, Django is specially designed web application framework, the most commonly required activities will takes care automatically by Diango and Hence Developer's task will be simplified and we can develop applications very easily
+= As Django invented at news paper,clear documentation is available including sample polling application
+= https://docs.djangoproject.com/en/2.1/contents/
+
+
+

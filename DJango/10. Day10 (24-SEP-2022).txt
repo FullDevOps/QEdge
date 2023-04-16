@@ -1,0 +1,350 @@
+***Working with URL-pattern at Application-Level::-
+==Diagram==
+-----------------------------------------------------------
+==>> How to define URL Patterns at Application Level instead of Project Level???
+
+= Basically, a 1-Django-project can have multiple applications
+Ex:-
+	FirstProject(FirstApp/MultiViewsApp/App1/App2)
+==Diagram==
+
+= Here, each application has multiple views(functions)
+= And we define, mulitple-url-patterns for all views of all different-applications inside "urls.py" file of our-project(FirstProject-conf-folder)
+
+= When App's increases, its views also increases
+= In this case, it is difficult to maintain all urls in Main-Project-Folder(urls.py)
+Ex:-
+	from FirstApp import views as v1;
+	from MultiViewsApp import views as v2;
+	from App1 import views as v3;
+	from App2 import views as v4;
+	...etc
+(here every App has views.py and importing them with aliases(v1,v2,v3,v4,...) creates confusions in request path() function, url(), re_path() functions)
+
+=> Solution??
+= We can define url-patterns at application level only
+= But, for every application we have to create a separate urls.py file separately and define all that particular-application urls in that file-only
+= Finally, link these application-level urls.py files to project-level(FirstProject) "urls.py" file by using "include()" method
+
+==>>> Programming-EXAMPLE::-
+-----------------------------
+Step-1) 
+Create a new-Project ("DemoProject")
+F:\SAISIR\DJANGO>django-admin startproject DemoProject
+
+Step-2)
+Create our own Applications
+cmd\DemoProject> py manage.py startapp DemoApp1
+cmd\DemoProject> py manage.py startapp DemoApp2 
+
+Step-3)
+Add our apps(DemoApp1,DemoApp2), to the DemoProject inside "settings.py" file (proj-conf-folder)
+Ex:-
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+	"DemoApp1",
+	"DemoApp2",
+];
+
+Step-4)
+Define View Functions in "views.py" of DemoApp1, DemoApp2
+Ex:-
+DemoApp1 (views.py)
+--------------------
+from django.shortcuts import render;
+from django.http import HttpResponse
+
+#Create your views here...
+def f1(request): 
+	return HttpResponse("<h1>Hello from DemoApp1 f1()</h1><hr />"); 
+def f2(request): 
+	return HttpResponse("<h1>Hello from DemoApp1 f2()</h1><hr />"); 
+
+Ex:-
+DemoApp2 (views.py)
+-------------------- 
+from django.shortcuts import render;
+from django.http import HttpResponse
+
+#Create your views here...
+def f3(request): 
+	return HttpResponse("<h1>Hello from DemoApp2 f3()</h1><hr />"); 
+def f4(request): 
+	return HttpResponse("<h1>Hello from DemoApp2 f4()</h1><hr />"); 
+
+Step-5)
+Create a seperate urls.py file inside both applications
+"DemoApp1/urls.py"
+Ex1:- 
+"DemoApp1/urls.py" (Create a new-file)
+------------------
+#DemoApp1/urls.py file
+
+from django.conf.urls import url;	#old
+from django.urls import path;	#new
+from django.urls import re_path;
+from DemoApp1 import views;
+
+urlpatterns = [ 
+	path('first/', views.f1), 
+	path('second/', views.f2),
+];
+
+
+Ex:- 
+"DemoApp2/urls.py" (Create a new-file)
+-------------------
+#DemoApp2/urls.py
+
+from django.conf.urls import url;	#old
+from django.urls import path;	#new
+from django.urls import re_path;
+
+from DemoApp2 import views;
+
+urlpatterns = [ 
+	path('third/', views.f3), 
+	path('fourth/', views.f4),
+];
+
+
+Step-6)***
+= Include these application-level "urls.py"(DemoApp1,DemoApp2) inside project-level(DemoProject) "urls.py" file
+(using include() function in main urls.py)
+Ex:-
+from django.contrib import admin
+from django.conf.urls import url #old
+from django.urls import path	#new
+from django.conf.urls import include;
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+	path("DemoApp1/",include("DemoApp1.urls")),
+	path("DemoApp2/",include("DemoApp2.urls"))
+]
+ 
+Step-7)
+= Run Server,
+cmd\DemoProject> py manage.py runserver 
+
+Step-8)
+= Send the Request, using given-urls (Application-URL is compulsory)
+Ex:-
+	http://127.0.0.1:8000/DemoApp1/first/
+	http://127.0.0.1:8000/DemoApp1/second/
+	(or)
+	http://127.0.0.1:8000/DemoApp2/third/
+	http://127.0.0.1:8000/DemoApp2/fourth/
+
+
+
+(***)
+NOTE: 
+= We can see reusability of application in other project just with only 2-lines addition 
+Ex:-
+	settings.py -->add application(url) name  (DemoApp1,DemoApp2)
+	urls.py --->just add:  path("DemoApp1/",include("DemoApp1.urls")),
+	(***no-need to configure separate url-patterns in every project)
+
+=> Advantage::-
+= To define urlpatterns at application-level instead of project level,
+a) Reusability of Django-Applications across multiple-projects
+b) Project level urls.py file will be more readable for update/modify
+
+
+==> No-URL, UnKnown-URL,default-URL, missing-URL::-
+NOTE:-
+(no-url or default-url or unknown-url patterns)
+Main-Project-Folder(urls.py)
+-----------------------------
+from django.urls import path;
+from django.conf.urls import url;
+from django.urls import re_path;
+from DemoApp1 import views;
+
+urlpatterns = [
+	....
+	....
+#path('$',views.homepage),   #no-url-view
+#url('^.*$',views.homepage), #no-url/unknown
+#re_path('$',views.homepage),  #no-url-view 
+
+re_path('^.*$',views.homepage),  #use-this-only***
+];
+
+=>
+#DemoApp1/views.py 
+-------------------------------   
+def homepage(request): 
+	return HttpResponse("<h1>Hello from Demo-Project Home-page(default-view)</h1><hr />"); 
+
+
+
+
+==> Another-Project
+------------------------
+(App-Level URLS in Project-Level-Urls)::-
+Step-1) 
+Create a new-Project ("SampleProject")
+D:\SAISIR\DJANGO>django-admin startproject SampleProject
+
+Step-2)
+Create our own Applications
+cmd\SampleProject> py manage.py startapp SampleApp1
+cmd\SampleProject> py manage.py startapp SampleApp2 
+
+Step-3)
+Add our apps(SampleApp1,SampleApp2), to the SampleProject inside "settings.py" file
+Ex:-
+INSTALLED_APPS = [
+    .....
+	.....
+	"SampleApp1",
+	"SampleApp2",
+];
+
+Step-4)
+Define View Functions in "views.py" of SampleApp1, SampleApp2
+Ex:-
+SampleApp1 (views.py)
+--------------------
+from django.shortcuts import render;
+from django.http import HttpResponse
+
+#Create your views here...
+def f11(request): 
+	return HttpResponse("<h1>Hello from SampleApp1 f11()</h1><hr />"); 
+def f22(request): 
+	return HttpResponse("<h1>Hello from SampleApp1 f22()</h1><hr />"); 
+
+Ex:-
+SampleApp2 (views.py)
+-------------------- 
+from django.shortcuts import render;
+from django.http import HttpResponse
+
+#Create your views here...
+def f33(request): 
+	return HttpResponse("<h1>Hello from SampleApp2 f33()</h1><hr />"); 
+def f44(request): 
+	return HttpResponse("<h1>Hello from SampleApp2 f44()</h1><hr />"); 
+
+Step-5)
+Create a seperate urls.py file inside both applications
+"SampleApp1/urls.py"
+Ex1:- 
+"SampleApp1/urls.py"
+------------------
+#SampleApp1/urls.py file
+
+from django.conf.urls import url;	#old
+from django.urls import path;	#new
+from django.urls import re_path;
+from SampleApp1 import views;
+
+urlpatterns = [ 
+	path('one/', views.f11), 
+	path('two/', views.f22),
+];
+
+
+Ex:- 
+"SampleApp2/urls.py"
+-------------------
+#SampleApp2/urls.py
+
+from django.conf.urls import url;	#old
+from django.urls import path;	#new
+from django.urls import re_path;
+
+from SampleApp2 import views;
+
+urlpatterns = [ 
+	path('three/', views.f33), 
+	path('four/', views.f44),
+];
+
+
+Step-6)**
+= Include these application-level "urls.py"(SampleApp1,SampleApp2) inside project-level(SampleProject) "urls.py" file
+Ex:-
+from django.contrib import admin
+from django.conf.urls import url #old
+from django.urls import path	#new
+from django.conf.urls import include;
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+	path("SApp1/",include("SampleApp1.urls")),
+	path("SApp2/",include("SampleApp2.urls"))
+
+=*** Here App-name & it's URL-name may not be same(it is not compulsory)
+Ex:-
+	SampleApp1 (SApp1/ is url-pattern)
+	SampleApp2 (SApp2/ is url-pattern)
+
+ 
+Step-7)
+= Run Server,
+cmd\SampleProject> py manage.py runserver 
+
+Step-8)
+= Send the Request, using given-urls (Application-URL is compulsory)
+Ex:-
+	http://localhost:8000/SApp1/one/
+	http://localhost:8000/SApp1/two/
+	(or)
+	http://localhost:8000/SApp2/three/
+	http://localhost:8000/SApp2/four/
+
+
+===>>>
+NOTE:-
+(How to configure no-URL or default-URL for SampleProject)
+
+Step1:-
+SampleProject(urls.py)
+----------------------------
+from django.urls import re_path	#new
+from SampleApp1 import views;
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+	path("SApp1/",include("SampleApp1.urls")),
+	path("SApp2/",include("SampleApp2.urls")),
+    
+    re_path('^.*$',views.homepage),#no-url or def-url
+]
+
+step2:- (SampleApp1/urls.py
+------------
+def homepage(request):
+    return HttpResponse("<h1>Hello from SampleProject Homepage...!!!</h1><hr />");
+
+Step3:-
+= request no-URL or default-URL in browser
+	http://localhost:8000/	(no-URL)
+	http://localhost:8000/any
+	http://localhost:8000/SApp1/hi	(any-URL)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

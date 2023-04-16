@@ -1,0 +1,526 @@
+***(DJANGO CRUD Operations)***
+
+==>>> Class Based Views And CRUD Operations By Using Both CBVs And FBVs::-
+
+I)
+==>Class Based Views(CBVs)::
+
+=> Django Views-types::-
+= There are 2-types of views
+	1. Function Based Views
+	2. Class Based Views
+
+Note::-(Imp-points)CBV
+1. Class Based Views introduced in Django 1.3 Version to implement Generic Views
+2. When compared with Function Based Views, Class Based views are very easy to use. Hence Class Based Views are most frequently used views in real-time project development
+3***. Internally Class Based Views will be converted into Function based Views only auto by DJ. Hence Class Based Views are simply acts as wrappers to the Function based views to hide complexity
+4. Function Based Views are more powerful when compared with Class Based Views
+
+
+(IQ)
+NOTE::-
+***Explain the Sceneario where we should use Function based Views only and we cannot use Class Based Views?
+= For simple operations like listing of all records or display of a particular record then we should go for Class Based Views
+= For complex operations like handling multiple forms simulataneously then we should go for Function Based views
+
+	
+***CBV HelloWorld-app***
+------------------------------	
+==> HelloWorld Application By using ClassBasedViews::-
+(Create a project(CBVProject) & application(MyApps1))
+Ex:-
+views.py  (MyApps1 main-folder)
+----------------------------------------
+from django.views.generic import View
+from django.http import HttpResponse
+
+# Create your views here.
+class HelloWorldView(View):
+    def get(self,request):
+        ss='''<h1>Hello from Class-Bassed-View</h1>
+        <hr />
+        <h2>Response given for get-method from client</h2>
+        <h3>Have a nice day..!!</h3>
+		<hr />
+        <h4>***ALL THE BEST***</h4>
+        '''
+        return HttpResponse(ss)
+
+NOTE:-
+=***our CBV is inherited from View-class(belongs to django.views.generic pkg/module)
+
+= use get() method in class-based-view, it is executed when client request-method(get) is
+	i) direct URL-request (http://localhost:8000/hello/)
+	ii) Hyperlink (<a href="/hello/">Click-Here</a>)
+	iii) form (<form action="/hello/" method="get">....</form>)
+
+= use post() method in class-based-view, it is executed when client-request-method(post) is
+	i) form (<form action="/hello/" method="post">....</form>)
+	
+	
+Ex:-
+urls.py  (Project main-folder)
+----------------------------------------
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('helloworld/', views.HelloWorldView.as_view()), #***add-in-last
+]
+(depending on get/post request, corresponding get()/post() is executed)
+
+Ex:-
+==>> Now, start or run the project & request below URL,
+http://localhost:8000/
+http://localhost:8000/helloworld/
+
+
+=> Note::-
+(Refer-notes)
+1) While defining Class Based Views we have to extend View-class from "django.views.generic" module
+2) To provide response to GET request from client, Django will always call get() method from CBV. Hence we have to override this method from base-class(View) to provide response to the GET request.
+Similarly for other HTTP Methods also like POST, HEAD, PUT, DELETE etc...
+3) While defining url pattern we have to use as_view() method from CBV instead of get() or post() specific-methods for client-request
+(depending on get/post request from client from view-class corresponding method is executed auto DJ-Frwk...)
+
+
+***Imp-concept***
+==> Template Based Application by using Class-Based-Views:-
+Ex:-
+----------------------------
+from django.views.generic import TemplateView
+class TemplateCBV(TemplateView):
+	template_name = "MyApps1/home.html"
+----------------------------
+**= make-sure "home.html" is available in "templates/MyApps1" folder
+
+=> How to send Context Paramters:-
+(Context-Paramters means dynamic-data from views to template(.html file))
+Ex:-
+from django.views.generic import TemplateView
+class TemplateCBV(TemplateView):
+	template_name = "MyApps1/home.html"
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+		context['name'] = 'Sai'
+		context['age'] = 23
+		context['height'] = 6.2
+		return context;
+
+**= make-sure "home.html" is available in "templates/MyApps1" folder
+**=  get_context_data() is used to send dynamic-data from views to template-file using context-dict-var
+
+Ex:- Finally,
+=> In template-file(home.html), we can access context-dict parameters as follows (using template-var-tags {{var}})
+Ex:-
+	{{name}}
+	{{age}}
+	{{height}}
+
+
+##Program to demo Template based app with Class-Based-Views
+Ex:-
+views.py (MyApps1 main-folder)
+---------------------------------
+from django.views.generic import TemplateView
+class TemplateCBV(TemplateView):
+	template_name = "MyApps1/home.html"
+	def get_context_data(self, **kwargs):
+		context = super().get_context_data(**kwargs)
+        
+		context['name'] = 'Sai'
+		context['age'] = 23
+		context['height'] = 6.2
+		return context;
+
+(here our class is inherited from TemplateView-class, it belongs to django.views.generic module)
+(here in TemplateView-class, we dont have get() or post() for giving response)
+(it is auto. template_name(file) is sent as response to client-request with given context-dict-data for either get/post)
+
+Ex:-
+home.html (under templates/MyApps1 folder)
+---------------------------------------------
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home-Page Template CBV</title>
+</head>
+<body>
+    <h1>Welcome to Home-Page Template CBV</h1>
+    <hr />
+    <h2>Have a nice day!!</h2>
+    <h3>***All the Best***</h3>
+    <hr />
+    <h4>Welcome user : {{name}}</h4>
+    <h5>Your age : {{age}}</h5>
+    <h6>Height : {{height}}</h6>
+    <hr />
+</body>
+</html>
+
+		
+Ex:-
+urls.py  (Project main-folder)
+----------------------------------------
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('helloworld/', views.HelloWorldView.as_view()),
+	
+    path('home/', views.TemplateCBV.as_view()),	#***add-in-last
+]
+
+Ex:-
+==>> Now, start or run the project & request below URL,
+http://localhost:8000/
+http://localhost:8000/home/
+
+
+
+---------------------------------------------------------------------
+==> Advanced CBV views::-
+--------------------------
+***==>ListView for CBV::-
+= It is predefined class from "django.views.generic" pkg
+= this class provides data from db-models(Tables), for presentation in html-list-format
+= We can use ListView-class to list out all the records from database table(model i.e, models.py)
+****= It is alternative to ORM-code use in FBVs, 
+Syntax:-
+	ModelClassName.objects.all()
+Ex:-(in views.py)
+	emplist=Employee.objects.all() #for Employee model
+	studlist=Student.objects.all() #for Student model
+	-----------------------------------------------------
+	dict1 = {'studlist':studlist}
+	render(request,'MyApps1/student.html',context=dict1)
+	------------------------------------------------------
+(getting data from django-models(models.py) into views.py, is done with model-object Ex:- Employee/Student)
+
+NOTE:-
+= Here no need to use above stmts in views.py to get data from DB to views.py
+= Simple write model=Employee (or) model=Student
+
+
+##Program
+***Start-Coding***
+(use project->CBVProject & app->MyApps1)
+---------------------------------------------
+#Program to work with ListView for CBV
+Ex:-
+==> models.py: (MyApps1 main-folder)
+MySQL-DB (myapps1_book table in db)
+----------------------------------------
+from django.db import models
+#Create your models here.
+#ListView
+class Book(models.Model):
+    title=models.CharField(max_length=100)
+    author=models.CharField(max_length=50)
+    pages=models.IntegerField()
+    price=models.FloatField()
+
+
+Ex:-(admin-interface) --> http://localhost:8000/admin/)
+==> admin.py: (MyApps1 main-folder)
+----------------------------------------
+from django.contrib import admin
+from MyApps1.models import Book
+
+# Register your models here.
+class BookAdmin(admin.ModelAdmin):
+    list_display = ["title","author","pages","price"];
+
+admin.site.register(Book, BookAdmin)
+
+
+NOTE:-(DB-steps)
+=> Follow all steps related to models.py(model-class) & MySQL DB-activities
+1) configure DATABESES={...} in settings.py
+Ex:-
+settings.py:(CBVProject)
+-------------------------------
+DATABASES = {
+    #'default': {
+    #    'ENGINE': 'django.db.backends.sqlite3',
+    #    'NAME': BASE_DIR / 'db.sqlite3',
+    #}
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'PORT': '3302',		#3306 or 3308
+        'NAME': 'bookdb',
+        'USER': 'root',
+        'PASSWORD': 'root',
+    }
+}
+(also create "bookdb" mysql-db and keep it ready...)
+mysql> show databases;
+mysql> create database bookdb;
+mysql> show databases;
+mysql> use bookdb;
+mysql> show tables
+
+
+2) install mysqlclient in terminal-tab(py-charm)
+cmd> pip install --only-binary :all: mysqlclient
+Collecting mysqlclient
+  Using cached mysqlclient-2.1.0-cp39-cp39-win_amd64.whl (180 kB)
+Installing collected packages: mysqlclient
+Successfully installed mysqlclient-2.1.0
+
+3) verify mysql-db-connection
+cmd> py manage.py shell
+>>> from django.db import connection
+>>> mycursor = connection.cursor();
+>>> print(mycursor);
+<django.db.backends.utils.CursorDebugWrapper object at 0x000002115A02CD90>
+>>> exit()
+
+4) perform or  make-migrations
+cmd> py manage.py makemigrations
+Migrations for 'MyApps1':
+  MyApps1\migrations\0001_initial.py
+    - Create model Book
+
+5) sql-migrate
+cmd> py manage.py sqlmigrate MyApps1 0001
+--
+-- Create model Book
+--
+CREATE TABLE `MyApps1_book` (`id` bigint AUTO_INCREMENT NOT NULL PRIMARY KEY, `title` varchar(100) NOT NUL
+L, `author` varchar(50) NOT NULL, `pages` integer NOT NULL, `price` double precision NOT NULL);
+
+6) run migrate
+cmd> py manage.py migrate
+Operations to perform:
+  Apply all migrations: MyApps1, admin, auth, contenttypes, sessions
+Running migrations:
+  Applying MyApps1.0001_initial... OK
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying sessions.0001_initial... OK
+
+=** Also verify in mysql-db,
+mysql> show tables;
++----------------------------+
+| Tables_in_bookdb           |
++----------------------------+
+| auth_group                 |
+| auth_group_permissions     |
+| auth_permission            |
+| auth_user                  |
+| auth_user_groups           |
+| auth_user_user_permissions |
+| django_admin_log           |
+| django_content_type        |
+| django_migrations          |
+| django_session             |
+| myapps1_book               |
++----------------------------+
+11 rows in set (0.10 sec)
+
+7) create superuser
+cmd> py manage.py createsuperuser
+(uname:sai, pwd:sai)
+Username (leave blank to use 'office'): sai
+Email address: sai@gmail.com
+Password: sai
+Password (again): sai
+The password is too similar to the username.
+This password is too short. It must contain at least 8 characters.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+8) Run server & login to below-url,
+http://localhost:8000/admin/
+(select books-link(model/table) under MyApps1 & perform add/update/del operations as per your requirement...)
+===add-3-records===
+
+9) also verify records in mysql-db
+mysql> select * from myapps1_book;
++----+--------+---------+-------+-------+
+| id | title  | author  | pages | price |
++----+--------+---------+-------+-------+
+|  1 | Python | Sai sir |   500 |  1500 |
+|  2 | Java   | Sai sir |   350 |  1200 |
+|  3 | Django | Sai sir |   650 |  1800 |
++----+--------+---------+-------+-------+
+3 rows in set (0.00 sec)
+
+
+Ex:-
+==> views.py: (MyApps1 main-folder)
+----------------------------------------
+#ListView
+from MyApps1.models import Book
+from django.views.generic import ListView
+#Create your views here.
+class BookListView(ListView):
+	model=Book;		#book_list=Book.objects.all();
+
+
+(automatically 4-things happens)
+i) we get book_list context-var(dict1={'book_list':book_list})
+ii) we get book_list.html file
+iii) we can use Book-class(vars) directly in template
+({{title}},{{author}},{{pages}},{{price}})
+iv) automatically, return render() also happens...
+(return render(request,"MyApps1/book.html",context=dict1);
+
+**NOW,
+==>>How to create Template-File(.html) for ListView::
+= Django will auto.identify template-file automatically and we are not required to configure anywhere. But Django will always search for template file with the name as follows,
+Syntax:-
+	modelclassname_list.html 
+Ex:-
+	book_list.html
+	
+=*** Django will always search for template file in the following location(Folder).
+      [projectname/(appname)/templates/appname/]
+Ex:- CBVProject/(MyApps1)/templates/MyApps1/book_list.html
+(it is optional, use directly templates/MyApps1 folder)
+
+Note: 
+= by default django will provide context-dict-object to the template(.html) file with the name: 
+Syntax:-
+	"modelclassname_list"
+Ex:-
+	book_list (contains all the records of book-objs)
+
+Ex:-
+book_list.html (MyApps1/templates/MyApps1 folder) (or)
+(CBVProject/templates/MyApps1 folder)
+------------------------------------------
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>CBV ListView</title>
+    </head>
+    <body>
+        <h1>All Books Information(book_list.html)</h1>
+        <hr/>
+        {% if book_list %}
+            {% for book in book_list%}
+                <ul>
+                    <li> <strong>Title</strong> : {{book.title}}</li>
+                    <li> <strong>Author</strong> : {{book.author}}</li>
+                    <li> <strong>Pages</strong> : {{book.pages}}</li>
+                    <li> <strong>Price</strong> : {{book.price}}</li>
+                </ul>
+            <hr>
+            {%endfor%}
+        {% else %}
+            <p>No Books information Found..!!!</p>
+        {% endif %}
+    </body>
+</html>
+
+
+
+Ex:-
+urls.py  (CBVProject main-folder)
+------------------------------------------
+from django.contrib import admin
+from django.urls import path
+from MyApps1 import views
+
+urlpatterns = [
+    ......
+	......
+    path('booklistview/',views.BookListView.as_view())
+]
+
+Ex:-
+==>> Finally run-server & request below URL,
+http://localhost:8000/booklistview/
+(verify the output...)
+
+
+NOTE::-
+==> How to provide our own context Object Name:-
+= The default context object name is: modelclassname_list (book_list)
+= But we can customize this with our own name based on our requirement as follows,
+Ex:-
+class BooklistView(ListView):
+	context_object_name = 'books'
+	model = Book
+(use in views.py)
+(use same in book_list.html file)
+
+Ex:-(comments in Django-Template-Language)
+		{% comment %}{% if book_list %} {% endcomment %}
+        {% if books%}
+        {% comment %}{% for book in book_list%} {% endcomment %}
+            {% for book in books%}
+                <ul>
+                    <li> <strong>Title</strong> : {{book.title}}</li>
+                    <li> <strong>Author</strong> : {{book.author}}</li>
+                    <li> <strong>Pages</strong> : {{book.pages}}</li>
+                    <li> <strong>Price</strong> : {{book.price}}</li>
+                </ul>
+            <hr>
+            {%endfor%}
+        {% else %}
+            <p>No Books information Found..!!!</p>
+        {% endif %}
+
+(Now)
+=> How to configure our own Template-File at Project Level::-
+(this approach is not recommended)
+Ex:-
+class BookListView(ListView):
+	context_object_name = 'books'
+	model = Book
+	template_name = 'MyApps1/books.html'
+(use in views.py)
+(use same-program(book_list.html) in books.html file under templates/MyApps1 folder)
+Ex:-
+books.html (templates/MyApps1 folder)
+---------------------------------------
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>CBV ListView</title>
+    </head>
+    <body>
+        <h1>All Books Information(books.html)</h1>
+        <hr/>
+        {% comment %}{% if book_list %} {% endcomment %}
+        {% if books%}
+        {% comment %}{% for book in book_list%} {% endcomment %}
+            {% for book in books%}
+                <ul>
+                    <li> <strong>Title</strong> : {{book.title}}</li>
+                    <li> <strong>Author</strong> : {{book.author}}</li>
+                    <li> <strong>Pages</strong> : {{book.pages}}</li>
+                    <li> <strong>Price</strong> : {{book.price}}</li>
+                </ul>
+            <hr>
+            {%endfor%}
+        {% else %}
+            <p>No Books information Found..!!!</p>
+        {% endif %}
+    </body>
+</html>
+
+**Note:- 
+= Even if we are not specifying template_name variable, still django can recognize project level template file. But name should be modelclassname_list.html (book_list.html)
+
+
