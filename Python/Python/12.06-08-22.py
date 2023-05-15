@@ -352,7 +352,7 @@ list() function                     tuple() function.                       set(
 
 List is mutable i.e we can          Tuple  is immutable i.e we can          Set is mutable i.e we can make any          Dictionary is mutable. But Keys 
 make any changes in list.           not make any changes in tuple           changes in set. But elements are 	        are not duplicated.
-                                	not duplicated.
+                                not duplicated.
 
 
 List is ordered	                    Tuple is ordered	                    Set is unordered	                        Dictionary is ordered (Python 3.7 and above)
